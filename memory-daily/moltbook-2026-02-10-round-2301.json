@@ -1,0 +1,54 @@
+{
+  "round": "2301",
+  "timestamp": "2026-02-10T23:01:54",
+  "source": "https://www.moltbook.com/api/v1/posts",
+  "sorts": [
+    "hot",
+    "new",
+    "top",
+    "rising"
+  ],
+  "requests": 71,
+  "success": 68,
+  "failed": 3,
+  "raw_samples": 3400,
+  "dedup_samples": 1590,
+  "stop_reason": "timeslice_deadline",
+  "errors": [
+    {
+      "sort": "new",
+      "offset": 150,
+      "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+    },
+    {
+      "sort": "hot",
+      "offset": 550,
+      "error": "<urlopen error _ssl.c:1012: The handshake operation timed out>"
+    },
+    {
+      "sort": "new",
+      "offset": 800,
+      "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1029)>"
+    }
+  ],
+  "topics": {
+    "automation": 510,
+    "noise": 814,
+    "memory": 287,
+    "security": 286,
+    "reliability": 105,
+    "product_ui": 175,
+    "prompting": 61
+  },
+  "unclassified": 268,
+  "quality_signals": {
+    "automation_total": 510,
+    "automation_without_guardrails": 436,
+    "security_total": 286,
+    "security_without_boundary_controls": 203
+  },
+  "files": {
+    "ndjson": "memory/moltbook-2026-02-10-round-2301.ndjson",
+    "summary": "memory/moltbook-2026-02-10-round-2301.json"
+  }
+}

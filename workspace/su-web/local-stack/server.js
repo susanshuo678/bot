@@ -46,6 +46,8 @@ function now() { return Date.now(); }
 let bootstrapCache = null;
 let bootstrapEtagCache = null;
 let bootstrapBodyCache = null;
+const bootstrapFilteredCache = new Map();
+const BOOTSTRAP_FILTERED_CACHE_MAX = 20;
 const BOOTSTRAP_CACHE_TTL_MS = 2000;
 const PUBLIC_API_CACHE_CONTROL = 'public, max-age=15, stale-while-revalidate=60, must-revalidate';
 let latestDataUpdatedAtCache = { ts: 0, value: null };
@@ -80,23 +82,36 @@ function getBootstrapPayload() {
 function getBootstrapPayloadByCategory(category = '', scope = 'strict') {
   const key = String(category || '').trim().toLowerCase();
   if (!key) return getBootstrapPayload();
+
+  const normalizedScope = scope !== 'strict' ? 'with-all' : 'strict';
+  const dataVer = getLatestDataUpdatedAt() || 'none';
+  const cacheKey = `${key}::${normalizedScope}::${dataVer}`;
+  const hit = bootstrapFilteredCache.get(cacheKey);
+  if (hit) return hit;
+
   const base = getBootstrapPayload();
-  const allowAll = scope !== 'strict';
+  const allowAll = normalizedScope === 'with-all';
   const cards = (base.cards || []).filter(item => {
     const cat = String(item?.category || '').trim().toLowerCase();
     if (allowAll && cat === 'all') return true;
     return cat === key;
   });
-  return {
+  const payload = {
     ...base,
     cards,
     meta: {
       ...(base.meta || {}),
-      filter: { category: key, scope: allowAll ? 'with-all' : 'strict' },
+      filter: { category: key, scope: normalizedScope },
       totalCardsBeforeFilter: Array.isArray(base.cards) ? base.cards.length : 0,
       cardsAfterFilter: cards.length
     }
   };
+  bootstrapFilteredCache.set(cacheKey, payload);
+  if (bootstrapFilteredCache.size > BOOTSTRAP_FILTERED_CACHE_MAX) {
+    const oldest = bootstrapFilteredCache.keys().next().value;
+    if (oldest) bootstrapFilteredCache.delete(oldest);
+  }
+  return payload;
 }
 
 function getBootstrapEtag(data) {
@@ -295,6 +310,7 @@ function invalidateBootstrapCache() {
   bootstrapCache = null;
   bootstrapEtagCache = null;
   bootstrapBodyCache = null;
+  bootstrapFilteredCache.clear();
   latestDataUpdatedAtCache = { ts: 0, value: null };
   sortedCollectionCache.clear();
   enabledCardsCache.ver = '';
@@ -322,6 +338,7 @@ function invalidateBootstrapCache() {
   emptySummaryCache.clear();
   textMediaBalanceCache.ver = '';
   textMediaBalanceCache.data = null;
+  dateIntegrityCache.clear();
 }
 
 function pruneInternalCaches() {
@@ -353,6 +370,10 @@ function pruneInternalCaches() {
   if (emptySummaryCache.size > 12) {
     const keys = [...emptySummaryCache.keys()];
     for (let i = 0; i < keys.length - 12; i++) emptySummaryCache.delete(keys[i]);
+  }
+  if (dateIntegrityCache.size > 12) {
+    const keys = [...dateIntegrityCache.keys()];
+    for (let i = 0; i < keys.length - 12; i++) dateIntegrityCache.delete(keys[i]);
   }
 }
 
@@ -491,6 +512,7 @@ const recentUpdateFeedCache = new Map();
 const opsScoreCache = { ver: '', data: null };
 const emptySummaryCache = new Map();
 const textMediaBalanceCache = { ver: '', data: null };
+const dateIntegrityCache = new Map();
 
 function backupFilePath(file) {
   return `${file}.bak`;
@@ -1984,6 +2006,76 @@ function fillCardsUpdatedAt() {
   return { updated, total: list.length };
 }
 
+function getCardDateIntegrity(limit = 20) {
+  const safeLimit = Math.min(100, Math.max(1, Number(limit) || 20));
+  const ver = `${getFileVersionKey(FILES.cards)}::${safeLimit}`;
+  const hit = dateIntegrityCache.get(ver);
+  if (hit) return hit;
+  const list = getSortedCollection('cards').filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const invalidUpdated = [];
+  const invalidCreated = [];
+  const futureUpdated = [];
+  for (const card of list) {
+    const createdAt = String(card.createdAt || '').trim();
+    const updatedAt = String(card.updatedAt || '').trim();
+    const cts = Date.parse(createdAt);
+    const uts = Date.parse(updatedAt);
+    if (!Number.isFinite(cts)) invalidCreated.push({ id: String(card.id || ''), title: String(card.title || ''), createdAt });
+    if (!Number.isFinite(uts)) invalidUpdated.push({ id: String(card.id || ''), title: String(card.title || ''), updatedAt });
+    if (Number.isFinite(uts) && uts > nowMs + 5 * 60 * 1000) futureUpdated.push({ id: String(card.id || ''), title: String(card.title || ''), updatedAt });
+  }
+  const data = {
+    generatedAt: new Date().toISOString(),
+    total: list.length,
+    invalidCreatedCount: invalidCreated.length,
+    invalidUpdatedCount: invalidUpdated.length,
+    futureUpdatedCount: futureUpdated.length,
+    invalidCreated: invalidCreated.slice(0, safeLimit),
+    invalidUpdated: invalidUpdated.slice(0, safeLimit),
+    futureUpdated: futureUpdated.slice(0, safeLimit)
+  };
+  dateIntegrityCache.set(ver, data);
+  return data;
+}
+
+function normalizeCardDates() {
+  const list = readJson(FILES.cards, []);
+  let updated = 0;
+  const nowIso = new Date().toISOString();
+  const next = list.map(item => {
+    let createdAt = String(item.createdAt || '').trim();
+    let updatedAt = String(item.updatedAt || '').trim();
+    const cts = Date.parse(createdAt);
+    const uts = Date.parse(updatedAt);
+    let changed = false;
+
+    if (!Number.isFinite(cts)) {
+      createdAt = Number.isFinite(uts) ? new Date(uts).toISOString() : nowIso;
+      changed = true;
+    }
+    if (!Number.isFinite(uts)) {
+      updatedAt = createdAt || nowIso;
+      changed = true;
+    }
+    const c2 = Date.parse(createdAt);
+    const u2 = Date.parse(updatedAt);
+    if (Number.isFinite(c2) && Number.isFinite(u2) && u2 < c2) {
+      updatedAt = createdAt;
+      changed = true;
+    }
+    if (!changed) return item;
+    updated++;
+    return { ...item, createdAt, updatedAt };
+  });
+
+  if (updated > 0) {
+    writeJson(FILES.cards, next);
+    invalidateBootstrapCache();
+  }
+  return { updated, total: list.length };
+}
+
 function fillMissingCategory() {
   const list = readJson(FILES.cards, []);
   let updated = 0;
@@ -3030,6 +3122,19 @@ if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
   if (u.pathname === '/api/admin/cards/fill-category' && req.method === 'POST') {
     if (!auth(req,res)) return;
     const result = fillMissingCategory();
+    return send(res, 200, JSON.stringify({ ok: true, ...result }));
+  }
+
+  if (u.pathname === '/api/admin/cards/date-integrity' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(100, Math.max(1, Number(u.searchParams.get('limit') || 20)));
+    const data = getCardDateIntegrity(limit);
+    return sendJsonWithEtag(req, res, data, 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/date-normalize' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = normalizeCardDates();
     return send(res, 200, JSON.stringify({ ok: true, ...result }));
   }
 

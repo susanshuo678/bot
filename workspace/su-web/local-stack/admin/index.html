@@ -92,6 +92,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn" onclick="loadPublishReadiness()">发布就绪检查</button>
           <button class="btn" onclick="loadRecentUpdateFeed()">24h更新清单</button>
           <button class="btn ok" onclick="copyOpsDigest()">复制运营摘要</button>
+          <button class="btn" onclick="copyShiftDigest()">复制值班巡检摘要</button>
           <button class="btn" onclick="exportClaimLinks()">导出可领链接</button>
           <button class="btn" onclick="loadClaimDomainStats()">可领域名分布</button>
           <button class="btn ok" onclick="disableDuplicateCardsByTitle()">一键停用重复标题</button>
@@ -102,6 +103,8 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn ok" onclick="fillMissingButtonText()">补齐按钮文案</button>
           <button class="btn ok" onclick="standardizeButtonText()">按钮文案全量标准化</button>
           <button class="btn" onclick="auditStaleCards()">陈旧内容体检</button>
+          <button class="btn" onclick="loadDateIntegrity()">时间字段体检</button>
+          <button class="btn ok" onclick="normalizeCardDates()">一键修复时间字段</button>
           <button class="btn" onclick="touchStaleCards()">一键刷新陈旧时间</button>
           <button class="btn danger" onclick="disableStaleCards()">一键停用陈旧内容</button>
           <span id="summaryMeta" class="muted"></span>
@@ -158,6 +161,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
         <div id="summaryFillBox" class="muted" style="margin-top:10px"></div>
         <div id="categoryStatsBox" class="muted" style="margin-top:10px"></div>
         <div id="staleCardsBox" class="muted" style="margin-top:10px"></div>
+        <div id="dateIntegrityBox" class="muted" style="margin-top:10px"></div>
         <div id="qualityOverviewBox" class="muted" style="margin-top:10px"></div>
         <div id="textMediaBalanceBox" class="muted" style="margin-top:10px">点击“图文结构分布”查看</div>
         <div id="opsScoreBox" class="muted" style="margin-top:10px"></div>
@@ -176,7 +180,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
 
       <section id="cardsView" class="view panel">
         <h3>优惠卡片管理（标题 + 三行摘要）</h3>
-        <div class="row" style="margin-bottom:8px"><input id="cardSearch" placeholder="搜索卡片（ID/标题/分类/摘要）" oninput="onCardSearchInput()"/><button class="btn" type="button" onclick="clearCardSearch()">清空</button><button class="btn" type="button" onclick="resequenceCardsByCurrentView()">按当前视图重排</button><button class="btn" type="button" onclick="batchDisableBySearch()">按搜索批量停用</button><button class="btn ok" type="button" onclick="batchEnableBySearch()">按搜索批量启用</button><button class="btn" type="button" onclick="batchMoveCategoryBySearch()">按搜索批量改分类</button><button class="btn ok" type="button" onclick="touchCardsBySearch()">按搜索刷新更新时间</button></div>
+        <div class="row" style="margin-bottom:8px"><input id="cardSearch" placeholder="搜索卡片（ID/标题/分类/摘要）" oninput="onCardSearchInput()"/><button class="btn" type="button" onclick="clearCardSearch()">清空</button><label class="muted" style="display:flex;align-items:center;gap:6px;padding:0 6px">仅看启用 <input id="onlyEnabledToggle" type="checkbox" onchange="renderCardsFiltered()"/></label><button class="btn" type="button" onclick="resequenceCardsByCurrentView()">按当前视图重排</button><button class="btn" type="button" onclick="batchDisableBySearch()">按搜索批量停用</button><button class="btn ok" type="button" onclick="batchEnableBySearch()">按搜索批量启用</button><button class="btn" type="button" onclick="batchMoveCategoryBySearch()">按搜索批量改分类</button><button class="btn ok" type="button" onclick="touchCardsBySearch()">按搜索刷新更新时间</button></div>
         <div class="row" style="margin-bottom:8px">
           <input id="searchTargetButtonText" placeholder="搜索结果按钮文案（如：去领取）" style="max-width:220px"/>
           <button class="btn" type="button" onclick="batchUpdateButtonTextBySearch()">按搜索批量改按钮文案</button>
@@ -428,6 +432,7 @@ async function doLogin(){
       loadLinkSummaryGaps();
       loadPublishReadiness();
       loadRecentUpdateFeed();
+      loadDateIntegrity();
       restoreActiveView();
       toast('登录成功');
     } catch(e) {
@@ -595,10 +600,12 @@ document.getElementById('cardSearch')?.addEventListener('keydown', (e) => {
 
 function renderCardsFiltered(){
   const q=(document.getElementById('cardSearch')?.value||'').trim().toLowerCase();
+  const onlyEnabled = !!document.getElementById('onlyEnabledToggle')?.checked;
   const root=document.getElementById('cards');
   const meta=document.getElementById('cardSearchMeta');
   const tpl=(x,n)=>`<div id='cards-${n?'new':x.id}'><div class='grid'><input data-k='title' placeholder='标题' value='${esc(x.title)}'/><input data-k='category' placeholder='分类key' value='${esc(x.category)}'/></div><textarea data-k='summary' placeholder='三行摘要'>${esc(x.summary)}</textarea><div class='grid3'><input data-k='image' placeholder='图片URL' value='${esc(x.image)}'/><input data-k='video' placeholder='视频URL' value='${esc(x.video)}'/><input data-k='link' placeholder='链接' value='${esc(x.link)}'/></div><div class='grid3'><input data-k='buttonText' placeholder='按钮文案' value='${esc(x.buttonText)}'/><input data-k='order' placeholder='排序' value='${esc(x.order)}'/><label>启用 <input data-k='enabled' type='checkbox' ${x.enabled!==false?'checked':''}/></label></div>${n?`<button class='btn ok' onclick="add('cards','new')">新增卡片</button>`:btns('cards',x.id)}</div>`;
-  const list=q?cardCache.filter(x=>`${x.id||''} ${x.title||''} ${x.category||''} ${x.summary||''}`.toLowerCase().includes(q)):cardCache;
+  const baseList = onlyEnabled ? cardCache.filter(x => x.enabled !== false) : cardCache;
+  const list=q?baseList.filter(x=>`${x.id||''} ${x.title||''} ${x.category||''} ${x.summary||''}`.toLowerCase().includes(q)):baseList;
   const fingerprint = `${q}::${list.length}::${cardCache.length}::${list.map(x=>`${x.id}|${x.title||''}|${x.category||''}|${x.order||''}|${x.enabled!==false}`).join(',')}`;
   if (fingerprint === lastCardRenderFingerprint && q === lastCardRenderQuery) {
     if (meta) meta.textContent = `显示 ${list.length} / ${cardCache.length}`;
@@ -877,6 +884,38 @@ async function loadRecentCards(){
 
 
 
+async function loadDateIntegrity(){
+  const box = document.getElementById('dateIntegrityBox');
+  if (box) box.innerHTML = '时间字段体检中...';
+  try {
+    const r = await req('/api/admin/cards/date-integrity?limit=8', 'GET');
+    const badCreated = Array.isArray(r.invalidCreated) ? r.invalidCreated : [];
+    const badUpdated = Array.isArray(r.invalidUpdated) ? r.invalidUpdated : [];
+    const futureUpdated = Array.isArray(r.futureUpdated) ? r.futureUpdated : [];
+    const renderList = (arr, label) => arr.length
+      ? `<div>${label}（展示前 ${arr.length} 条）</div><ul>${arr.map(x=>`<li><code>${esc(x.id||'')}</code> ${esc(x.title||'未命名')} · ${esc(x.updatedAt || x.createdAt || '-')}</li>`).join('')}</ul>`
+      : `<div class='muted'>${label}：无</div>`;
+    if (box) box.innerHTML = `<div>总卡片 ${r.total||0} · createdAt异常 ${r.invalidCreatedCount||0} · updatedAt异常 ${r.invalidUpdatedCount||0} · 未来时间 ${r.futureUpdatedCount||0}</div>${renderList(badCreated,'createdAt 异常')} ${renderList(badUpdated,'updatedAt 异常')} ${renderList(futureUpdated,'未来时间异常')}`;
+    toast('时间字段体检完成');
+  } catch (e) {
+    if (box) box.innerHTML = `<span style="color:#ffb4b4">时间字段体检失败：${esc(e?.message||'网络异常')}</span>`;
+    toast(`时间字段体检失败：${e?.message || '网络异常'}`);
+  }
+}
+
+async function normalizeCardDates(){
+  if(!confirm('确认修复 createdAt/updatedAt 异常？会自动补齐缺失值并校正更新时间早于创建时间的问题。')) return;
+  try {
+    const r = await req('/api/admin/cards/date-normalize', 'POST', {});
+    toast(`时间字段修复完成：更新 ${r.updated||0}/${r.total||0}`);
+    loadAll();
+    refreshSummary();
+    loadDateIntegrity();
+  } catch (e) {
+    toast(`时间字段修复失败：${e?.message || '网络异常'}`);
+  }
+}
+
 async function loadUpdatedRange(){
   const box = document.getElementById('updatedRangeBox');
   if (box) box.innerHTML = '更新时间分布加载中...';
@@ -1012,7 +1051,32 @@ async function copyOpsDigest(){
   }
 }
 
-async function loadClaimDomainStats(){
+async function copyShiftDigest(){
+  try {
+    const [runtime, health, summary] = await Promise.all([
+      req('/api/admin/runtime-metrics', 'GET'),
+      req('/api/admin/health-check', 'GET'),
+      req('/api/admin/cards/quick-insights', 'GET')
+    ]);
+    const caches = runtime?.caches || {};
+    const totals = summary?.totals || {};
+    const lines = [
+      `# 值班巡检摘要`,
+      `- 生成时间: ${new Date().toLocaleString('zh-CN', {hour12:false})}`,
+      `- 服务运行: ${runtime?.uptimeSec || 0}s，RSS ${runtime?.memoryRssMb || 0}MB，Heap ${runtime?.memoryHeapUsedMb || 0}/${runtime?.memoryHeapTotalMb || 0}MB`,
+      `- 数据健康: 异常链接 ${health?.invalidLinks || 0}，文件检查 ${Array.isArray(health?.files) ? health.files.length : 0} 项`,
+      `- 内容概览: 启用 ${totals?.enabled || 0}，可领 ${totals?.claimable || 0}，24h更新 ${totals?.updated24h || 0}`,
+      `- 缓存状态: cardSearch ${caches.cardSearch || 0}，recentCards ${caches.recentCards || 0}，staticBr ${caches.staticBr || 0}，staticGzip ${caches.staticGzip || 0}`
+    ];
+    const ok = await copyText(lines.join('\n'));
+    if (!ok) throw new Error('剪贴板不可用');
+    toast('值班巡检摘要已复制');
+  } catch (e) {
+    toast(`复制值班巡检摘要失败：${e?.message || '网络异常'}`);
+  }
+}
+
+async function loadClaimDomainStats(){ 
   const box = document.getElementById('claimDomainBox');
   if (box) box.innerHTML = '可领域名分布加载中...';
   try {
@@ -1428,7 +1492,9 @@ async function exportCategoryData(){
 }
 async function resequenceCardsByCurrentView(){
   const q=(document.getElementById('cardSearch')?.value||'').trim().toLowerCase();
-  const list=q?cardCache.filter(x=>`${x.id||''} ${x.title||''} ${x.category||''} ${x.summary||''}`.toLowerCase().includes(q)):cardCache;
+  const onlyEnabled = !!document.getElementById('onlyEnabledToggle')?.checked;
+  const baseList = onlyEnabled ? cardCache.filter(x => x.enabled !== false) : cardCache;
+  const list=q?baseList.filter(x=>`${x.id||''} ${x.title||''} ${x.category||''} ${x.summary||''}`.toLowerCase().includes(q)):baseList;
   if(!list.length) return toast('当前视图没有可重排的卡片');
   if(!confirm(`确认重排当前视图中的 ${list.length} 张卡片顺序？`)) return;
   try {
