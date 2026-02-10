@@ -434,7 +434,8 @@ function writeJson(file, data) {
   return true;
 }
 function send(res, status, body, type = 'application/json; charset=utf-8', method = 'GET') {
-  res.writeHead(status, {
+  const payload = Buffer.isBuffer(body) ? body : Buffer.from(String(body || ''), 'utf8');
+  const headers = {
     'Content-Type': type,
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET,HEAD,POST,PUT,DELETE,OPTIONS',
@@ -443,10 +444,12 @@ function send(res, status, body, type = 'application/json; charset=utf-8', metho
     'X-Frame-Options': 'SAMEORIGIN',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
-    'Cache-Control': 'no-store'
-  });
+    'Cache-Control': 'no-store',
+    'Content-Length': payload.length
+  };
+  res.writeHead(status, headers);
   if (method === 'HEAD') return res.end();
-  res.end(body);
+  res.end(payload);
 }
 
 function getCachedCompressedAsset(filePath, stat, encoding = 'gzip') {
@@ -1023,6 +1026,27 @@ function touchCardsUpdatedAtByCategory(category = '') {
   return { updated, total, category: cat, updatedAt: nowIso };
 }
 
+
+function touchCardsUpdatedAtByIds(ids = []) {
+  const idSet = new Set(Array.isArray(ids) ? ids.map(x => String(x || '').trim()).filter(Boolean) : []);
+  if (!idSet.size) return { updated: 0, requested: 0 };
+  const list = readJson(FILES.cards, []);
+  const nowIso = new Date().toISOString();
+  let updated = 0;
+  const next = list.map(item => {
+    const id = String(item.id || '').trim();
+    if (!idSet.has(id)) return item;
+    const createdAt = String(item.createdAt || '').trim() || nowIso;
+    updated++;
+    return { ...item, createdAt, updatedAt: nowIso };
+  });
+  if (updated > 0) {
+    writeJson(FILES.cards, next);
+    invalidateBootstrapCache();
+  }
+  return { updated, requested: idSet.size, updatedAt: nowIso };
+}
+
 function appendTrackingToUrl(rawUrl, params = {}) {
   const raw = String(rawUrl || '').trim();
   if (!raw || raw === '#') return raw;
@@ -1109,6 +1133,31 @@ function getCardCategoryStats() {
   categoryStatsCache.ver = ver;
   categoryStatsCache.data = rows;
   return rows;
+}
+
+function getAdminCategoryOptions() {
+  const tabs = getSortedCollection('tabs');
+  const cards = getSortedCollection('cards');
+  const byCategory = new Map();
+  for (const card of cards) {
+    const key = String(card.category || '').trim() || 'all';
+    if (!byCategory.has(key)) byCategory.set(key, { key, count: 0, enabled: 0, fromTab: false, name: key });
+    const row = byCategory.get(key);
+    row.count++;
+    if (card.enabled !== false) row.enabled++;
+  }
+  for (const tab of tabs) {
+    const key = String(tab.key || '').trim();
+    if (!key) continue;
+    if (!byCategory.has(key)) byCategory.set(key, { key, count: 0, enabled: 0, fromTab: true, name: String(tab.name || key) });
+    const row = byCategory.get(key);
+    row.fromTab = true;
+    row.name = String(tab.name || key);
+  }
+  return {
+    updatedAt: getLatestDataUpdatedAt(),
+    rows: [...byCategory.values()].sort((a, b) => b.count - a.count || a.key.localeCompare(b.key))
+  };
 }
 
 function getRecentCards(limit = 10) {
@@ -1706,6 +1755,11 @@ const backend = http.createServer((req, res) => {
     }, 'private, max-age=3, stale-while-revalidate=15');
   }
 
+  if (u.pathname === '/api/admin/cards/category-options' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getAdminCategoryOptions(), 'private, max-age=5, stale-while-revalidate=30');
+  }
+
   if (u.pathname === '/api/admin/validate-links' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     const invalid = collectInvalidLinks();
@@ -1837,6 +1891,19 @@ const backend = http.createServer((req, res) => {
       return send(res, 200, JSON.stringify({ ok: true, ...result }));
     }).catch((err)=>handleParseError(res, err));
   }
+
+  if (u.pathname === '/api/admin/cards/touch-by-search' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    return parseBody(req).then(({ query, category, limit }) => {
+      const q = String(query || '').trim();
+      const cat = String(category || '').trim();
+      const matched = searchCardsForAdmin(q, cat, limit || 500);
+      const ids = Array.isArray(matched.items) ? matched.items.map(x => String(x.id || '')).filter(Boolean) : [];
+      const result = touchCardsUpdatedAtByIds(ids);
+      return send(res, 200, JSON.stringify({ ok: true, matched: matched.total || 0, ...result }));
+    }).catch((err)=>handleParseError(res, err));
+  }
+
 
 if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
     if (!auth(req,res)) return;
