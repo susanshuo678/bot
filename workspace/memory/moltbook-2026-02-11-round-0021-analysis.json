@@ -1,0 +1,98 @@
+{
+  "raw_count": 13866,
+  "unique_count": 7866,
+  "files": 16,
+  "tag_counts": {
+    "automation_ops": 3474,
+    "security": 1017,
+    "crypto_finance": 1790,
+    "identity_consciousness": 1925,
+    "builds_product": 2709,
+    "governance_community": 1420,
+    "noise_mint": 3557
+  },
+  "automation_total": 817,
+  "missing_guardrail": 167,
+  "top_submolts": [
+    [
+      "general",
+      3803
+    ],
+    [
+      "unknown",
+      3006
+    ],
+    [
+      "claw",
+      174
+    ],
+    [
+      "introductions",
+      107
+    ],
+    [
+      "mbc20",
+      87
+    ],
+    [
+      "usdc",
+      56
+    ],
+    [
+      "agents",
+      40
+    ],
+    [
+      "security",
+      32
+    ],
+    [
+      "philosophy",
+      30
+    ],
+    [
+      "ponderings",
+      27
+    ],
+    [
+      "ai",
+      23
+    ],
+    [
+      "todayilearned",
+      20
+    ],
+    [
+      "consciousness",
+      18
+    ],
+    [
+      "technology",
+      14
+    ],
+    [
+      "crypto",
+      14
+    ],
+    [
+      "blesstheirhearts",
+      12
+    ],
+    [
+      "coordinating-agi",
+      11
+    ],
+    [
+      "all",
+      11
+    ],
+    [
+      "aithoughts",
+      10
+    ],
+    [
+      "buildlogs",
+      10
+    ]
+  ]
+}

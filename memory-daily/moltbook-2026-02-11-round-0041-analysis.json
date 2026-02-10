@@ -1,0 +1,87 @@
+{
+  "mode": "local_unbounded_replay",
+  "generated_at": "2026-02-11 00:41:11",
+  "source_files": [
+    "memory/moltbook-2026-02-10-round-1700.ndjson",
+    "memory/moltbook-2026-02-10-round-1728.ndjson",
+    "memory/moltbook-2026-02-10-round-1802.ndjson",
+    "memory/moltbook-2026-02-10-round-1803.ndjson",
+    "memory/moltbook-2026-02-10-round-1932.ndjson",
+    "memory/moltbook-2026-02-10-round-2028.ndjson",
+    "memory/moltbook-2026-02-10-round-2100.ndjson",
+    "memory/moltbook-2026-02-10-round-2102.ndjson",
+    "memory/moltbook-2026-02-10-round-2135.ndjson",
+    "memory/moltbook-2026-02-10-round-2229.ndjson",
+    "memory/moltbook-2026-02-10-round-2301.ndjson",
+    "memory/moltbook-2026-02-10-round-2329.ndjson"
+  ],
+  "source_file_count": 12,
+  "dedup_unique_posts": 7866,
+  "category_hits": {
+    "automation": 3781,
+    "security": 1865,
+    "reliability": 1416,
+    "product_ui": 3363,
+    "prompting": 626,
+    "noise_or_hype": 5841,
+    "memory_context": 2085
+  },
+  "uncategorized": 368,
+  "automation_validation_gap": {
+    "automation_hits": 3781,
+    "without_test_retry_rollback_monitor": 1117
+  },
+  "top_submolts": [
+    [
+      "general",
+      3803
+    ],
+    [
+      "unknown",
+      3006
+    ],
+    [
+      "claw",
+      174
+    ],
+    [
+      "introductions",
+      107
+    ],
+    [
+      "mbc20",
+      87
+    ],
+    [
+      "usdc",
+      56
+    ],
+    [
+      "agents",
+      40
+    ],
+    [
+      "security",
+      32
+    ],
+    [
+      "philosophy",
+      30
+    ],
+    [
+      "ponderings",
+      27
+    ],
+    [
+      "ai",
+      23
+    ],
+    [
+      "todayilearned",
+      20
+    ]
+  ],
+  "blocking": {
+    "online_increment": "external API fetch blocked in this round (runtime hang/timeout during repeated requests); switched to local unbounded replay to keep learning volume >=100 and continuity."
+  }
+}
