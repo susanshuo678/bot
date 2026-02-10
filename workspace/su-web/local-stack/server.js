@@ -36,6 +36,11 @@ const UPLOAD_WINDOW_MS = 60 * 1000;
 const UPLOAD_MAX_PER_WINDOW = 20;
 const UPLOAD_ATTEMPTS_MAX_KEYS = 5000;
 
+const bootstrapHits = new Map();
+const BOOTSTRAP_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const BOOTSTRAP_RATE_LIMIT_MAX = 180;
+const BOOTSTRAP_HITS_MAX_KEYS = 5000;
+
 function now() { return Date.now(); }
 
 let bootstrapCache = null;
@@ -352,10 +357,53 @@ function pruneLoginAttempts() {
     for (let i = 0; i < keys.length - LOGIN_ATTEMPTS_MAX_KEYS; i++) loginAttempts.delete(keys[i]);
   }
 }
+
+function pruneBootstrapHits() {
+  const t = now();
+  for (const [ip, hits] of bootstrapHits.entries()) {
+    const fresh = hits.filter(ts => t - ts < BOOTSTRAP_RATE_LIMIT_WINDOW_MS);
+    if (fresh.length) bootstrapHits.set(ip, fresh);
+    else bootstrapHits.delete(ip);
+  }
+  if (bootstrapHits.size > BOOTSTRAP_HITS_MAX_KEYS) {
+    const keys = [...bootstrapHits.keys()];
+    for (let i = 0; i < keys.length - BOOTSTRAP_HITS_MAX_KEYS; i++) bootstrapHits.delete(keys[i]);
+  }
+}
+
+function canHitBootstrap(ip) {
+  const t = now();
+  const bucket = (bootstrapHits.get(ip) || []).filter(ts => t - ts < BOOTSTRAP_RATE_LIMIT_WINDOW_MS);
+  if (bucket.length >= BOOTSTRAP_RATE_LIMIT_MAX) {
+    const oldest = bucket[0] || t;
+    const resetSec = Math.max(1, Math.ceil((BOOTSTRAP_RATE_LIMIT_WINDOW_MS - (t - oldest)) / 1000));
+    bootstrapHits.set(ip, bucket);
+    return { ok: false, remaining: 0, resetSec };
+  }
+  const next = [...bucket, t];
+  bootstrapHits.set(ip, next);
+  const oldest = next[0] || t;
+  const resetSec = Math.max(1, Math.ceil((BOOTSTRAP_RATE_LIMIT_WINDOW_MS - (t - oldest)) / 1000));
+  return { ok: true, remaining: Math.max(0, BOOTSTRAP_RATE_LIMIT_MAX - next.length), resetSec };
+}
+
+function applyBootstrapRateLimit(req, res) {
+  const ip = getClientIp(req);
+  const state = canHitBootstrap(ip);
+  res.setHeader('X-RateLimit-Limit', String(BOOTSTRAP_RATE_LIMIT_MAX));
+  res.setHeader('X-RateLimit-Remaining', String(state.remaining));
+  res.setHeader('X-RateLimit-Reset', String(state.resetSec));
+  if (state.ok) return true;
+  res.setHeader('Retry-After', String(state.resetSec));
+  send(res, 429, JSON.stringify({ error: '请求过于频繁，请稍后重试', retryAfterSec: state.resetSec }), 'application/json; charset=utf-8', req.method);
+  return false;
+}
+
 setInterval(() => {
   pruneTokens();
   pruneLoginAttempts();
   pruneUploadAttempts();
+  pruneBootstrapHits();
   pruneInternalCaches();
 }, 10 * 60 * 1000).unref();
 
@@ -1378,6 +1426,42 @@ function getCardsQuickInsights() {
   };
 }
 
+function getCardsWeeklySnapshot(limit = 8) {
+  const safeLimit = Math.min(30, Math.max(3, Number(limit) || 8));
+  const cards = getSortedCollection('cards');
+  const enabledCards = cards.filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+  const recent = enabledCards
+    .map(item => {
+      const ts = Date.parse(String(item.updatedAt || item.createdAt || ''));
+      return {
+        id: String(item.id || ''),
+        title: String(item.title || ''),
+        category: String(item.category || ''),
+        hasClaim: !!String(item.link || '').trim() && String(item.link || '').trim() !== '#',
+        updatedAt: Number.isFinite(ts) ? new Date(ts).toISOString() : ''
+      };
+    })
+    .filter(item => !!item.updatedAt)
+    .sort((a, b) => (Date.parse(b.updatedAt) || 0) - (Date.parse(a.updatedAt) || 0));
+
+  const updated7d = recent.filter(x => (nowMs - (Date.parse(x.updatedAt) || 0)) <= weekMs);
+  const claimable7d = updated7d.filter(x => x.hasClaim).length;
+
+  return {
+    generatedAt: new Date().toISOString(),
+    totals: {
+      enabled: enabledCards.length,
+      updated7d: updated7d.length,
+      claimable7d,
+      updated7dRate: enabledCards.length ? Math.round((updated7d.length / enabledCards.length) * 100) : 0
+    },
+    topUpdated: recent.slice(0, safeLimit)
+  };
+}
+
 function getCardsQualityOverview() {
   const ver = getFileVersionKey(FILES.cards);
   if (qualityOverviewCache.data && qualityOverviewCache.ver === ver) return qualityOverviewCache.data;
@@ -1949,6 +2033,47 @@ function autoFixInvalidLinks() {
   return { fixed };
 }
 
+function normalizeSchemelessUrl(raw = '') {
+  const v = String(raw || '').trim();
+  if (!v) return '';
+  if (v.startsWith('//')) return `https:${v}`;
+  if (/^www\.[^\s]+/i.test(v)) return `https://${v}`;
+  return v;
+}
+
+function autoFixSchemelessLinks() {
+  const checks = [
+    { file: 'ads', fields: ['link', 'image'] },
+    { file: 'shortcuts', fields: ['link', 'icon'] },
+    { file: 'cards', fields: ['link', 'image', 'video'] }
+  ];
+  let fixed = 0;
+
+  for (const check of checks) {
+    const list = readJson(FILES[check.file], []);
+    let changed = false;
+    const next = list.map(item => {
+      const copy = { ...item };
+      for (const f of check.fields) {
+        if (!(f in copy)) continue;
+        const oldValue = String(copy[f] || '').trim();
+        if (!oldValue) continue;
+        const normalized = normalizeSchemelessUrl(oldValue);
+        if (normalized === oldValue) continue;
+        if (!isSafeHttpLikeLink(normalized)) continue;
+        copy[f] = normalized;
+        fixed++;
+        changed = true;
+      }
+      return copy;
+    });
+    if (changed) writeJson(FILES[check.file], next);
+  }
+
+  if (fixed > 0) invalidateBootstrapCache();
+  return { fixed };
+}
+
 const backend = http.createServer((req, res) => {
   const u = new URL(req.url, `http://localhost:${BACKEND_PORT}`);
   if (req.method === 'OPTIONS') return send(res, 204, '');
@@ -1956,6 +2081,7 @@ const backend = http.createServer((req, res) => {
   if (u.pathname === '/health') return send(res, 200, JSON.stringify({ ok: true, service: 'backend', port: BACKEND_PORT, uptimeSec: Math.floor(process.uptime()), tokens: tokens.size, rssMb: Math.round(process.memoryUsage().rss / 1024 / 1024), node: process.version, bootstrapCacheAgeMs: bootstrapCache ? (now() - bootstrapCache.ts) : null }), 'application/json; charset=utf-8', req.method);
   if (u.pathname === '/' || u.pathname === '/admin' || u.pathname === '/admin/' || u.pathname === '/admin/login' || u.pathname === '/admin/login/') return serveFile(req, res, path.join(ROOT, 'admin', 'index.html'));
   if (u.pathname === '/api/bootstrap' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!applyBootstrapRateLimit(req, res)) return;
     return sendBootstrap(req, res);
   }
 
@@ -2050,6 +2176,12 @@ const backend = http.createServer((req, res) => {
     return sendJsonWithEtag(req, res, getCardsQuickInsights(), 'private, max-age=2, stale-while-revalidate=10');
   }
 
+  if (u.pathname === '/api/admin/cards/weekly-snapshot' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(30, Math.max(3, Number(u.searchParams.get('limit') || 8)));
+    return sendJsonWithEtag(req, res, getCardsWeeklySnapshot(limit), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
   if (u.pathname === '/api/admin/cards/quality-overview' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     return sendJsonWithEtag(req, res, getCardsQualityOverview(), 'private, max-age=2, stale-while-revalidate=10');
@@ -2086,6 +2218,12 @@ const backend = http.createServer((req, res) => {
   if (u.pathname === '/api/admin/quick-fix-links' && req.method === 'POST') {
     if (!auth(req,res)) return;
     const result = autoFixInvalidLinks();
+    return send(res, 200, JSON.stringify({ ok: true, fixed: result.fixed }));
+  }
+
+  if (u.pathname === '/api/admin/fix-schemeless-links' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = autoFixSchemelessLinks();
     return send(res, 200, JSON.stringify({ ok: true, fixed: result.fixed }));
   }
 
@@ -2540,6 +2678,7 @@ const frontend = http.createServer((req, res) => {
 
   // one-shot payload for fast first screen
   if (u.pathname === '/api/bootstrap' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!applyBootstrapRateLimit(req, res)) return;
     return sendBootstrap(req, res);
   }
 

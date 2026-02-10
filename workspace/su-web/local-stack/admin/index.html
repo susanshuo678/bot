@@ -61,6 +61,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
         <div class="row" style="margin-bottom:10px">
           <button class="btn" onclick="refreshSummary()">刷新统计</button>
           <button class="btn" onclick="loadQuickInsights()">快速洞察</button>
+          <button class="btn" onclick="loadWeeklySnapshot()">7天快照</button>
           <button class="btn" onclick="loadBootstrapMeta()">Bootstrap体积</button>
           <button class="btn" onclick="loadRuntimeMetrics()">运行态指标</button>
           <button class="btn" onclick="pruneRuntimeCaches()">缓存瘦身</button>
@@ -70,6 +71,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn ok" onclick="repairTabKeys()">自动修复空分类</button>
           <button class="btn" onclick="validateLinks()">链接体检</button>
           <button class="btn ok" onclick="quickFixLinks()">一键修复非法链接</button>
+          <button class="btn ok" onclick="fixSchemelessLinks()">一键补全缺失协议</button>
           <button class="btn" onclick="runHealthCheck()">健康检查</button>
           <button class="btn" onclick="auditCardSummaries()">摘要体检</button>
           <button class="btn ok" onclick="normalizeCardSummaries()">摘要一键规范化</button>
@@ -129,6 +131,10 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
         <div class="panel" style="margin-top:10px">
           <h4 style="margin:0 0 8px">卡片快速洞察（启用卡片）</h4>
           <div id="quickInsightsBox" class="muted">点击“快速洞察”查看</div>
+        </div>
+        <div class="panel" style="margin-top:10px">
+          <h4 style="margin:0 0 8px">7天更新快照</h4>
+          <div id="weeklySnapshotBox" class="muted">点击“7天快照”查看</div>
         </div>
         <div class="muted" style="margin-top:10px"></div>
         <div id="duplicateCheckBox" class="muted" style="margin-top:10px"></div>
@@ -363,6 +369,7 @@ async function doLogin(){
       loadBootstrapMeta();
       loadRuntimeMetrics();
       loadQuickInsights();
+      loadWeeklySnapshot();
       loadQualityOverview();
       loadActionabilitySummary();
       loadPublishReadiness();
@@ -605,6 +612,19 @@ async function quickFixLinks(){
     refreshSummary();
   } catch (e) {
     toast(`修复失败：${e?.message || '网络异常'}`);
+  }
+}
+
+async function fixSchemelessLinks(){
+  if(!confirm('确认补全缺失协议？会将 //example.com 或 www.example.com 自动补成 https://...')) return;
+  try {
+    const r = await req('/api/admin/fix-schemeless-links', 'POST', {});
+    toast(`补全完成：${r.fixed||0} 项`);
+    await validateLinks();
+    loadAll();
+    refreshSummary();
+  } catch (e) {
+    toast(`补全失败：${e?.message || '网络异常'}`);
   }
 }
 
@@ -914,6 +934,27 @@ async function loadQuickInsights(){
   } catch (e) {
     if (box) box.innerHTML = `<span style="color:#ffb4b4">快速洞察加载失败：${esc(e?.message||'网络异常')}</span>`;
     toast(`快速洞察加载失败：${e?.message || '网络异常'}`);
+  }
+}
+
+async function loadWeeklySnapshot(){
+  const box = document.getElementById('weeklySnapshotBox');
+  if (box) box.innerHTML = '7天快照加载中...';
+  try {
+    const r = await req('/api/admin/cards/weekly-snapshot?limit=8', 'GET');
+    const t = r.totals || {};
+    const rows = Array.isArray(r.topUpdated) ? r.topUpdated : [];
+    const list = rows.length
+      ? `<ul>${rows.map((x, i)=>`<li>${i+1}. <code>${esc(x.id||'-')}</code> ${esc(x.title||'未命名')} · ${esc(x.category||'-')} · ${x.hasClaim ? '可领' : '无链接'} · ${esc(x.updatedAt ? new Date(x.updatedAt).toLocaleString('zh-CN', { hour12:false }) : '-')}</li>`).join('')}</ul>`
+      : '<div class="muted">暂无最近更新数据</div>';
+    if (box) box.innerHTML = `
+      <div>7天更新 ${t.updated7d||0}/${t.enabled||0}（覆盖率 ${t.updated7dRate||0}%） · 其中可领 ${t.claimable7d||0}</div>
+      ${list}
+      <div class='muted'>统计时间：${esc(r.generatedAt || '-')}</div>`;
+    toast('7天快照已刷新');
+  } catch (e) {
+    if (box) box.innerHTML = `<span style="color:#ffb4b4">7天快照加载失败：${esc(e?.message||'网络异常')}</span>`;
+    toast(`7天快照加载失败：${e?.message || '网络异常'}`);
   }
 }
 
