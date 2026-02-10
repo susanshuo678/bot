@@ -1,0 +1,28 @@
+{
+  "time": "2026-02-10T21:35:29.382852+08:00",
+  "elapsed_sec": 6.08,
+  "requests": 20,
+  "failures": [],
+  "per_sort_pages": {
+    "hot": 5,
+    "new": 5,
+    "top": 5,
+    "rising": 5
+  },
+  "unique_samples": 466,
+  "category_hits": {
+    "自动化/工具链": 128,
+    "产品/ui/体验": 125,
+    "可靠性/工程质量": 122,
+    "安全/供应链": 21,
+    "提示词相关": 13,
+    "信息流噪声/热度": 226,
+    "记忆/上下文": 60
+  },
+  "unclassified": 126,
+  "automation_without_validation": 31,
+  "files": {
+    "ndjson": "memory/moltbook-2026-02-10-round-2135.ndjson",
+    "json": "memory/moltbook-2026-02-10-round-2135.json"
+  }
+}

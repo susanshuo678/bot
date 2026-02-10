@@ -288,6 +288,9 @@ function invalidateBootstrapCache() {
   updatedRangeCache.data = null;
   duplicateReportCache.ver = '';
   duplicateReportCache.data = null;
+  recentUpdateFeedCache.clear();
+  opsScoreCache.ver = '';
+  opsScoreCache.data = null;
 }
 
 function pruneInternalCaches() {
@@ -311,6 +314,10 @@ function pruneInternalCaches() {
   if (freshnessSummaryCache.size > 12) {
     const keys = [...freshnessSummaryCache.keys()];
     for (let i = 0; i < keys.length - 12; i++) freshnessSummaryCache.delete(keys[i]);
+  }
+  if (recentUpdateFeedCache.size > 20) {
+    const keys = [...recentUpdateFeedCache.keys()];
+    for (let i = 0; i < keys.length - 20; i++) recentUpdateFeedCache.delete(keys[i]);
   }
 }
 
@@ -445,6 +452,8 @@ const actionabilitySummaryCache = { ver: '', data: null };
 const freshnessSummaryCache = new Map();
 const updatedRangeCache = { ver: '', data: null };
 const duplicateReportCache = { ver: '', data: null };
+const recentUpdateFeedCache = new Map();
+const opsScoreCache = { ver: '', data: null };
 
 function backupFilePath(file) {
   return `${file}.bak`;
@@ -1352,6 +1361,57 @@ function getRecentCards(limit = 10) {
 
 
 
+
+
+function getRecentUpdateFeed(hours = 24, limit = 20, enabledOnly = true) {
+  const safeHours = Math.min(24 * 14, Math.max(1, Number(hours) || 24));
+  const safeLimit = Math.min(100, Math.max(1, Number(limit) || 20));
+  const onlyEnabled = enabledOnly !== false;
+  const ver = `${getFileVersionKey(FILES.cards)}::${safeHours}::${safeLimit}::${onlyEnabled ? 1 : 0}`;
+  const hit = recentUpdateFeedCache.get(ver);
+  if (hit) return hit;
+
+  const nowMs = Date.now();
+  const windowMs = safeHours * 60 * 60 * 1000;
+  const cards = getSortedCollection('cards')
+    .filter(item => !onlyEnabled || item.enabled !== false)
+    .map(item => {
+      const ts = Date.parse(String(item.updatedAt || item.createdAt || '')) || 0;
+      return {
+        id: String(item.id || ''),
+        title: String(item.title || ''),
+        category: String(item.category || ''),
+        updatedAt: ts ? new Date(ts).toISOString() : '' ,
+        updatedAgoMs: ts ? Math.max(0, nowMs - ts) : Number.MAX_SAFE_INTEGER,
+        enabled: item.enabled !== false
+      };
+    })
+    .filter(item => item.updatedAgoMs <= windowMs)
+    .sort((a, b) => a.updatedAgoMs - b.updatedAgoMs || a.id.localeCompare(b.id));
+
+  const toAgoText = (ms) => {
+    if (!Number.isFinite(ms) || ms < 0) return '-';
+    const min = Math.floor(ms / (60 * 1000));
+    if (min < 60) return `${min} 分钟前`;
+    const h = Math.floor(min / 60);
+    if (h < 24) return `${h} 小时前`;
+    const d = Math.floor(h / 24);
+    return `${d} 天前`;
+  };
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    hours: safeHours,
+    total: cards.length,
+    items: cards.slice(0, safeLimit).map(item => ({
+      ...item,
+      updatedAgoText: toAgoText(item.updatedAgoMs)
+    }))
+  };
+
+  recentUpdateFeedCache.set(ver, data);
+  return data;
+}
 function getCardActionabilitySummary() {
   const ver = getFileVersionKey(FILES.cards);
   if (actionabilitySummaryCache.data && actionabilitySummaryCache.ver === ver) return actionabilitySummaryCache.data;
@@ -1648,6 +1708,56 @@ function getCardsQualityOverview() {
   return data;
 }
 
+
+function getOpsScoreSummary() {
+  const ver = getFileVersionKey(FILES.cards);
+  if (opsScoreCache.data && opsScoreCache.ver === ver) return opsScoreCache.data;
+
+  const cards = getSortedCollection('cards').filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const metrics = {
+    total: cards.length,
+    withLink: 0,
+    withMedia: 0,
+    fresh7d: 0,
+    missingSummary: 0,
+    missingButtonText: 0
+  };
+
+  for (const card of cards) {
+    const link = String(card.link || '').trim();
+    const summary = String(card.summary || '').trim();
+    const buttonText = String(card.buttonText || '').trim();
+    const hasMedia = !!String(card.image || '').trim() || !!String(card.video || '').trim();
+    const ts = Date.parse(String(card.updatedAt || card.createdAt || ''));
+    if (link && link !== '#') metrics.withLink++;
+    if (hasMedia) metrics.withMedia++;
+    if (Number.isFinite(ts) && (nowMs - ts) <= 7 * 24 * 60 * 60 * 1000) metrics.fresh7d++;
+    if (!summary) metrics.missingSummary++;
+    if (!buttonText) metrics.missingButtonText++;
+  }
+
+  const total = Math.max(1, metrics.total);
+  const score = Math.max(0, Math.min(100,
+    Math.round((metrics.withLink / total) * 40 + (metrics.fresh7d / total) * 25 + (metrics.withMedia / total) * 20 + ((total - metrics.missingSummary) / total) * 10 + ((total - metrics.missingButtonText) / total) * 5)
+  ));
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    score,
+    level: score >= 85 ? 'healthy' : (score >= 70 ? 'watch' : 'risk'),
+    metrics,
+    rates: {
+      linkRate: Math.round((metrics.withLink / total) * 100),
+      fresh7dRate: Math.round((metrics.fresh7d / total) * 100),
+      mediaRate: Math.round((metrics.withMedia / total) * 100)
+    }
+  };
+
+  opsScoreCache.ver = ver;
+  opsScoreCache.data = data;
+  return data;
+}
 
 function getPublishReadinessReport() {
   const cards = getSortedCollection('cards').filter(x => x.enabled !== false);
@@ -2378,6 +2488,11 @@ const backend = http.createServer((req, res) => {
   if (u.pathname === '/api/admin/cards/quality-overview' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     return sendJsonWithEtag(req, res, getCardsQualityOverview(), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/ops-score' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getOpsScoreSummary(), 'private, max-age=2, stale-while-revalidate=10');
   }
 
   if (u.pathname === '/api/admin/cards/summary-short' && (req.method === 'GET' || req.method === 'HEAD')) {

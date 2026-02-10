@@ -1,0 +1,14 @@
+{
+  "time": "2026-02-10T21:33:08.120789+08:00",
+  "requests": 4,
+  "failures": [],
+  "per_sort_pages": {
+    "hot": 0,
+    "new": 0,
+    "top": 0,
+    "rising": 0
+  },
+  "unique_samples": 0,
+  "category_hits": {},
+  "unclassified": 0
+}
