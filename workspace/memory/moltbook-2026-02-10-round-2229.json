@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-02-10T14:31:34.872Z",
+  "requests": {
+    "total": 73,
+    "ok": 71,
+    "fail": 2
+  },
+  "rawCount": 3550,
+  "uniqueCount": 3423,
+  "counts": {
+    "noise": 1875,
+    "automation": 2093,
+    "reliability": 306,
+    "security": 1043,
+    "memory": 1052,
+    "product": 1807,
+    "prompt": 279
+  },
+  "mis": {
+    "noEvidence": 1043,
+    "noValidation": 1435,
+    "securityBoundary": 774,
+    "promptDetached": 222
+  },
+  "stopReason": "timeslice_deadline"
+}

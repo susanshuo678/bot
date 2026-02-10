@@ -77,6 +77,28 @@ function getBootstrapPayload() {
   return data;
 }
 
+function getBootstrapPayloadByCategory(category = '', scope = 'strict') {
+  const key = String(category || '').trim().toLowerCase();
+  if (!key) return getBootstrapPayload();
+  const base = getBootstrapPayload();
+  const allowAll = scope !== 'strict';
+  const cards = (base.cards || []).filter(item => {
+    const cat = String(item?.category || '').trim().toLowerCase();
+    if (allowAll && cat === 'all') return true;
+    return cat === key;
+  });
+  return {
+    ...base,
+    cards,
+    meta: {
+      ...(base.meta || {}),
+      filter: { category: key, scope: allowAll ? 'with-all' : 'strict' },
+      totalCardsBeforeFilter: Array.isArray(base.cards) ? base.cards.length : 0,
+      cardsAfterFilter: cards.length
+    }
+  };
+}
+
 function getBootstrapEtag(data) {
   if (bootstrapEtagCache && bootstrapEtagCache.dataRef === data) return bootstrapEtagCache.etag;
   const etag = `W/"bootstrap-${crypto.createHash('sha1').update(JSON.stringify(data)).digest('hex').slice(0, 16)}"`;
@@ -164,6 +186,7 @@ function sendJsonWithEtag(req, res, data, cacheControl = 'private, max-age=0, mu
       'ETag': etag,
       'Cache-Control': cacheControl,
       'Access-Control-Allow-Origin': '*',
+      'X-Data-Updated-At': getLatestDataUpdatedAt() || '',
       'Vary': 'If-None-Match, Accept-Encoding'
     });
     return res.end();
@@ -205,8 +228,10 @@ function sendJsonWithEtag(req, res, data, cacheControl = 'private, max-age=0, mu
   res.end(encoded.body);
 }
 
-function sendBootstrap(req, res) {
-  const data = getBootstrapPayload();
+function sendBootstrap(req, res, options = {}) {
+  const category = String(options.category || "").trim();
+  const scope = String(options.scope || "strict").trim().toLowerCase();
+  const data = getBootstrapPayloadByCategory(category, scope);
   const etag = getBootstrapEtag(data);
   const cacheControl = PUBLIC_API_CACHE_CONTROL;
   if (etagMatches(req.headers['if-none-match'], etag)) {
@@ -214,6 +239,7 @@ function sendBootstrap(req, res) {
       'ETag': etag,
       'Cache-Control': cacheControl,
       'Access-Control-Allow-Origin': '*',
+      'X-Data-Updated-At': getLatestDataUpdatedAt() || '',
       'Vary': 'If-None-Match, Accept-Encoding'
     });
     return res.end();
@@ -231,6 +257,7 @@ function sendBootstrap(req, res) {
       'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
       'Cache-Control': cacheControl,
       'ETag': etag,
+      'X-Data-Updated-At': getLatestDataUpdatedAt() || '',
       'Vary': 'If-None-Match, Accept-Encoding'
     });
     return res.end();
@@ -254,6 +281,7 @@ function sendBootstrap(req, res) {
     'Permissions-Policy': 'geolocation=(), microphone=(), camera=()',
     'Cache-Control': cacheControl,
     'ETag': etag,
+    'X-Data-Updated-At': getLatestDataUpdatedAt() || '',
     'Vary': 'If-None-Match, Accept-Encoding'
   };
   if (useBr) headers['Content-Encoding'] = 'br';
@@ -292,6 +320,8 @@ function invalidateBootstrapCache() {
   opsScoreCache.ver = '';
   opsScoreCache.data = null;
   emptySummaryCache.clear();
+  textMediaBalanceCache.ver = '';
+  textMediaBalanceCache.data = null;
 }
 
 function pruneInternalCaches() {
@@ -460,6 +490,7 @@ const duplicateReportCache = { ver: '', data: null };
 const recentUpdateFeedCache = new Map();
 const opsScoreCache = { ver: '', data: null };
 const emptySummaryCache = new Map();
+const textMediaBalanceCache = { ver: '', data: null };
 
 function backupFilePath(file) {
   return `${file}.bak`;
@@ -1502,6 +1533,46 @@ function getCardActionabilitySummary() {
   return data;
 }
 
+function getCardsTextMediaBalance() {
+  const ver = getFileVersionKey(FILES.cards);
+  if (textMediaBalanceCache.data && textMediaBalanceCache.ver === ver) return textMediaBalanceCache.data;
+  const cards = getSortedCollection('cards');
+  let textOnly = 0;
+  let mediaOnly = 0;
+  let mixed = 0;
+  let empty = 0;
+  for (const card of cards) {
+    if (card?.enabled === false) continue;
+    const hasMedia = !!String(card?.image || '').trim() || !!String(card?.video || '').trim();
+    const summary = String(card?.summary || '').trim();
+    const bodyText = String(card?.contentHtml || '').replace(/<[^>]+>/g, '').trim();
+    const hasText = !!summary || !!bodyText;
+    if (hasText && hasMedia) mixed += 1;
+    else if (hasText) textOnly += 1;
+    else if (hasMedia) mediaOnly += 1;
+    else empty += 1;
+  }
+  const total = textOnly + mediaOnly + mixed + empty;
+  const ratio = (n) => total ? Number((n * 100 / total).toFixed(1)) : 0;
+  const data = {
+    total,
+    textOnly,
+    mediaOnly,
+    mixed,
+    empty,
+    ratios: {
+      textOnly: ratio(textOnly),
+      mediaOnly: ratio(mediaOnly),
+      mixed: ratio(mixed),
+      empty: ratio(empty)
+    },
+    generatedAt: new Date().toISOString()
+  };
+  textMediaBalanceCache.ver = ver;
+  textMediaBalanceCache.data = data;
+  return data;
+}
+
 function getCardsQuickInsights() {
   const cards = getSortedCollection('cards');
   const enabledCards = cards.filter(x => x.enabled !== false);
@@ -2456,7 +2527,10 @@ const backend = http.createServer((req, res) => {
   if (u.pathname === '/' || u.pathname === '/admin' || u.pathname === '/admin/' || u.pathname === '/admin/login' || u.pathname === '/admin/login/') return serveFile(req, res, path.join(ROOT, 'admin', 'index.html'));
   if (u.pathname === '/api/bootstrap' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!applyBootstrapRateLimit(req, res)) return;
-    return sendBootstrap(req, res);
+    const category = String(u.searchParams.get('category') || '').trim().slice(0, 64);
+    const scopeRaw = String(u.searchParams.get('scope') || 'strict').toLowerCase();
+    const scope = scopeRaw === 'with-all' ? 'with-all' : 'strict';
+    return sendBootstrap(req, res, { category, scope });
   }
 
   if (u.pathname === '/api/login' && req.method === 'POST') {
@@ -2578,6 +2652,11 @@ const backend = http.createServer((req, res) => {
     return sendJsonWithEtag(req, res, getCardsQualityOverview(), 'private, max-age=2, stale-while-revalidate=10');
   }
 
+  if (u.pathname === '/api/admin/cards/text-media-balance' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getCardsTextMediaBalance(), 'private, max-age=3, stale-while-revalidate=20');
+  }
+
   if (u.pathname === '/api/admin/cards/ops-score' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     return sendJsonWithEtag(req, res, getOpsScoreSummary(), 'private, max-age=2, stale-while-revalidate=10');
@@ -2674,6 +2753,7 @@ const backend = http.createServer((req, res) => {
         recentCards: recentCardsCache.size,
         freshnessSummary: freshnessSummaryCache.size,
         emptySummary: emptySummaryCache.size,
+        textMediaBalance: textMediaBalanceCache.data ? 1 : 0,
         staticGzip: staticGzipCache.size,
         staticBr: staticBrCache.size
       },
@@ -3096,7 +3176,10 @@ const frontend = http.createServer((req, res) => {
   // one-shot payload for fast first screen
   if (u.pathname === '/api/bootstrap' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!applyBootstrapRateLimit(req, res)) return;
-    return sendBootstrap(req, res);
+    const category = String(u.searchParams.get('category') || '').trim().slice(0, 64);
+    const scopeRaw = String(u.searchParams.get('scope') || 'strict').toLowerCase();
+    const scope = scopeRaw === 'with-all' ? 'with-all' : 'strict';
+    return sendBootstrap(req, res, { category, scope });
   }
 
   // proxy-like read endpoints so mobile frontend can use same origin (avoid localhost CORS/mixed-content issues)
