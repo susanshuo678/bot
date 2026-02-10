@@ -283,6 +283,7 @@ function invalidateBootstrapCache() {
   claimDomainStatsCache.clear();
   actionabilitySummaryCache.ver = '';
   actionabilitySummaryCache.data = null;
+  freshnessSummaryCache.clear();
   duplicateReportCache.ver = '';
   duplicateReportCache.data = null;
 }
@@ -304,6 +305,10 @@ function pruneInternalCaches() {
   if (claimDomainStatsCache.size > 20) {
     const keys = [...claimDomainStatsCache.keys()];
     for (let i = 0; i < keys.length - 20; i++) claimDomainStatsCache.delete(keys[i]);
+  }
+  if (freshnessSummaryCache.size > 12) {
+    const keys = [...freshnessSummaryCache.keys()];
+    for (let i = 0; i < keys.length - 12; i++) freshnessSummaryCache.delete(keys[i]);
   }
 }
 
@@ -435,6 +440,7 @@ const qualityOverviewCache = { ver: '', data: null };
 const claimLinksCache = new Map();
 const claimDomainStatsCache = new Map();
 const actionabilitySummaryCache = { ver: '', data: null };
+const freshnessSummaryCache = new Map();
 const duplicateReportCache = { ver: '', data: null };
 
 function backupFilePath(file) {
@@ -1462,6 +1468,100 @@ function getCardsWeeklySnapshot(limit = 8) {
   };
 }
 
+function getCardsFreshnessSummary(limit = 6) {
+  const safeLimit = Math.min(20, Math.max(3, Number(limit) || 6));
+  const ver = getFileVersionKey(FILES.cards);
+  const cacheKey = `${ver}:${safeLimit}`;
+  const hit = freshnessSummaryCache.get(cacheKey);
+  if (hit) return hit;
+
+  const cards = getSortedCollection('cards').filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const buckets = { d1: 0, d3: 0, d7: 0, d14: 0, d30: 0, stale30: 0, unknown: 0, claimable: 0 };
+
+  const rows = cards.map(item => {
+    const link = String(item.link || '').trim();
+    const hasClaim = !!link && link !== '#';
+    if (hasClaim) buckets.claimable++;
+    const ts = Date.parse(String(item.updatedAt || item.createdAt || ''));
+    if (!Number.isFinite(ts)) {
+      buckets.unknown++;
+      return {
+        id: String(item.id || ''),
+        title: String(item.title || ''),
+        category: String(item.category || ''),
+        hasClaim,
+        updatedAt: '',
+        daysSinceUpdated: null
+      };
+    }
+    const daysSinceUpdated = Math.max(0, Math.floor((nowMs - ts) / dayMs));
+    if (daysSinceUpdated <= 1) buckets.d1++;
+    if (daysSinceUpdated <= 3) buckets.d3++;
+    if (daysSinceUpdated <= 7) buckets.d7++;
+    if (daysSinceUpdated <= 14) buckets.d14++;
+    if (daysSinceUpdated <= 30) buckets.d30++;
+    if (daysSinceUpdated > 30) buckets.stale30++;
+    return {
+      id: String(item.id || ''),
+      title: String(item.title || ''),
+      category: String(item.category || ''),
+      hasClaim,
+      updatedAt: new Date(ts).toISOString(),
+      daysSinceUpdated
+    };
+  });
+
+  const mostStale = rows
+    .filter(x => Number.isFinite(x.daysSinceUpdated))
+    .sort((a, b) => (b.daysSinceUpdated || 0) - (a.daysSinceUpdated || 0))
+    .slice(0, safeLimit);
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    totals: {
+      enabled: cards.length,
+      ...buckets,
+      claimableRate: cards.length ? Math.round((buckets.claimable / cards.length) * 100) : 0,
+      unknownRate: cards.length ? Math.round((buckets.unknown / cards.length) * 100) : 0
+    },
+    mostStale
+  };
+  freshnessSummaryCache.set(cacheKey, data);
+  return data;
+}
+
+function getCardsShortSummary(limit = 80, maxLen = 20) {
+  const safeLimit = Math.min(300, Math.max(1, Number(limit) || 80));
+  const safeMaxLen = Math.min(120, Math.max(5, Number(maxLen) || 20));
+  const cards = getSortedCollection('cards');
+  const rows = cards
+    .filter(item => item.enabled !== false)
+    .map(item => {
+      const summary = String(item.summary || '').replace(/\s+/g, ' ').trim();
+      if (!summary || summary.length > safeMaxLen) return null;
+      return {
+        id: String(item.id || ''),
+        title: String(item.title || ''),
+        category: String(item.category || ''),
+        summary,
+        summaryLength: summary.length,
+        hasClaim: !!String(item.link || '').trim() && String(item.link || '').trim() !== '#',
+        updatedAt: String(item.updatedAt || item.createdAt || '').trim()
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.summaryLength - b.summaryLength || (Date.parse(b.updatedAt) || 0) - (Date.parse(a.updatedAt) || 0));
+
+  return {
+    generatedAt: new Date().toISOString(),
+    maxLen: safeMaxLen,
+    total: rows.length,
+    rows: rows.slice(0, safeLimit)
+  };
+}
+
 function getCardsQualityOverview() {
   const ver = getFileVersionKey(FILES.cards);
   if (qualityOverviewCache.data && qualityOverviewCache.ver === ver) return qualityOverviewCache.data;
@@ -1633,6 +1733,7 @@ function pruneAllRuntimeCaches() {
     sortedCollection: sortedCollectionCache.size,
     cardSearch: cardSearchCache.size,
     recentCards: recentCardsCache.size,
+    freshnessSummary: freshnessSummaryCache.size,
     staticGzip: staticGzipCache.size,
     staticBr: staticBrCache.size,
     tokens: tokens.size,
@@ -1660,6 +1761,7 @@ function pruneAllRuntimeCaches() {
     sortedCollection: sortedCollectionCache.size,
     cardSearch: cardSearchCache.size,
     recentCards: recentCardsCache.size,
+    freshnessSummary: freshnessSummaryCache.size,
     staticGzip: staticGzipCache.size,
     staticBr: staticBrCache.size,
     tokens: tokens.size,
@@ -2182,9 +2284,22 @@ const backend = http.createServer((req, res) => {
     return sendJsonWithEtag(req, res, getCardsWeeklySnapshot(limit), 'private, max-age=2, stale-while-revalidate=10');
   }
 
+  if (u.pathname === '/api/admin/cards/freshness-summary' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(20, Math.max(3, Number(u.searchParams.get('limit') || 6)));
+    return sendJsonWithEtag(req, res, getCardsFreshnessSummary(limit), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
   if (u.pathname === '/api/admin/cards/quality-overview' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     return sendJsonWithEtag(req, res, getCardsQualityOverview(), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/summary-short' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(300, Math.max(1, Number(u.searchParams.get('limit') || 80)));
+    const maxLen = Math.min(120, Math.max(5, Number(u.searchParams.get('maxLen') || 20)));
+    return sendJsonWithEtag(req, res, getCardsShortSummary(limit, maxLen), 'private, max-age=2, stale-while-revalidate=10');
   }
 
   if (u.pathname === '/api/admin/cards/publish-readiness' && (req.method === 'GET' || req.method === 'HEAD')) {
@@ -2263,6 +2378,7 @@ const backend = http.createServer((req, res) => {
         sortedCollection: sortedCollectionCache.size,
         cardSearch: cardSearchCache.size,
         recentCards: recentCardsCache.size,
+        freshnessSummary: freshnessSummaryCache.size,
         staticGzip: staticGzipCache.size,
         staticBr: staticBrCache.size
       },
