@@ -120,6 +120,12 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <input id="searchTargetButtonText" placeholder="搜索结果按钮文案（如：去领取）" style="max-width:220px"/>
           <button class="btn" type="button" onclick="batchUpdateButtonTextBySearch()">按搜索批量改按钮文案</button>
         </div>
+        <div class="row" style="margin-bottom:8px">
+          <input id="utmSource" placeholder="utm_source（如：telegram）" style="max-width:200px"/>
+          <input id="utmMedium" placeholder="utm_medium（如：social）" style="max-width:200px"/>
+          <input id="utmCampaign" placeholder="utm_campaign（如：feb_campaign）" style="max-width:220px"/>
+          <button class="btn" type="button" onclick="batchAppendTrackingBySearch()">按搜索批量加UTM</button>
+        </div>
         <p id="cardSearchMeta" class="muted" style="margin:0 0 6px">显示 0 / 0（快捷键：Ctrl/Cmd+K 聚焦，Esc 清空）</p>
         <div class="row" style="margin-bottom:8px">
           <input id="bulkCategoryKey" placeholder="按分类批量启停（category key）"/>
@@ -227,7 +233,7 @@ function toast(text){
 }
 async function req(url,m='GET',b,auth=true){
   const method = String(m || 'GET').toUpperCase();
-  const isIdempotent = method === 'GET' || method === 'HEAD' || method === 'PUT' || method === 'DELETE';
+  const isIdempotent = method === 'GET' || method === 'HEAD';
   const maxAttempts = isIdempotent ? 2 : 1;
   let lastErr = null;
 
@@ -365,7 +371,7 @@ docEditor.addEventListener('paste', async (e)=>{
   toast(ok===files.length ? `已粘贴插入 ${ok} 个文件` : `已粘贴插入 ${ok}/${files.length} 个文件（部分失败）`);
 });
 
-function btns(api,id){return `<div class='row'><button class='btn' onclick="save('${api}','${id}')">保存</button><button class='btn' onclick="editDoc('${id}')">编辑文档</button><button class='btn danger' onclick="del('${api}','${id}')">删除</button></div>`}
+function btns(api,id){return `<div class='row'><button class='btn' onclick="save('${api}','${id}')">保存</button>${api==='cards'?`<button class='btn' onclick="cloneCard('${id}')">克隆</button>`:''}<button class='btn' onclick="editDoc('${id}')">编辑文档</button><button class='btn danger' onclick="del('${api}','${id}')">删除</button></div>`}
 async function save(api,id){const btn=document.activeElement;const box=document.getElementById(`${api}-${id}`);const data=Object.fromEntries([...box.querySelectorAll('[data-k]')].map(i=>[i.dataset.k, i.type==='checkbox'?i.checked:i.value]));await runWithButton(btn,'保存中...',async()=>{await req(`/api/${api}/${id}`,'PUT',data);clearDirty();toast('保存成功');loadAll();});}
 async function del(api,id){
   if(!confirm(`确认删除 ${api} / ${id} ?`)) return;
@@ -375,6 +381,19 @@ async function del(api,id){
   toast('删除成功');
   loadAll();});
 }
+
+async function cloneCard(id){
+  if(!id) return;
+  const btn=document.activeElement;
+  await runWithButton(btn,'克隆中...',async()=>{
+    const r = await req('/api/admin/cards/clone','POST',{ id });
+    clearDirty();
+    toast(`已克隆：${r.newId || ''}`);
+    loadAll();
+    refreshSummary();
+  });
+}
+
 async function add(api,tempId){const btn=document.activeElement;const box=document.getElementById(`${api}-${tempId}`);const data=Object.fromEntries([...box.querySelectorAll('[data-k]')].map(i=>[i.dataset.k, i.type==='checkbox'?i.checked:i.value]));await runWithButton(btn,'新增中...',async()=>{await req(`/api/${api}`,'POST',data);clearDirty();toast('新增成功');loadAll();});}
 
 function editDoc(id){const c=cardCache.find(x=>x.id===id);if(!c) return; editingCardId.value=c.id; editingCardTitle.value=c.title||''; docEditor.innerHTML=c.contentHtml||c.contentMd||''; showView('editorView', document.querySelector('.m[data-view="editorView"]')); window.scrollTo({top:0,behavior:'smooth'});}
@@ -857,6 +876,25 @@ async function batchUpdateButtonTextBySearch(){
     loadAll();
   } catch (e) {
     toast(`批量改按钮文案失败：${e?.message||'网络异常'}`);
+  }
+}
+
+async function batchAppendTrackingBySearch(){
+  const list = getFilteredCardsBySearch();
+  if(!list.length) return toast('先输入关键词再批量加UTM');
+  const utmSource = (document.getElementById('utmSource')?.value || '').trim();
+  const utmMedium = (document.getElementById('utmMedium')?.value || '').trim();
+  const utmCampaign = (document.getElementById('utmCampaign')?.value || '').trim();
+  if(!utmSource && !utmMedium && !utmCampaign) return toast('至少填写一个 UTM 参数');
+  if(!confirm(`确认给命中的 ${list.length} 张卡片链接批量追加/覆盖 UTM 参数？`)) return;
+  try {
+    const ids = list.map(x=>x.id).filter(Boolean);
+    const r = await req('/api/admin/cards/batch-append-tracking','POST',{ ids, utmSource, utmMedium, utmCampaign });
+    toast(`批量加UTM完成：更新 ${r.updated||0}/${r.requested||ids.length}`);
+    loadAll();
+    refreshSummary();
+  } catch (e) {
+    toast(`批量加UTM失败：${e?.message||'网络异常'}`);
   }
 }
 
