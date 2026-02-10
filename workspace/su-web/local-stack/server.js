@@ -384,13 +384,19 @@ function writeJson(file, data) {
   const tmp = `${file}.tmp-${process.pid}-${Date.now()}`;
   const backup = backupFilePath(file);
   const content = JSON.stringify(data, null, 2);
+  let oldContent = null;
   if (fs.existsSync(file)) {
+    try { oldContent = fs.readFileSync(file, 'utf8'); } catch {}
+    if (oldContent === content) {
+      return false;
+    }
     rotateBackups(file);
     try { fs.copyFileSync(file, backup); } catch {}
   }
   fs.writeFileSync(tmp, content, 'utf8');
   fs.renameSync(tmp, file);
   jsonReadCache.delete(file);
+  return true;
 }
 function send(res, status, body, type = 'application/json; charset=utf-8', method = 'GET') {
   res.writeHead(status, {
@@ -911,6 +917,27 @@ function toggleCardsEnabledByCategory(category = '', enabled = true) {
   return { updated, total: list.filter(x => String(x.category || '').trim() === cat).length, category: cat, enabled: nextEnabled };
 }
 
+function touchCardsUpdatedAtByCategory(category = '') {
+  const cat = String(category || '').trim();
+  if (!cat) return { updated: 0, total: 0, category: '' };
+  const list = readJson(FILES.cards, []);
+  const nowIso = new Date().toISOString();
+  let updated = 0;
+  let total = 0;
+  const next = list.map(item => {
+    if (String(item.category || '').trim() !== cat) return item;
+    total++;
+    updated++;
+    const createdAt = String(item.createdAt || '').trim() || nowIso;
+    return { ...item, createdAt, updatedAt: nowIso };
+  });
+  if (updated > 0) {
+    writeJson(FILES.cards, next);
+    invalidateBootstrapCache();
+  }
+  return { updated, total, category: cat, updatedAt: nowIso };
+}
+
 function appendTrackingToUrl(rawUrl, params = {}) {
   const raw = String(rawUrl || '').trim();
   if (!raw || raw === '#') return raw;
@@ -1073,6 +1100,23 @@ function fillCardsUpdatedAt() {
     invalidateBootstrapCache();
   }
   return { updated, total: list.length };
+}
+
+function fillMissingCategory() {
+  const list = readJson(FILES.cards, []);
+  let updated = 0;
+  const nowIso = new Date().toISOString();
+  const next = list.map(item => {
+    const category = String(item.category || '').trim();
+    if (category) return item;
+    updated++;
+    return { ...item, category: 'all', updatedAt: nowIso };
+  });
+  if (updated > 0) {
+    writeJson(FILES.cards, next);
+    invalidateBootstrapCache();
+  }
+  return { updated, total: list.length, category: 'all' };
 }
 
 function fillMissingButtonText() {
@@ -1531,6 +1575,16 @@ const backend = http.createServer((req, res) => {
     }).catch((err)=>handleParseError(res, err));
   }
 
+  if (u.pathname === '/api/admin/cards/touch-by-category' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    return parseBody(req).then(({ category }) => {
+      const cat = String(category || '').trim();
+      if (!cat) return send(res, 400, JSON.stringify({ error: 'category required' }));
+      const result = touchCardsUpdatedAtByCategory(cat);
+      return send(res, 200, JSON.stringify({ ok: true, ...result }));
+    }).catch((err)=>handleParseError(res, err));
+  }
+
 if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
     if (!auth(req,res)) return;
     return parseBody(req).then(({ ids, enabled }) => {
@@ -1647,6 +1701,12 @@ if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
   if (u.pathname === '/api/admin/cards/fill-updated-at' && req.method === 'POST') {
     if (!auth(req,res)) return;
     const result = fillCardsUpdatedAt();
+    return send(res, 200, JSON.stringify({ ok: true, ...result }));
+  }
+
+  if (u.pathname === '/api/admin/cards/fill-category' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = fillMissingCategory();
     return send(res, 200, JSON.stringify({ ok: true, ...result }));
   }
 
