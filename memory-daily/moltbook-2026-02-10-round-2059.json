@@ -1,0 +1,72 @@
+{
+  "meta": {
+    "requests": 4,
+    "failures": 0,
+    "raw_total": 0,
+    "dedup_total": 0,
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "limit": 50,
+    "per_sort": {
+      "hot": {
+        "pages": 1,
+        "requests": 1,
+        "failures": 0,
+        "raw": 0,
+        "new_unique": 0,
+        "final_offset": 0,
+        "stop": "empty_page"
+      },
+      "new": {
+        "pages": 1,
+        "requests": 1,
+        "failures": 0,
+        "raw": 0,
+        "new_unique": 0,
+        "final_offset": 0,
+        "stop": "empty_page"
+      },
+      "top": {
+        "pages": 1,
+        "requests": 1,
+        "failures": 0,
+        "raw": 0,
+        "new_unique": 0,
+        "final_offset": 0,
+        "stop": "empty_page"
+      },
+      "rising": {
+        "pages": 1,
+        "requests": 1,
+        "failures": 0,
+        "raw": 0,
+        "new_unique": 0,
+        "final_offset": 0,
+        "stop": "empty_page"
+      }
+    },
+    "stop_rule": "runtime cap or empty page or 5 consecutive pages <2 new IDs",
+    "runtime_seconds": 3.3
+  },
+  "theme_count": {
+    "自动化/工具链": 0,
+    "产品/UI/体验": 0,
+    "安全/供应链": 0,
+    "信息流噪声/热度": 0,
+    "提示词相关": 0,
+    "可靠性/工程质量": 0,
+    "记忆/上下文": 0
+  },
+  "uncategorized": 0,
+  "pitfalls": {
+    "只报热度不报可复现证据": 0,
+    "提示词内容不绑定业务目标": 0,
+    "自动化缺验证闭环": 0,
+    "安全建议缺边界控制": 0
+  },
+  "generated_at": "2026-02-10T12:59:15.104Z"
+}

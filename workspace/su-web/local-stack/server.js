@@ -284,6 +284,8 @@ function invalidateBootstrapCache() {
   actionabilitySummaryCache.ver = '';
   actionabilitySummaryCache.data = null;
   freshnessSummaryCache.clear();
+  updatedRangeCache.ver = '';
+  updatedRangeCache.data = null;
   duplicateReportCache.ver = '';
   duplicateReportCache.data = null;
 }
@@ -441,6 +443,7 @@ const claimLinksCache = new Map();
 const claimDomainStatsCache = new Map();
 const actionabilitySummaryCache = { ver: '', data: null };
 const freshnessSummaryCache = new Map();
+const updatedRangeCache = { ver: '', data: null };
 const duplicateReportCache = { ver: '', data: null };
 
 function backupFilePath(file) {
@@ -1532,6 +1535,40 @@ function getCardsFreshnessSummary(limit = 6) {
   return data;
 }
 
+function getCardsUpdatedRange() {
+  const ver = getFileVersionKey(FILES.cards);
+  if (updatedRangeCache.data && updatedRangeCache.ver === ver) return updatedRangeCache.data;
+
+  const cards = getSortedCollection('cards').filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const buckets = { h24: 0, h48: 0, d7: 0, d14: 0, d30: 0, older: 0, unknown: 0 };
+
+  for (const item of cards) {
+    const ts = Date.parse(String(item.updatedAt || item.createdAt || ''));
+    if (!Number.isFinite(ts)) {
+      buckets.unknown++;
+      continue;
+    }
+    const ageMs = Math.max(0, nowMs - ts);
+    if (ageMs <= 1 * dayMs) { buckets.h24++; continue; }
+    if (ageMs <= 2 * dayMs) { buckets.h48++; continue; }
+    if (ageMs <= 7 * dayMs) { buckets.d7++; continue; }
+    if (ageMs <= 14 * dayMs) { buckets.d14++; continue; }
+    if (ageMs <= 30 * dayMs) { buckets.d30++; continue; }
+    buckets.older++;
+  }
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    enabledTotal: cards.length,
+    buckets
+  };
+  updatedRangeCache.ver = ver;
+  updatedRangeCache.data = data;
+  return data;
+}
+
 function getCardsShortSummary(limit = 80, maxLen = 20) {
   const safeLimit = Math.min(300, Math.max(1, Number(limit) || 80));
   const safeMaxLen = Math.min(120, Math.max(5, Number(maxLen) || 20));
@@ -1727,6 +1764,46 @@ function normalizeCardTitles() {
   return { updated, total: list.length };
 }
 
+function trimCardFields() {
+  const list = readJson(FILES.cards, []);
+  let updated = 0;
+  const nowIso = new Date().toISOString();
+  const trimText = (v, maxLen = 2000) => String(v || '').replace(/[\t ]+/g, ' ').trim().slice(0, maxLen);
+  const normalizeSummary = (v) => String(v || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/[\t ]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .split('\n')
+    .map(x => x.trim())
+    .join('\n')
+    .trim()
+    .slice(0, 1200);
+
+  const next = list.map(item => {
+    const normalized = {
+      ...item,
+      title: trimText(item.title, 120),
+      summary: normalizeSummary(item.summary),
+      category: trimText(item.category, 60) || 'all',
+      buttonText: trimText(item.buttonText, 30),
+      link: trimText(item.link, 600),
+      image: trimText(item.image, 600),
+      video: trimText(item.video, 600)
+    };
+    if (!normalized.buttonText) normalized.buttonText = (!normalized.link || normalized.link === '#') ? '查看详情' : '去领取';
+    const changed = ['title','summary','category','buttonText','link','image','video'].some(k => String(item[k] || '') !== String(normalized[k] || ''));
+    if (!changed) return item;
+    updated++;
+    return { ...normalized, updatedAt: nowIso, createdAt: String(item.createdAt || '').trim() || nowIso };
+  });
+
+  if (updated > 0) {
+    writeJson(FILES.cards, next);
+    invalidateBootstrapCache();
+  }
+  return { updated, total: list.length, updatedAt: nowIso };
+}
+
 function pruneAllRuntimeCaches() {
   const before = {
     jsonRead: jsonReadCache.size,
@@ -1738,11 +1815,13 @@ function pruneAllRuntimeCaches() {
     staticBr: staticBrCache.size,
     tokens: tokens.size,
     loginBuckets: loginAttempts.size,
-    uploadBuckets: uploadAttempts.size
+    uploadBuckets: uploadAttempts.size,
+    bootstrapBuckets: bootstrapHits.size
   };
   pruneTokens();
   pruneLoginAttempts();
   pruneUploadAttempts();
+  pruneBootstrapHits();
   pruneInternalCaches();
   if (jsonReadCache.size > 12) {
     const keys = [...jsonReadCache.keys()];
@@ -1766,7 +1845,8 @@ function pruneAllRuntimeCaches() {
     staticBr: staticBrCache.size,
     tokens: tokens.size,
     loginBuckets: loginAttempts.size,
-    uploadBuckets: uploadAttempts.size
+    uploadBuckets: uploadAttempts.size,
+    bootstrapBuckets: bootstrapHits.size
   };
   return { before, after, prunedAt: new Date().toISOString() };
 }
@@ -2240,7 +2320,7 @@ const backend = http.createServer((req, res) => {
     if (!auth(req,res)) return;
     const q = String(u.searchParams.get('q') || '').slice(0, 80);
     const category = String(u.searchParams.get('category') || '').slice(0, 40);
-    const limit = Math.min(100, Math.max(1, Number(u.searchParams.get('limit') || 30)));
+    const limit = Math.min(60, Math.max(1, Number(u.searchParams.get('limit') || 30)));
     const data = searchCardsForAdmin(q, category, limit);
     return sendJsonWithEtag(req, res, data, 'private, max-age=2, stale-while-revalidate=10');
   }
@@ -2288,6 +2368,11 @@ const backend = http.createServer((req, res) => {
     if (!auth(req,res)) return;
     const limit = Math.min(20, Math.max(3, Number(u.searchParams.get('limit') || 6)));
     return sendJsonWithEtag(req, res, getCardsFreshnessSummary(limit), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/updated-range' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getCardsUpdatedRange(), 'private, max-age=3, stale-while-revalidate=20');
   }
 
   if (u.pathname === '/api/admin/cards/quality-overview' && (req.method === 'GET' || req.method === 'HEAD')) {
@@ -2661,6 +2746,12 @@ if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
   if (u.pathname === '/api/admin/cards/title-normalize' && req.method === 'POST') {
     if (!auth(req,res)) return;
     const result = normalizeCardTitles();
+    return send(res, 200, JSON.stringify({ ok: true, ...result }));
+  }
+
+  if (u.pathname === '/api/admin/cards/trim-fields' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = trimCardFields();
     return send(res, 200, JSON.stringify({ ok: true, ...result }));
   }
 
