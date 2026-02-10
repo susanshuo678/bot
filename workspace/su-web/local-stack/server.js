@@ -232,6 +232,8 @@ function invalidateBootstrapCache() {
   categoryStatsCache.ver = '';
   categoryStatsCache.data = null;
   recentCardsCache.clear();
+  qualityOverviewCache.ver = '';
+  qualityOverviewCache.data = null;
 }
 
 function pruneInternalCaches() {
@@ -326,6 +328,7 @@ const CARD_SEARCH_CACHE_MAX = 40;
 
 const categoryStatsCache = { ver: '', data: null };
 const recentCardsCache = new Map();
+const qualityOverviewCache = { ver: '', data: null };
 
 function backupFilePath(file) {
   return `${file}.bak`;
@@ -441,6 +444,13 @@ function parseBody(req) {
     const MAX_BODY = 5 * 1024 * 1024; // 5MB
     const contentLength = Number(req.headers['content-length'] || 0);
 
+    const contentType = String(req.headers['content-type'] || '').toLowerCase();
+    if (contentType && !contentType.includes('application/json')) {
+      const err = new Error('Unsupported Media Type');
+      err.code = 'UNSUPPORTED_MEDIA_TYPE';
+      return reject(err);
+    }
+
     // 性能优化：已知超限时尽早拒绝，减少无效内存占用
     if (Number.isFinite(contentLength) && contentLength > MAX_BODY) {
       const err = new Error('Payload too large');
@@ -495,6 +505,9 @@ function parseBody(req) {
 function handleParseError(res, err, fallbackMsg = 'Invalid JSON') {
   if (err && err.code === 'PAYLOAD_TOO_LARGE') {
     return send(res, 413, JSON.stringify({ error: 'Payload too large' }));
+  }
+  if (err && err.code === 'UNSUPPORTED_MEDIA_TYPE') {
+    return send(res, 415, JSON.stringify({ error: 'Content-Type must be application/json' }));
   }
   return send(res, 400, JSON.stringify({ error: fallbackMsg }));
 }
@@ -1061,6 +1074,56 @@ function getRecentCards(limit = 10) {
   return data;
 }
 
+
+function getCardsQualityOverview() {
+  const ver = getFileVersionKey(FILES.cards);
+  if (qualityOverviewCache.data && qualityOverviewCache.ver === ver) return qualityOverviewCache.data;
+
+  const cards = getSortedCollection('cards');
+  const nowMs = Date.now();
+  const rows = cards.map(item => {
+    const updatedAt = String(item.updatedAt || item.createdAt || '').trim();
+    const ts = Date.parse(updatedAt);
+    const daysSinceUpdated = Number.isFinite(ts) ? Math.floor((nowMs - ts) / (24 * 60 * 60 * 1000)) : null;
+    const summary = String(item.summary || '').trim();
+    const link = String(item.link || '').trim();
+    return {
+      id: item.id,
+      title: String(item.title || ''),
+      enabled: item.enabled !== false,
+      hasLink: !!link && link !== '#',
+      hasMedia: !!String(item.image || '').trim() || !!String(item.video || '').trim(),
+      emptySummary: !summary,
+      emptyButtonText: !String(item.buttonText || '').trim(),
+      emptyCategory: !String(item.category || '').trim(),
+      stale14d: !Number.isFinite(ts) || daysSinceUpdated >= 14,
+      daysSinceUpdated
+    };
+  });
+
+  const counts = {
+    total: rows.length,
+    enabled: rows.filter(x => x.enabled).length,
+    withLink: rows.filter(x => x.hasLink).length,
+    withMedia: rows.filter(x => x.hasMedia).length,
+    emptySummary: rows.filter(x => x.emptySummary).length,
+    emptyButtonText: rows.filter(x => x.emptyButtonText).length,
+    emptyCategory: rows.filter(x => x.emptyCategory).length,
+    stale14d: rows.filter(x => x.stale14d).length
+  };
+
+  const topStale = rows
+    .filter(x => x.enabled)
+    .sort((a, b) => (b.daysSinceUpdated || 0) - (a.daysSinceUpdated || 0))
+    .slice(0, 5)
+    .map(x => ({ id: x.id, title: x.title, daysSinceUpdated: x.daysSinceUpdated }));
+
+  const data = { counts, topStale, generatedAt: new Date().toISOString() };
+  qualityOverviewCache.ver = ver;
+  qualityOverviewCache.data = data;
+  return data;
+}
+
 function autoDisableLowQualityCards() {
   const list = readJson(FILES.cards, []);
   let updated = 0;
@@ -1223,6 +1286,29 @@ function buildExportPayload() {
       tabs: getSortedCollection('tabs'),
       cards: getSortedCollection('cards')
     }
+  };
+}
+
+function getBootstrapMeta() {
+  const data = getBootstrapPayload();
+  const body = getBootstrapBody(data);
+  const cards = data.cards || [];
+  return {
+    counts: {
+      ads: (data.ads || []).length,
+      shortcuts: (data.shortcuts || []).length,
+      tabs: (data.tabs || []).length,
+      cards: cards.length,
+      enabledCards: cards.filter(x => x.enabled !== false).length
+    },
+    bytes: {
+      raw: body.raw ? body.raw.length : 0,
+      gzip: body.gzip ? body.gzip.length : null,
+      br: body.br ? body.br.length : null
+    },
+    etag: getBootstrapEtag(data),
+    updatedAt: getLatestDataUpdatedAt(),
+    generatedAt: new Date().toISOString()
   };
 }
 
@@ -1452,6 +1538,11 @@ const backend = http.createServer((req, res) => {
     }, 'private, max-age=3, stale-while-revalidate=15');
   }
 
+  if (u.pathname === '/api/admin/bootstrap-meta' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getBootstrapMeta(), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
   if (u.pathname === '/api/admin/cards/search' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     const q = String(u.searchParams.get('q') || '').slice(0, 80);
@@ -1466,6 +1557,11 @@ const backend = http.createServer((req, res) => {
     const limit = Math.min(50, Math.max(1, Number(u.searchParams.get('limit') || 8)));
     const data = getRecentCards(limit);
     return sendJsonWithEtag(req, res, data, 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/quality-overview' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getCardsQualityOverview(), 'private, max-age=2, stale-while-revalidate=10');
   }
 
   if (u.pathname === '/api/admin/cards/category-stats' && (req.method === 'GET' || req.method === 'HEAD')) {

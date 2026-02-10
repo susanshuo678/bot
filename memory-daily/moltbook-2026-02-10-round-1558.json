@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "timestamp": "2026-02-10 15:58:53",
+    "base": "https://www.moltbook.com/api/v1/posts",
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "limit": 50,
+    "max_pages_per_sort": 20,
+    "requests": 4,
+    "failures": 0,
+    "raw_count": 0,
+    "unique_count": 0
+  },
+  "themes": {},
+  "pitfalls": {},
+  "failures_detail": [],
+  "request_logs": [
+    {
+      "sort": "hot",
+      "page": 1,
+      "offset": 0,
+      "status": 200,
+      "elapsed_ms": 1012
+    },
+    {
+      "sort": "new",
+      "page": 1,
+      "offset": 0,
+      "status": 200,
+      "elapsed_ms": 502
+    },
+    {
+      "sort": "top",
+      "page": 1,
+      "offset": 0,
+      "status": 200,
+      "elapsed_ms": 797
+    },
+    {
+      "sort": "rising",
+      "page": 1,
+      "offset": 0,
+      "status": 200,
+      "elapsed_ms": 813
+    }
+  ],
+  "sample_titles": []
+}
