@@ -50,6 +50,7 @@
   <div class="search-wrap">
     <div class="search-row">
       <input id="cardSearch" class="search" placeholder="搜索内容（标题/摘要）" aria-label="搜索内容">
+      <button id="randomPickBtn" class="search-clear" type="button" aria-label="随机看看">随机</button>
       <button id="clearSearchBtn" class="search-clear" type="button" aria-label="清空搜索">清空</button>
     </div>
     <div class="filter-row" role="group" aria-label="内容筛选">
@@ -58,7 +59,8 @@
       <button class="filter-chip" data-media="video" type="button">含视频</button>
       <button class="filter-chip" data-media="link" type="button">可领取</button>
       <button class="filter-chip" data-media="content" type="button">含正文</button>
-      <button class="filter-chip" data-media="starred" type="button">已收藏</button>
+      <button id="starredFilterChip" class="filter-chip" data-media="starred" type="button">已收藏</button>
+      <button id="clearStarBtn" class="filter-chip" type="button" aria-label="清空收藏">清空收藏</button>
       <button id="tabScopeToggle" class="filter-chip" type="button" aria-pressed="false">仅看当前栏目</button>
       <span id="resultMeta" class="result-meta" aria-live="polite">0 条内容</span>
     </div>
@@ -118,6 +120,8 @@ const resultMetaEl = document.getElementById('resultMeta');
 const mediaFilterEls = [...document.querySelectorAll('.filter-chip[data-media]')];
 const tabScopeToggleEl = document.getElementById('tabScopeToggle');
 const clearSearchBtnEl = document.getElementById('clearSearchBtn');
+const randomPickBtnEl = document.getElementById('randomPickBtn');
+const clearStarBtnEl = document.getElementById('clearStarBtn');
 const syncStateEl = document.getElementById('syncState');
 let currentData = null;
 let currentQuery = '';
@@ -128,23 +132,42 @@ const SANITIZE_CACHE_LIMIT = 120;
 const sanitizeCache = new Map();
 let refreshFailCount = 0;
 const REFRESH_FAIL_CAP = 4;
+let starSetCache = null;
 function matchesQuery(card, query){
   if(!query) return true;
   const text = `${card?.title||''} ${card?.summary||''}`.toLowerCase();
   return text.includes(query);
 }
+function updateStarChipLabel(){
+  const chip = document.getElementById('starredFilterChip');
+  if (!chip) return;
+  const count = getStarSet().size;
+  chip.textContent = count > 0 ? `已收藏(${count})` : '已收藏';
+}
+
 function getStarSet(){
+  if (starSetCache) return starSetCache;
   try {
     const raw = localStorage.getItem(STAR_KEY);
     const parsed = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(parsed) ? parsed.map(x => String(x || '')) : []);
+    starSetCache = new Set(Array.isArray(parsed) ? parsed.map(x => String(x || '')) : []);
+    return starSetCache;
   } catch {
-    return new Set();
+    starSetCache = new Set();
+    return starSetCache;
   }
 }
 
 function saveStarSet(set){
+  starSetCache = new Set(set);
   try { localStorage.setItem(STAR_KEY, JSON.stringify([...set])); } catch {}
+  updateStarChipLabel();
+}
+
+function clearStarSet(){
+  starSetCache = new Set();
+  try { localStorage.removeItem(STAR_KEY); } catch {}
+  updateStarChipLabel();
 }
 
 function isCardStarred(card){
@@ -183,6 +206,25 @@ function showToast(text){
   el.style.display = 'block';
   clearTimeout(window.__suToastTimer);
   window.__suToastTimer = setTimeout(() => { el.style.display = 'none'; }, 1700);
+}
+
+function pickRandomVisibleCard(){
+  const active = document.querySelector('.tabpage.active');
+  if (!active) return;
+  const cards = [...active.querySelectorAll('.item[data-card-id]')];
+  if (!cards.length) {
+    showToast('当前栏目暂无可随机内容');
+    return;
+  }
+  const target = cards[Math.floor(Math.random() * cards.length)];
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  target.style.outline = '2px solid #5a85ff';
+  target.style.outlineOffset = '2px';
+  setTimeout(() => {
+    target.style.outline = 'none';
+    target.style.outlineOffset = '0';
+  }, 1200);
+  showToast(`随机定位：第 ${cards.indexOf(target) + 1} 条`);
 }
 
 async function copyCardLink(link){
@@ -540,10 +582,14 @@ function restoreActiveTab(){
   if (nav) switchTab(saved, nav);
 }
 
+let searchInputTimer = null;
 if (searchInputEl) {
   searchInputEl.addEventListener('input', () => {
-    currentQuery = String(searchInputEl.value || '').trim().toLowerCase();
-    if (currentData) applyData(currentData);
+    if (searchInputTimer) clearTimeout(searchInputTimer);
+    searchInputTimer = setTimeout(() => {
+      currentQuery = String(searchInputEl.value || '').trim().toLowerCase();
+      if (currentData) applyData(currentData);
+    }, 120);
   });
 }
 if (clearSearchBtnEl) {
@@ -553,6 +599,20 @@ if (clearSearchBtnEl) {
     currentQuery = '';
     if (currentData) applyData(currentData);
     searchInputEl.focus();
+  });
+}
+if (randomPickBtnEl) {
+  randomPickBtnEl.addEventListener('click', pickRandomVisibleCard);
+}
+if (clearStarBtnEl) {
+  clearStarBtnEl.addEventListener('click', () => {
+    const size = getStarSet().size;
+    if (!size) return showToast('当前没有收藏');
+    clearStarSet();
+    if (currentMediaFilter === 'starred') currentMediaFilter = 'all';
+    mediaFilterEls.forEach(btn => btn.classList.toggle('active', (btn.dataset.media||'all') === currentMediaFilter));
+    if (currentData) applyData(currentData);
+    showToast(`已清空 ${size} 条收藏`);
   });
 }
 window.addEventListener('keydown', (e) => {
@@ -565,12 +625,24 @@ window.addEventListener('keydown', (e) => {
     currentQuery = '';
     if (currentData) applyData(currentData);
   }
+  if (e.altKey && (e.key === 's' || e.key === 'S')) {
+    e.preventDefault();
+    currentMediaFilter = currentMediaFilter === 'starred' ? 'all' : 'starred';
+    mediaFilterEls.forEach(btn => btn.classList.toggle('active', (btn.dataset.media||'all') === currentMediaFilter));
+    if (currentData) applyData(currentData);
+    showToast(currentMediaFilter === 'starred' ? '已切换到收藏筛选' : '已切换到全部内容');
+    return;
+  }
   if (document.activeElement === searchInputEl) return;
   if (['1','2','3'].includes(e.key)) {
     const map = { '1': 'help', '2': 'hang', '3': 'bots' };
     const tab = map[e.key];
     const btn = [...document.querySelectorAll('.nav-btn')].find(x => (x.getAttribute('onclick')||'').includes(`'${tab}'`));
     if (btn) switchTab(tab, btn);
+  }
+  if (e.altKey && (e.key === 'r' || e.key === 'R')) {
+    e.preventDefault();
+    pickRandomVisibleCard();
   }
 });
 if (mediaFilterEls.length) {
@@ -598,8 +670,16 @@ if (toTopBtnEl) {
 }
 restoreSearchState();
 restoreActiveTab();
+updateStarChipLabel();
 updateNetworkUi();
 init();
+
+window.addEventListener('storage', (e) => {
+  if (e.key !== STAR_KEY) return;
+  starSetCache = null;
+  updateStarChipLabel();
+  if (currentData) applyData(currentData);
+});
 
 let lastAutoRefreshAt = Date.now();
 let lastManualRefreshAt = 0;
