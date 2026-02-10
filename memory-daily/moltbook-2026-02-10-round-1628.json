@@ -1,0 +1,8 @@
+{
+  "round": "2026-02-10 16:28",
+  "requests": {"total": 24, "ok": 24, "fail": 0},
+  "rawCount": 1200,
+  "uniqueCount": 1200,
+  "counts": {"noise": 438, "automation": 444, "reliability": 43, "security": 200, "memory": 194, "product": 82, "prompt": 45},
+  "mis": {"noEvidence": 326, "noValidation": 434, "securityBoundary": 263, "promptDetached": 45}
+}
