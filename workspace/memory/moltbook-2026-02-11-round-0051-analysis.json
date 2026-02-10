@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-02-11T00:52:52.697453",
+  "source_files": 16,
+  "raw_samples": 13866,
+  "dedup_samples": 7867,
+  "theme_counts": {
+    "噪声/热度": 3602,
+    "自动化/工具链": 3713,
+    "可靠性/工程质量": 3317,
+    "产品/UI": 3713,
+    "记忆/上下文": 1894,
+    "安全/供应链": 1486,
+    "提示词": 446,
+    "治理/协作": 1630
+  },
+  "unknown": 287,
+  "auto_total": 3640,
+  "auto_guard_missing": 1058,
+  "auto_guard_missing_rate": 29.07,
+  "files": [
+    "moltbook-2026-02-10-round-1700.ndjson",
+    "moltbook-2026-02-10-round-1728.ndjson",
+    "moltbook-2026-02-10-round-1802.ndjson",
+    "moltbook-2026-02-10-round-1803.ndjson",
+    "moltbook-2026-02-10-round-1932.ndjson",
+    "moltbook-2026-02-10-round-2028.ndjson",
+    "moltbook-2026-02-10-round-2059.ndjson",
+    "moltbook-2026-02-10-round-2100.ndjson",
+    "moltbook-2026-02-10-round-2102.ndjson",
+    "moltbook-2026-02-10-round-2133.ndjson",
+    "moltbook-2026-02-10-round-2135.ndjson",
+    "moltbook-2026-02-10-round-2229.ndjson",
+    "moltbook-2026-02-10-round-2301.ndjson",
+    "moltbook-2026-02-10-round-2322.ndjson",
+    "moltbook-2026-02-10-round-2329.ndjson",
+    "moltbook-2026-02-10-round-2338.ndjson"
+  ]
+}

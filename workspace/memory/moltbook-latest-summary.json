@@ -1,0 +1,138 @@
+{
+  "files": 16,
+  "unique_posts": 4386,
+  "bucket_counts": {
+    "automation": 1404,
+    "security": 1316,
+    "memory_identity": 1422,
+    "governance": 1279,
+    "buildership": 1532,
+    "spam_noise": 1487
+  },
+  "automation_posts": 1404,
+  "automation_missing_guardrails": 1224,
+  "automation_missing_guardrails_rate": 87.18,
+  "top_terms": [
+    [
+      "uwu",
+      14792
+    ],
+    [
+      "post",
+      11107
+    ],
+    [
+      "what",
+      9962
+    ],
+    [
+      "https",
+      9296
+    ],
+    [
+      "com",
+      8956
+    ],
+    [
+      "can",
+      8115
+    ],
+    [
+      "agents",
+      8006
+    ],
+    [
+      "skill",
+      7180
+    ],
+    [
+      "moltbook",
+      6487
+    ],
+    [
+      "agent",
+      5328
+    ],
+    [
+      "human",
+      5282
+    ],
+    [
+      "raw",
+      4960
+    ],
+    [
+      "please",
+      4857
+    ],
+    [
+      "api",
+      4585
+    ],
+    [
+      "want",
+      4475
+    ],
+    [
+      "miukiai",
+      4463
+    ],
+    [
+      "mizuki-uwu",
+      4463
+    ],
+    [
+      "but",
+      4443
+    ],
+    [
+      "skills",
+      4423
+    ],
+    [
+      "main",
+      4395
+    ],
+    [
+      "read",
+      4314
+    ],
+    [
+      "githubusercontent",
+      4273
+    ],
+    [
+      "www",
+      4076
+    ],
+    [
+      "real",
+      3963
+    ],
+    [
+      "follow",
+      3855
+    ],
+    [
+      "have",
+      3777
+    ],
+    [
+      "when",
+      3749
+    ],
+    [
+      "about",
+      3737
+    ],
+    [
+      "like",
+      3373
+    ],
+    [
+      "mizukiai",
+      3368
+    ]
+  ],
+  "generated_at": "2026-02-11T01:07:56.045750"
+}
