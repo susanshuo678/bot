@@ -61,6 +61,9 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn" onclick="exportAllData()">导出数据JSON</button>
           <button class="btn ok" onclick="repairTabKeys()">自动修复空分类</button>
           <button class="btn" onclick="validateLinks()">链接体检</button>
+          <button class="btn ok" onclick="quickFixLinks()">一键修复非法链接</button>
+          <button class="btn" onclick="runHealthCheck()">健康检查</button>
+          <button class="btn ok" onclick="normalizeAllOrders()">统一重排顺序</button>
           <span id="summaryMeta" class="muted"></span>
         </div>
         <div class="stats">
@@ -410,6 +413,34 @@ async function validateLinks(){
   }
 }
 
+
+async function quickFixLinks(){
+  if(!confirm('确认一键修复非法链接？非法 link 会改成 #，非法图片/视频地址会清空。')) return;
+  try {
+    const r = await req('/api/admin/quick-fix-links', 'POST', {});
+    toast(`修复完成：${r.fixed||0} 项`);
+    await validateLinks();
+    loadAll();
+    refreshSummary();
+  } catch (e) {
+    toast(`修复失败：${e?.message || '网络异常'}`);
+  }
+}
+
+async function runHealthCheck(){
+  const box = document.getElementById('linkCheckBox');
+  if (box) box.innerHTML = '健康检查中...';
+  try {
+    const r = await req('/api/admin/health-check', 'GET');
+    const fileRows = (r.files || []).map(f => `<li>${esc(f.key)}：${f.exists ? '✅' : '❌'}，${f.size||0} bytes，${esc(f.mtime || '-')}</li>`).join('');
+    if (box) box.innerHTML = `<div>服务内存：${esc(String(r.memoryRssMb||0))} MB；运行：${esc(String(r.uptimeSec||0))} 秒；非法链接：${esc(String(r.invalidLinks||0))}</div><ul>${fileRows}</ul>`;
+    toast('健康检查完成');
+  } catch (e) {
+    if (box) box.innerHTML = `<span style="color:#ffb4b4">健康检查失败：${esc(e?.message||'网络异常')}</span>`;
+    toast(`健康检查失败：${e?.message || '网络异常'}`);
+  }
+}
+
 async function refreshSummary(){
   try{
     const r = await req('/api/admin/summary', 'GET');
@@ -459,6 +490,21 @@ async function resequenceCardsByCurrentView(){
   }
 }
 
+async function normalizeAllOrders(){
+  if(!confirm('确认统一重排 ads/shortcuts/tabs/cards 的顺序字段？会按当前排序重写为 10,20,30...')) return;
+  try {
+    const r = await req('/api/admin/normalize-orders', 'POST', {});
+    const msgText = `统一重排完成：ads ${r.ads?.updated||0}/${r.ads?.total||0}，shortcuts ${r.shortcuts?.updated||0}/${r.shortcuts?.total||0}，tabs ${r.tabs?.updated||0}/${r.tabs?.total||0}，cards ${r.cards?.updated||0}/${r.cards?.total||0}`;
+    toast(msgText);
+    const box = document.getElementById('linkCheckBox');
+    if (box) box.textContent = msgText;
+    loadAll();
+    refreshSummary();
+  } catch (e) {
+    toast(`统一重排失败：${e?.message || '网络异常'}`);
+  }
+}
+
 async function repairTabKeys(){
   const tabs = await req('/api/tabs','GET',null,false);
   let fixed=0;
@@ -480,11 +526,13 @@ async function batchToggleBySearch(enabled){
   const list = getFilteredCardsBySearch();
   if(!list.length) return toast('先输入关键词再批量操作');
   if(!confirm(`确认将 ${list.length} 张卡片批量${enabled?'启用':'停用'}？`)) return;
-  let ok=0;
-  for(const x of list){
-    try { await req('/api/cards/'+x.id,'PUT',{enabled}); ok++; } catch {}
+  try {
+    const ids = list.map(x=>x.id).filter(Boolean);
+    const r = await req('/api/admin/cards/batch-enabled','POST',{ ids, enabled });
+    toast(`批量处理完成：更新 ${r.updated||0}/${r.requested||ids.length}`);
+  } catch (e) {
+    toast(`批量处理失败：${e?.message||'网络异常'}`);
   }
-  toast(`批量处理完成：${ok}/${list.length}`);
   loadAll();
 }
 function batchEnableBySearch(){ return batchToggleBySearch(true); }

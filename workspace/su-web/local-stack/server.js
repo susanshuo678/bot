@@ -260,6 +260,20 @@ function backupFilePath(file) {
   return `${file}.bak`;
 }
 
+function rotateBackups(file) {
+  const bak1 = backupFilePath(file);
+  const bak2 = `${bak1}.2`;
+  const bak3 = `${bak1}.3`;
+  try {
+    if (fs.existsSync(bak2)) {
+      try { fs.copyFileSync(bak2, bak3); } catch {}
+    }
+    if (fs.existsSync(bak1)) {
+      try { fs.copyFileSync(bak1, bak2); } catch {}
+    }
+  } catch {}
+}
+
 function readJson(file, fallback) {
   try {
     const stat = fs.statSync(file);
@@ -279,10 +293,14 @@ function readJson(file, fallback) {
     // 稳定性优化：主文件损坏时尝试从 .bak 自动恢复，避免前台/后台整体空白
     try {
       const backup = backupFilePath(file);
-      if (fs.existsSync(backup)) {
-        const parsed = JSON.parse(fs.readFileSync(backup, 'utf8'));
-        writeJson(file, parsed);
-        return parsed;
+      const candidates = [backup, `${backup}.2`, `${backup}.3`];
+      for (const candidate of candidates) {
+        if (!fs.existsSync(candidate)) continue;
+        try {
+          const parsed = JSON.parse(fs.readFileSync(candidate, 'utf8'));
+          writeJson(file, parsed);
+          return parsed;
+        } catch {}
       }
     } catch {}
     if (err && err.name === 'SyntaxError') {
@@ -296,6 +314,7 @@ function writeJson(file, data) {
   const backup = backupFilePath(file);
   const content = JSON.stringify(data, null, 2);
   if (fs.existsSync(file)) {
+    rotateBackups(file);
     try { fs.copyFileSync(file, backup); } catch {}
   }
   fs.writeFileSync(tmp, content, 'utf8');
@@ -748,6 +767,39 @@ function collectInvalidLinks() {
   return invalid;
 }
 
+
+function autoFixInvalidLinks() {
+  const checks = [
+    { file: 'ads', fields: ['link', 'image'] },
+    { file: 'shortcuts', fields: ['link', 'icon'] },
+    { file: 'cards', fields: ['link', 'image', 'video'] }
+  ];
+  let fixed = 0;
+
+  for (const check of checks) {
+    const list = readJson(FILES[check.file], []);
+    let changed = false;
+    const next = list.map(item => {
+      const copy = { ...item };
+      for (const f of check.fields) {
+        if (!(f in copy)) continue;
+        const v = String(copy[f] || '').trim();
+        if (!v) continue;
+        if (!isSafeHttpLikeLink(v)) {
+          copy[f] = (f === 'link') ? '#' : '';
+          fixed++;
+          changed = true;
+        }
+      }
+      return copy;
+    });
+    if (changed) writeJson(FILES[check.file], next);
+  }
+
+  if (fixed > 0) invalidateBootstrapCache();
+  return { fixed };
+}
+
 const backend = http.createServer((req, res) => {
   const u = new URL(req.url, `http://localhost:${BACKEND_PORT}`);
   if (req.method === 'OPTIONS') return send(res, 204, '');
@@ -811,6 +863,32 @@ const backend = http.createServer((req, res) => {
     }, 'private, max-age=0, must-revalidate');
   }
 
+  if (u.pathname === '/api/admin/quick-fix-links' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = autoFixInvalidLinks();
+    return send(res, 200, JSON.stringify({ ok: true, fixed: result.fixed }));
+  }
+
+  if (u.pathname === '/api/admin/health-check' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const files = ['ads', 'shortcuts', 'tabs', 'cards'].map((key) => {
+      const filePath = FILES[key];
+      try {
+        const st = fs.statSync(filePath);
+        return { key, exists: true, size: st.size, mtime: new Date(st.mtimeMs).toISOString() };
+      } catch {
+        return { key, exists: false, size: 0, mtime: null };
+      }
+    });
+    const invalid = collectInvalidLinks();
+    return sendJsonWithEtag(req, res, {
+      files,
+      invalidLinks: invalid.length,
+      uptimeSec: Math.floor(process.uptime()),
+      memoryRssMb: Math.round(process.memoryUsage().rss / 1024 / 1024)
+    }, 'private, max-age=3, stale-while-revalidate=15');
+  }
+
   if (u.pathname === '/api/change-password' && req.method === 'POST') {
     if (!auth(req,res)) return;
     return parseBody(req).then(({ password }) => {
@@ -833,6 +911,40 @@ const backend = http.createServer((req, res) => {
       if (!allowed.has(key)) return send(res, 400, JSON.stringify({ error: 'invalid collection' }));
       const result = resequenceCollection(key, ids);
       return send(res, 200, JSON.stringify({ ok: true, collection: key, ...result }));
+    }).catch((err)=>handleParseError(res, err));
+  }
+
+  if (u.pathname === '/api/admin/normalize-orders' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = {
+      ads: resequenceCollection('ads'),
+      shortcuts: resequenceCollection('shortcuts'),
+      tabs: resequenceCollection('tabs'),
+      cards: resequenceCollection('cards')
+    };
+    return send(res, 200, JSON.stringify({ ok: true, ...result }));
+  }
+
+  if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    return parseBody(req).then(({ ids, enabled }) => {
+      const idSet = new Set(Array.isArray(ids) ? ids.map(x => String(x || '')).filter(Boolean) : []);
+      if (!idSet.size) return send(res, 400, JSON.stringify({ error: 'ids required' }));
+      const list = readJson(FILES.cards, []);
+      let updated = 0;
+      const next = list.map(item => {
+        const id = String(item.id || '');
+        if (!idSet.has(id)) return item;
+        const nextEnabled = enabled !== false && String(enabled) !== 'false';
+        if ((item.enabled !== false) === nextEnabled) return item;
+        updated++;
+        return { ...item, enabled: nextEnabled };
+      });
+      if (updated > 0) {
+        writeJson(FILES.cards, next);
+        invalidateBootstrapCache();
+      }
+      return send(res, 200, JSON.stringify({ ok: true, updated, requested: idSet.size }));
     }).catch((err)=>handleParseError(res, err));
   }
 
