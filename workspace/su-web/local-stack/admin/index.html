@@ -73,6 +73,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn" onclick="runHealthCheck()">健康检查</button>
           <button class="btn" onclick="auditCardSummaries()">摘要体检</button>
           <button class="btn ok" onclick="normalizeCardSummaries()">摘要一键规范化</button>
+          <button class="btn ok" onclick="fillEmptySummaries()">一键补空摘要</button>
           <button class="btn ok" onclick="normalizeCardTitles()">标题一键规范化</button>
           <button class="btn ok" onclick="normalizeAllOrders()">统一重排顺序</button>
           <button class="btn" onclick="checkCardDuplicates()">重复卡片体检</button>
@@ -90,6 +91,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn ok" onclick="fillMissingButtonText()">补齐按钮文案</button>
           <button class="btn ok" onclick="standardizeButtonText()">按钮文案全量标准化</button>
           <button class="btn" onclick="auditStaleCards()">陈旧内容体检</button>
+          <button class="btn" onclick="touchStaleCards()">一键刷新陈旧时间</button>
           <button class="btn danger" onclick="disableStaleCards()">一键停用陈旧内容</button>
           <span id="summaryMeta" class="muted"></span>
         </div>
@@ -128,8 +130,9 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <h4 style="margin:0 0 8px">卡片快速洞察（启用卡片）</h4>
           <div id="quickInsightsBox" class="muted">点击“快速洞察”查看</div>
         </div>
-        <div id="linkCheckBox" class="muted" style="margin-top:10px"></div>
+        <div class="muted" style="margin-top:10px"></div>
         <div id="duplicateCheckBox" class="muted" style="margin-top:10px"></div>
+        <div id="summaryFillBox" class="muted" style="margin-top:10px"></div>
         <div id="categoryStatsBox" class="muted" style="margin-top:10px"></div>
         <div id="staleCardsBox" class="muted" style="margin-top:10px"></div>
         <div id="qualityOverviewBox" class="muted" style="margin-top:10px"></div>
@@ -170,7 +173,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
           <button class="btn ok" type="button" onclick="touchCardsByCategory()">按分类刷新更新时间</button>
         </div>
         <div id="cards"></div>
-        <div id="linkCheckBox" class="muted" style="margin-top:10px"></div>
+        <div class="muted" style="margin-top:10px"></div>
       </section>
 
       <section id="editorView" class="view panel">
@@ -189,7 +192,7 @@ input,textarea{width:100%;padding:9px;border-radius:10px;border:1px solid #33467
         <div id="docEditor" class="doc" contenteditable="true"></div>
         <p class="muted" style="margin:6px 0 0">可直接把图片/视频拖到编辑区，或粘贴截图自动上传插入（接近腾讯文档/WPS交互）。</p>
         <div class="row" style="margin-top:8px"><input id="file" type="file" accept="image/*,video/*"/><button class="btn ok" onclick="uploadAndInsert()">上传并插入正文</button><button class="btn" onclick="saveDoc()">保存正文到当前卡片</button></div>
-        <div id="linkCheckBox" class="muted" style="margin-top:10px"></div>
+        <div class="muted" style="margin-top:10px"></div>
       </section>
 
       <section id="settingsView" class="view panel">
@@ -651,6 +654,23 @@ async function normalizeCardSummaries(){
   }
 }
 
+async function fillEmptySummaries(){
+  if(!confirm('确认自动补齐空摘要？会按标题/分类生成简短摘要。')) return;
+  const box = document.getElementById('summaryFillBox');
+  if (box) box.innerHTML = '补齐空摘要中...';
+  try {
+    const r = await req('/api/admin/cards/fill-empty-summary', 'POST', {});
+    const sample = Array.isArray(r.samples) ? r.samples : [];
+    if (box) box.innerHTML = `✅ 已补齐 ${r.updated||0}/${r.total||0} 条空摘要` + (sample.length ? `<ul>${sample.map(x=>`<li><code>${esc(x.id||'')}</code> ${esc(x.title||'未命名')} → ${esc(x.summary||'')}</li>`).join('')}</ul>` : '');
+    toast(`空摘要补齐完成：${r.updated||0} 条`);
+    loadAll();
+    refreshSummary();
+  } catch (e) {
+    if (box) box.innerHTML = `<span style="color:#ffb4b4">补齐失败：${esc(e?.message||'网络异常')}</span>`;
+    toast(`空摘要补齐失败：${e?.message || '网络异常'}`);
+  }
+}
+
 async function normalizeCardTitles(){
   if(!confirm('确认统一规范卡片标题？会自动去除多余空白与连续标点。')) return;
   try {
@@ -1020,6 +1040,19 @@ async function auditStaleCards(){
   } catch (e) {
     if (box) box.innerHTML = `<span style="color:#ffb4b4">体检失败：${esc(e?.message||'网络异常')}</span>`;
     toast(`陈旧内容体检失败：${e?.message || '网络异常'}`);
+  }
+}
+
+async function touchStaleCards(){
+  if(!confirm('确认把超过 30 天未更新且仍启用的卡片批量刷新为“刚更新”？')) return;
+  try {
+    const r = await req('/api/admin/cards/stale-touch', 'POST', { days: 30 });
+    toast(`刷新完成：更新 ${r.updated||0}/${r.total||0}`);
+    await auditStaleCards();
+    loadAll();
+    refreshSummary();
+  } catch (e) {
+    toast(`刷新失败：${e?.message || '网络异常'}`);
   }
 }
 

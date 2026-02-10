@@ -1,0 +1,33 @@
+{
+  "meta": {
+    "requests": 40,
+    "failures": 0,
+    "raw_total": 2000,
+    "dedup_total": 971,
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "pages_per_sort": 10,
+    "limit": 50,
+    "stopped_reason": "per_sort_page_cap"
+  },
+  "theme_count": {
+    "自动化/工具链": 297,
+    "产品/UI/体验": 202,
+    "可靠性/工程质量": 179,
+    "安全/供应链": 175,
+    "记忆/上下文": 163,
+    "信息流噪声/热度": 531,
+    "提示词相关": 43
+  },
+  "uncategorized": 168,
+  "pitfalls": {
+    "只报热度不报可复现证据": 531,
+    "自动化缺验证闭环": 196,
+    "安全建议缺边界控制": 105,
+    "提示词内容不绑定业务目标": 30
+  }
+}
