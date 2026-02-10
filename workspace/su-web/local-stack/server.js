@@ -229,6 +229,9 @@ function invalidateBootstrapCache() {
   enabledCardsCache.ver = '';
   enabledCardsCache.data = null;
   cardSearchCache.clear();
+  categoryStatsCache.ver = '';
+  categoryStatsCache.data = null;
+  recentCardsCache.clear();
 }
 
 function pruneTokens() {
@@ -307,6 +310,9 @@ const STATIC_GZIP_MAX_BYTES = 256 * 1024;
 const cardSearchCache = new Map();
 const CARD_SEARCH_CACHE_TTL_MS = 5000;
 const CARD_SEARCH_CACHE_MAX = 40;
+
+const categoryStatsCache = { ver: '', data: null };
+const recentCardsCache = new Map();
 
 function backupFilePath(file) {
   return `${file}.bak`;
@@ -871,6 +877,9 @@ function toggleCardsEnabledByCategory(category = '', enabled = true) {
 }
 
 function getCardCategoryStats() {
+  const ver = `${getFileVersionKey(FILES.tabs)}::${getFileVersionKey(FILES.cards)}`;
+  if (categoryStatsCache.data && categoryStatsCache.ver === ver) return categoryStatsCache.data;
+
   const tabs = getSortedCollection('tabs');
   const cards = getSortedCollection('cards');
   const map = new Map();
@@ -901,7 +910,45 @@ function getCardCategoryStats() {
     if (String(card.image || '').trim() || String(card.video || '').trim()) row.withMedia++;
   }
 
-  return [...map.values()].sort((a, b) => b.total - a.total || a.key.localeCompare(b.key));
+  const rows = [...map.values()].sort((a, b) => b.total - a.total || a.key.localeCompare(b.key));
+  categoryStatsCache.ver = ver;
+  categoryStatsCache.data = rows;
+  return rows;
+}
+
+function getRecentCards(limit = 10) {
+  const safeLimit = Math.min(50, Math.max(1, Number(limit) || 10));
+  const ver = getFileVersionKey(FILES.cards);
+  const cacheKey = `${ver}::${safeLimit}`;
+  const hit = recentCardsCache.get(cacheKey);
+  if (hit) return hit;
+
+  const cards = getSortedCollection('cards');
+  const fallbackTs = getLatestDataUpdatedAt() || new Date().toISOString();
+  const rows = cards
+    .map(item => ({
+      id: item.id,
+      title: String(item.title || ''),
+      category: String(item.category || ''),
+      enabled: item.enabled !== false,
+      order: normalizeOrder(item.order, 9999),
+      updatedAt: String(item.updatedAt || item.createdAt || fallbackTs)
+    }))
+    .sort((a, b) => {
+      const ta = Date.parse(a.updatedAt || '') || 0;
+      const tb = Date.parse(b.updatedAt || '') || 0;
+      if (tb !== ta) return tb - ta;
+      return a.order - b.order;
+    })
+    .slice(0, safeLimit);
+
+  const data = { total: cards.length, limit: safeLimit, items: rows };
+  recentCardsCache.set(cacheKey, data);
+  if (recentCardsCache.size > 20) {
+    const oldest = recentCardsCache.keys().next().value;
+    if (oldest) recentCardsCache.delete(oldest);
+  }
+  return data;
 }
 
 function autoDisableLowQualityCards() {
@@ -1001,7 +1048,8 @@ function collectionRoutes(req, res, pathname, file, defaults = {}) {
     parseBody(req).then(payload => {
       const list = readJson(FILES[file], []);
       const safePayload = sanitizeCollectionPayload(file, payload);
-      const item = { id: createId(file.slice(0, 1)), ...defaults, ...safePayload };
+      const stamp = new Date().toISOString();
+      const item = { id: createId(file.slice(0, 1)), ...defaults, ...safePayload, createdAt: stamp, updatedAt: stamp };
       if ('order' in item) item.order = normalizeOrder(item.order, defaults.order ?? 9999);
       list.push(item);
       writeJson(FILES[file], list);
@@ -1017,7 +1065,8 @@ function collectionRoutes(req, res, pathname, file, defaults = {}) {
       const list = readJson(FILES[file], []); const i = list.findIndex(x=>x.id===id);
       if (i < 0) return send(res,404,JSON.stringify({error:'Not found'}));
       const safePayload = sanitizeCollectionPayload(file, payload);
-      const next = { ...list[i], ...safePayload, id };
+      const next = { ...list[i], ...safePayload, id, updatedAt: new Date().toISOString() };
+      if (!next.createdAt) next.createdAt = new Date().toISOString();
       if ('order' in next) next.order = normalizeOrder(next.order, list[i].order ?? defaults.order ?? 9999);
       list[i] = next;
       writeJson(FILES[file], list);
@@ -1170,6 +1219,13 @@ const backend = http.createServer((req, res) => {
     const category = String(u.searchParams.get('category') || '').slice(0, 40);
     const limit = Math.min(100, Math.max(1, Number(u.searchParams.get('limit') || 30)));
     const data = searchCardsForAdmin(q, category, limit);
+    return sendJsonWithEtag(req, res, data, 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/recent' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(50, Math.max(1, Number(u.searchParams.get('limit') || 8)));
+    const data = getRecentCards(limit);
     return sendJsonWithEtag(req, res, data, 'private, max-age=2, stale-while-revalidate=10');
   }
 
@@ -1326,6 +1382,32 @@ if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
         invalidateBootstrapCache();
       }
       return send(res, 200, JSON.stringify({ ok: true, updated, requested: idSet.size, category: nextCategory }));
+    }).catch((err)=>handleParseError(res, err));
+  }
+
+  if (u.pathname === '/api/admin/cards/batch-button-text' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    return parseBody(req).then(({ ids, buttonText }) => {
+      const idSet = new Set(Array.isArray(ids) ? ids.map(x => String(x || '')).filter(Boolean) : []);
+      const nextButtonText = String(buttonText || '').trim().slice(0, 20);
+      if (!idSet.size) return send(res, 400, JSON.stringify({ error: 'ids required' }));
+      if (!nextButtonText) return send(res, 400, JSON.stringify({ error: 'buttonText required' }));
+
+      const list = readJson(FILES.cards, []);
+      let updated = 0;
+      const next = list.map(item => {
+        const id = String(item.id || '');
+        if (!idSet.has(id)) return item;
+        if (String(item.buttonText || '') === nextButtonText) return item;
+        updated++;
+        return { ...item, buttonText: nextButtonText, updatedAt: new Date().toISOString() };
+      });
+
+      if (updated > 0) {
+        writeJson(FILES.cards, next);
+        invalidateBootstrapCache();
+      }
+      return send(res, 200, JSON.stringify({ ok: true, updated, requested: idSet.size, buttonText: nextButtonText }));
     }).catch((err)=>handleParseError(res, err));
   }
 
