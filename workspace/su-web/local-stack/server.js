@@ -258,6 +258,7 @@ function invalidateBootstrapCache() {
   qualityOverviewCache.ver = '';
   qualityOverviewCache.data = null;
   claimLinksCache.clear();
+  claimDomainStatsCache.clear();
   actionabilitySummaryCache.ver = '';
   actionabilitySummaryCache.data = null;
 }
@@ -275,6 +276,10 @@ function pruneInternalCaches() {
   if (claimLinksCache.size > 20) {
     const keys = [...claimLinksCache.keys()];
     for (let i = 0; i < keys.length - 20; i++) claimLinksCache.delete(keys[i]);
+  }
+  if (claimDomainStatsCache.size > 20) {
+    const keys = [...claimDomainStatsCache.keys()];
+    for (let i = 0; i < keys.length - 20; i++) claimDomainStatsCache.delete(keys[i]);
   }
 }
 
@@ -360,6 +365,7 @@ const categoryStatsCache = { ver: '', data: null };
 const recentCardsCache = new Map();
 const qualityOverviewCache = { ver: '', data: null };
 const claimLinksCache = new Map();
+const claimDomainStatsCache = new Map();
 const actionabilitySummaryCache = { ver: '', data: null };
 
 function backupFilePath(file) {
@@ -840,6 +846,58 @@ function getClaimableLinksForAdmin(category = '', limit = 300) {
     generatedAt: new Date().toISOString()
   };
   claimLinksCache.set(ver, data);
+  return data;
+}
+
+
+function getClaimDomainStats(category = '', limit = 12) {
+  const cat = String(category || '').trim().toLowerCase();
+  const safeLimit = Math.min(50, Math.max(3, Number(limit) || 12));
+  const ver = `${getFileVersionKey(FILES.cards)}::${cat}::${safeLimit}`;
+  const hit = claimDomainStatsCache.get(ver);
+  if (hit) return hit;
+
+  const rows = getSortedCollection('cards')
+    .filter(item => item.enabled !== false)
+    .filter(item => {
+      const link = String(item.link || '').trim();
+      if (!link || link === '#') return false;
+      if (!cat) return true;
+      return String(item.category || '').trim().toLowerCase() === cat;
+    });
+
+  const domainMap = new Map();
+  let invalidCount = 0;
+  for (const item of rows) {
+    const raw = String(item.link || '').trim();
+    try {
+      const u = new URL(raw);
+      const host = String(u.hostname || '').toLowerCase();
+      if (!host) {
+        invalidCount++;
+        continue;
+      }
+      const row = domainMap.get(host) || { domain: host, count: 0, sample: raw };
+      row.count++;
+      if (!row.sample) row.sample = raw;
+      domainMap.set(host, row);
+    } catch {
+      invalidCount++;
+    }
+  }
+
+  const domains = [...domainMap.values()]
+    .sort((a, b) => b.count - a.count || a.domain.localeCompare(b.domain))
+    .slice(0, safeLimit);
+
+  const data = {
+    category: cat || 'all',
+    totalClaimable: rows.length,
+    invalidCount,
+    topDomains: domains,
+    generatedAt: new Date().toISOString()
+  };
+  claimDomainStatsCache.set(ver, data);
   return data;
 }
 
@@ -1346,6 +1404,72 @@ function fillMissingCategory() {
   return { updated, total: list.length, category: 'all' };
 }
 
+
+function normalizeCardTitles() {
+  const list = readJson(FILES.cards, []);
+  let updated = 0;
+  const nowIso = new Date().toISOString();
+  const next = list.map(item => {
+    const raw = String(item.title || '');
+    const normalized = raw
+      .replace(/[\t\n\r]+/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/([!?！？。,.，])\1{1,}/g, '$1')
+      .trim()
+      .slice(0, 120);
+    if (normalized === raw) return item;
+    updated++;
+    return { ...item, title: normalized, updatedAt: nowIso };
+  });
+  if (updated > 0) {
+    writeJson(FILES.cards, next);
+    invalidateBootstrapCache();
+  }
+  return { updated, total: list.length };
+}
+
+function pruneAllRuntimeCaches() {
+  const before = {
+    jsonRead: jsonReadCache.size,
+    sortedCollection: sortedCollectionCache.size,
+    cardSearch: cardSearchCache.size,
+    recentCards: recentCardsCache.size,
+    staticGzip: staticGzipCache.size,
+    staticBr: staticBrCache.size,
+    tokens: tokens.size,
+    loginBuckets: loginAttempts.size,
+    uploadBuckets: uploadAttempts.size
+  };
+  pruneTokens();
+  pruneLoginAttempts();
+  pruneUploadAttempts();
+  pruneInternalCaches();
+  if (jsonReadCache.size > 12) {
+    const keys = [...jsonReadCache.keys()];
+    for (let i = 0; i < keys.length - 12; i++) jsonReadCache.delete(keys[i]);
+  }
+  if (staticGzipCache.size > 32) {
+    const keys = [...staticGzipCache.keys()];
+    for (let i = 0; i < keys.length - 32; i++) staticGzipCache.delete(keys[i]);
+  }
+  if (staticBrCache.size > 32) {
+    const keys = [...staticBrCache.keys()];
+    for (let i = 0; i < keys.length - 32; i++) staticBrCache.delete(keys[i]);
+  }
+  const after = {
+    jsonRead: jsonReadCache.size,
+    sortedCollection: sortedCollectionCache.size,
+    cardSearch: cardSearchCache.size,
+    recentCards: recentCardsCache.size,
+    staticGzip: staticGzipCache.size,
+    staticBr: staticBrCache.size,
+    tokens: tokens.size,
+    loginBuckets: loginAttempts.size,
+    uploadBuckets: uploadAttempts.size
+  };
+  return { before, after, prunedAt: new Date().toISOString() };
+}
+
 function fillMissingButtonText() {
   const list = readJson(FILES.cards, []);
   let updated = 0;
@@ -1735,6 +1859,13 @@ const backend = http.createServer((req, res) => {
     return sendJsonWithEtag(req, res, data, 'private, max-age=2, stale-while-revalidate=10');
   }
 
+  if (u.pathname === '/api/admin/cards/claim-domain-stats' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const category = String(u.searchParams.get('category') || '');
+    const limit = Math.min(50, Math.max(3, Number(u.searchParams.get('limit') || 12)));
+    const data = getClaimDomainStats(category, limit);
+    return sendJsonWithEtag(req, res, data, 'private, max-age=3, stale-while-revalidate=20');
+  }
 
   if (u.pathname === '/api/admin/cards/actionability-summary' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
@@ -2027,6 +2158,18 @@ if (u.pathname === '/api/admin/cards/batch-enabled' && req.method === 'POST') {
   if (u.pathname === '/api/admin/cards/fill-category' && req.method === 'POST') {
     if (!auth(req,res)) return;
     const result = fillMissingCategory();
+    return send(res, 200, JSON.stringify({ ok: true, ...result }));
+  }
+
+  if (u.pathname === '/api/admin/cards/title-normalize' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = normalizeCardTitles();
+    return send(res, 200, JSON.stringify({ ok: true, ...result }));
+  }
+
+  if (u.pathname === '/api/admin/runtime-prune-caches' && req.method === 'POST') {
+    if (!auth(req,res)) return;
+    const result = pruneAllRuntimeCaches();
     return send(res, 200, JSON.stringify({ ok: true, ...result }));
   }
 

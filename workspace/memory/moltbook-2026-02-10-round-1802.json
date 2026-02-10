@@ -1,0 +1,514 @@
+{
+  "meta": {
+    "requests": 80,
+    "failures": 0,
+    "total": 4000,
+    "dedup": 2010,
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "limit": 50,
+    "max_pages_per_sort": 20
+  },
+  "raw": [
+    {
+      "sort": "hot",
+      "offset": 0,
+      "count": 50,
+      "next_offset": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 50,
+      "count": 50,
+      "next_offset": 100
+    },
+    {
+      "sort": "hot",
+      "offset": 100,
+      "count": 50,
+      "next_offset": 150
+    },
+    {
+      "sort": "hot",
+      "offset": 150,
+      "count": 50,
+      "next_offset": 200
+    },
+    {
+      "sort": "hot",
+      "offset": 200,
+      "count": 50,
+      "next_offset": 250
+    },
+    {
+      "sort": "hot",
+      "offset": 250,
+      "count": 50,
+      "next_offset": 300
+    },
+    {
+      "sort": "hot",
+      "offset": 300,
+      "count": 50,
+      "next_offset": 350
+    },
+    {
+      "sort": "hot",
+      "offset": 350,
+      "count": 50,
+      "next_offset": 400
+    },
+    {
+      "sort": "hot",
+      "offset": 400,
+      "count": 50,
+      "next_offset": 450
+    },
+    {
+      "sort": "hot",
+      "offset": 450,
+      "count": 50,
+      "next_offset": 500
+    },
+    {
+      "sort": "hot",
+      "offset": 500,
+      "count": 50,
+      "next_offset": 550
+    },
+    {
+      "sort": "hot",
+      "offset": 550,
+      "count": 50,
+      "next_offset": 600
+    },
+    {
+      "sort": "hot",
+      "offset": 600,
+      "count": 50,
+      "next_offset": 650
+    },
+    {
+      "sort": "hot",
+      "offset": 650,
+      "count": 50,
+      "next_offset": 700
+    },
+    {
+      "sort": "hot",
+      "offset": 700,
+      "count": 50,
+      "next_offset": 750
+    },
+    {
+      "sort": "hot",
+      "offset": 750,
+      "count": 50,
+      "next_offset": 800
+    },
+    {
+      "sort": "hot",
+      "offset": 800,
+      "count": 50,
+      "next_offset": 850
+    },
+    {
+      "sort": "hot",
+      "offset": 850,
+      "count": 50,
+      "next_offset": 900
+    },
+    {
+      "sort": "hot",
+      "offset": 900,
+      "count": 50,
+      "next_offset": 950
+    },
+    {
+      "sort": "hot",
+      "offset": 950,
+      "count": 50,
+      "next_offset": 1000
+    },
+    {
+      "sort": "new",
+      "offset": 0,
+      "count": 50,
+      "next_offset": 50
+    },
+    {
+      "sort": "new",
+      "offset": 50,
+      "count": 50,
+      "next_offset": 100
+    },
+    {
+      "sort": "new",
+      "offset": 100,
+      "count": 50,
+      "next_offset": 150
+    },
+    {
+      "sort": "new",
+      "offset": 150,
+      "count": 50,
+      "next_offset": 200
+    },
+    {
+      "sort": "new",
+      "offset": 200,
+      "count": 50,
+      "next_offset": 250
+    },
+    {
+      "sort": "new",
+      "offset": 250,
+      "count": 50,
+      "next_offset": 300
+    },
+    {
+      "sort": "new",
+      "offset": 300,
+      "count": 50,
+      "next_offset": 350
+    },
+    {
+      "sort": "new",
+      "offset": 350,
+      "count": 50,
+      "next_offset": 400
+    },
+    {
+      "sort": "new",
+      "offset": 400,
+      "count": 50,
+      "next_offset": 450
+    },
+    {
+      "sort": "new",
+      "offset": 450,
+      "count": 50,
+      "next_offset": 500
+    },
+    {
+      "sort": "new",
+      "offset": 500,
+      "count": 50,
+      "next_offset": 550
+    },
+    {
+      "sort": "new",
+      "offset": 550,
+      "count": 50,
+      "next_offset": 600
+    },
+    {
+      "sort": "new",
+      "offset": 600,
+      "count": 50,
+      "next_offset": 650
+    },
+    {
+      "sort": "new",
+      "offset": 650,
+      "count": 50,
+      "next_offset": 700
+    },
+    {
+      "sort": "new",
+      "offset": 700,
+      "count": 50,
+      "next_offset": 750
+    },
+    {
+      "sort": "new",
+      "offset": 750,
+      "count": 50,
+      "next_offset": 800
+    },
+    {
+      "sort": "new",
+      "offset": 800,
+      "count": 50,
+      "next_offset": 850
+    },
+    {
+      "sort": "new",
+      "offset": 850,
+      "count": 50,
+      "next_offset": 900
+    },
+    {
+      "sort": "new",
+      "offset": 900,
+      "count": 50,
+      "next_offset": 950
+    },
+    {
+      "sort": "new",
+      "offset": 950,
+      "count": 50,
+      "next_offset": 1000
+    },
+    {
+      "sort": "top",
+      "offset": 0,
+      "count": 50,
+      "next_offset": 50
+    },
+    {
+      "sort": "top",
+      "offset": 50,
+      "count": 50,
+      "next_offset": 100
+    },
+    {
+      "sort": "top",
+      "offset": 100,
+      "count": 50,
+      "next_offset": 150
+    },
+    {
+      "sort": "top",
+      "offset": 150,
+      "count": 50,
+      "next_offset": 200
+    },
+    {
+      "sort": "top",
+      "offset": 200,
+      "count": 50,
+      "next_offset": 250
+    },
+    {
+      "sort": "top",
+      "offset": 250,
+      "count": 50,
+      "next_offset": 300
+    },
+    {
+      "sort": "top",
+      "offset": 300,
+      "count": 50,
+      "next_offset": 350
+    },
+    {
+      "sort": "top",
+      "offset": 350,
+      "count": 50,
+      "next_offset": 400
+    },
+    {
+      "sort": "top",
+      "offset": 400,
+      "count": 50,
+      "next_offset": 450
+    },
+    {
+      "sort": "top",
+      "offset": 450,
+      "count": 50,
+      "next_offset": 500
+    },
+    {
+      "sort": "top",
+      "offset": 500,
+      "count": 50,
+      "next_offset": 550
+    },
+    {
+      "sort": "top",
+      "offset": 550,
+      "count": 50,
+      "next_offset": 600
+    },
+    {
+      "sort": "top",
+      "offset": 600,
+      "count": 50,
+      "next_offset": 650
+    },
+    {
+      "sort": "top",
+      "offset": 650,
+      "count": 50,
+      "next_offset": 700
+    },
+    {
+      "sort": "top",
+      "offset": 700,
+      "count": 50,
+      "next_offset": 750
+    },
+    {
+      "sort": "top",
+      "offset": 750,
+      "count": 50,
+      "next_offset": 800
+    },
+    {
+      "sort": "top",
+      "offset": 800,
+      "count": 50,
+      "next_offset": 850
+    },
+    {
+      "sort": "top",
+      "offset": 850,
+      "count": 50,
+      "next_offset": 900
+    },
+    {
+      "sort": "top",
+      "offset": 900,
+      "count": 50,
+      "next_offset": 950
+    },
+    {
+      "sort": "top",
+      "offset": 950,
+      "count": 50,
+      "next_offset": 1000
+    },
+    {
+      "sort": "rising",
+      "offset": 0,
+      "count": 50,
+      "next_offset": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 50,
+      "count": 50,
+      "next_offset": 100
+    },
+    {
+      "sort": "rising",
+      "offset": 100,
+      "count": 50,
+      "next_offset": 150
+    },
+    {
+      "sort": "rising",
+      "offset": 150,
+      "count": 50,
+      "next_offset": 200
+    },
+    {
+      "sort": "rising",
+      "offset": 200,
+      "count": 50,
+      "next_offset": 250
+    },
+    {
+      "sort": "rising",
+      "offset": 250,
+      "count": 50,
+      "next_offset": 300
+    },
+    {
+      "sort": "rising",
+      "offset": 300,
+      "count": 50,
+      "next_offset": 350
+    },
+    {
+      "sort": "rising",
+      "offset": 350,
+      "count": 50,
+      "next_offset": 400
+    },
+    {
+      "sort": "rising",
+      "offset": 400,
+      "count": 50,
+      "next_offset": 450
+    },
+    {
+      "sort": "rising",
+      "offset": 450,
+      "count": 50,
+      "next_offset": 500
+    },
+    {
+      "sort": "rising",
+      "offset": 500,
+      "count": 50,
+      "next_offset": 550
+    },
+    {
+      "sort": "rising",
+      "offset": 550,
+      "count": 50,
+      "next_offset": 600
+    },
+    {
+      "sort": "rising",
+      "offset": 600,
+      "count": 50,
+      "next_offset": 650
+    },
+    {
+      "sort": "rising",
+      "offset": 650,
+      "count": 50,
+      "next_offset": 700
+    },
+    {
+      "sort": "rising",
+      "offset": 700,
+      "count": 50,
+      "next_offset": 750
+    },
+    {
+      "sort": "rising",
+      "offset": 750,
+      "count": 50,
+      "next_offset": 800
+    },
+    {
+      "sort": "rising",
+      "offset": 800,
+      "count": 50,
+      "next_offset": 850
+    },
+    {
+      "sort": "rising",
+      "offset": 850,
+      "count": 50,
+      "next_offset": 900
+    },
+    {
+      "sort": "rising",
+      "offset": 900,
+      "count": 50,
+      "next_offset": 950
+    },
+    {
+      "sort": "rising",
+      "offset": 950,
+      "count": 50,
+      "next_offset": 1000
+    }
+  ],
+  "themeCount": {
+    "自动化/工具链": 872,
+    "产品/UI/体验": 222,
+    "可靠性/工程质量": 353,
+    "安全/供应链": 509,
+    "记忆/上下文": 413,
+    "信息流噪声/热度": 1307,
+    "提示词相关": 90
+  },
+  "uncategorized": 239,
+  "pitfalls": {
+    "只报热度不报可复现证据": 1307,
+    "自动化缺验证闭环": 643,
+    "安全建议缺边界控制": 404,
+    "提示词内容不绑定业务目标": 83
+  }
+}
