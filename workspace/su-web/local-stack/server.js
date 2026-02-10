@@ -291,6 +291,7 @@ function invalidateBootstrapCache() {
   recentUpdateFeedCache.clear();
   opsScoreCache.ver = '';
   opsScoreCache.data = null;
+  emptySummaryCache.clear();
 }
 
 function pruneInternalCaches() {
@@ -318,6 +319,10 @@ function pruneInternalCaches() {
   if (recentUpdateFeedCache.size > 20) {
     const keys = [...recentUpdateFeedCache.keys()];
     for (let i = 0; i < keys.length - 20; i++) recentUpdateFeedCache.delete(keys[i]);
+  }
+  if (emptySummaryCache.size > 12) {
+    const keys = [...emptySummaryCache.keys()];
+    for (let i = 0; i < keys.length - 12; i++) emptySummaryCache.delete(keys[i]);
   }
 }
 
@@ -454,6 +459,7 @@ const updatedRangeCache = { ver: '', data: null };
 const duplicateReportCache = { ver: '', data: null };
 const recentUpdateFeedCache = new Map();
 const opsScoreCache = { ver: '', data: null };
+const emptySummaryCache = new Map();
 
 function backupFilePath(file) {
   return `${file}.bak`;
@@ -865,7 +871,7 @@ function getLatestDataUpdatedAt() {
 }
 
 function searchCardsForAdmin(query = '', category = '', limit = 30) {
-  const q = String(query || '').trim().toLowerCase();
+  const q = String(query || '').trim().slice(0, 80).toLowerCase();
   const cat = String(category || '').trim().toLowerCase();
   const safeLimit = Math.min(100, Math.max(1, Number(limit) || 30));
   const cacheKey = `${q}::${cat}::${safeLimit}`;
@@ -992,6 +998,48 @@ function getClaimDomainStats(category = '', limit = 12) {
     generatedAt: new Date().toISOString()
   };
   claimDomainStatsCache.set(ver, data);
+  return data;
+}
+
+
+function getLinkSummaryGapReport(limit = 20) {
+  const safeLimit = Math.min(80, Math.max(1, Number(limit) || 20));
+  const ver = `${getFileVersionKey(FILES.cards)}::link-summary-gap::${safeLimit}`;
+  const hit = emptySummaryCache.get(ver);
+  if (hit) return hit;
+
+  const cards = getSortedCollection('cards').filter(item => item.enabled !== false);
+  const withLinkNoSummary = [];
+  const withSummaryNoLink = [];
+
+  for (const item of cards) {
+    const link = String(item.link || '').trim();
+    const summary = String(item.summary || '').replace(/\s+/g, ' ').trim();
+    const hasLink = !!link && link !== '#';
+    const hasSummary = summary.length >= 8;
+    const row = {
+      id: String(item.id || ''),
+      title: String(item.title || ''),
+      category: String(item.category || ''),
+      updatedAt: String(item.updatedAt || item.createdAt || '')
+    };
+    if (hasLink && !hasSummary) withLinkNoSummary.push(row);
+    if (!hasLink && hasSummary) withSummaryNoLink.push(row);
+  }
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    enabledTotal: cards.length,
+    withLinkNoSummary: {
+      total: withLinkNoSummary.length,
+      items: withLinkNoSummary.slice(0, safeLimit)
+    },
+    withSummaryNoLink: {
+      total: withSummaryNoLink.length,
+      items: withSummaryNoLink.slice(0, safeLimit)
+    }
+  };
+  emptySummaryCache.set(ver, data);
   return data;
 }
 
@@ -1659,6 +1707,38 @@ function getCardsShortSummary(limit = 80, maxLen = 20) {
   };
 }
 
+function getCardsEmptySummary(limit = 30) {
+  const safeLimit = Math.min(200, Math.max(1, Number(limit) || 30));
+  const ver = `${getFileVersionKey(FILES.cards)}::${safeLimit}`;
+  const hit = emptySummaryCache.get(ver);
+  if (hit) return hit;
+
+  const rows = getSortedCollection('cards')
+    .filter(item => item.enabled !== false)
+    .map(item => {
+      const summary = String(item.summary || '').replace(/\s+/g, ' ').trim();
+      if (summary) return null;
+      const link = String(item.link || '').trim();
+      return {
+        id: String(item.id || ''),
+        title: String(item.title || ''),
+        category: String(item.category || ''),
+        hasLink: !!link && link !== '#',
+        updatedAt: String(item.updatedAt || item.createdAt || '').trim()
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => (Date.parse(b.updatedAt || '') || 0) - (Date.parse(a.updatedAt || '') || 0));
+
+  const data = {
+    generatedAt: new Date().toISOString(),
+    total: rows.length,
+    rows: rows.slice(0, safeLimit)
+  };
+  emptySummaryCache.set(ver, data);
+  return data;
+}
+
 function getCardsQualityOverview() {
   const ver = getFileVersionKey(FILES.cards);
   if (qualityOverviewCache.data && qualityOverviewCache.ver === ver) return qualityOverviewCache.data;
@@ -1921,6 +2001,7 @@ function pruneAllRuntimeCaches() {
     cardSearch: cardSearchCache.size,
     recentCards: recentCardsCache.size,
     freshnessSummary: freshnessSummaryCache.size,
+    emptySummary: emptySummaryCache.size,
     staticGzip: staticGzipCache.size,
     staticBr: staticBrCache.size,
     tokens: tokens.size,
@@ -1951,6 +2032,7 @@ function pruneAllRuntimeCaches() {
     cardSearch: cardSearchCache.size,
     recentCards: recentCardsCache.size,
     freshnessSummary: freshnessSummaryCache.size,
+    emptySummary: emptySummaryCache.size,
     staticGzip: staticGzipCache.size,
     staticBr: staticBrCache.size,
     tokens: tokens.size,
@@ -2458,6 +2540,12 @@ const backend = http.createServer((req, res) => {
     return sendJsonWithEtag(req, res, data, 'private, max-age=3, stale-while-revalidate=20');
   }
 
+  if (u.pathname === '/api/admin/cards/link-summary-gaps' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(80, Math.max(1, Number(u.searchParams.get('limit') || 20)));
+    return sendJsonWithEtag(req, res, getLinkSummaryGapReport(limit), 'private, max-age=3, stale-while-revalidate=20');
+  }
+
   if (u.pathname === '/api/admin/cards/actionability-summary' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     return sendJsonWithEtag(req, res, getCardActionabilitySummary(), 'private, max-age=3, stale-while-revalidate=20');
@@ -2500,6 +2588,12 @@ const backend = http.createServer((req, res) => {
     const limit = Math.min(300, Math.max(1, Number(u.searchParams.get('limit') || 80)));
     const maxLen = Math.min(120, Math.max(5, Number(u.searchParams.get('maxLen') || 20)));
     return sendJsonWithEtag(req, res, getCardsShortSummary(limit, maxLen), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/summary-empty' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    const limit = Math.min(200, Math.max(1, Number(u.searchParams.get('limit') || 30)));
+    return sendJsonWithEtag(req, res, getCardsEmptySummary(limit), 'private, max-age=2, stale-while-revalidate=10');
   }
 
   if (u.pathname === '/api/admin/cards/publish-readiness' && (req.method === 'GET' || req.method === 'HEAD')) {
@@ -2579,6 +2673,7 @@ const backend = http.createServer((req, res) => {
         cardSearch: cardSearchCache.size,
         recentCards: recentCardsCache.size,
         freshnessSummary: freshnessSummaryCache.size,
+        emptySummary: emptySummaryCache.size,
         staticGzip: staticGzipCache.size,
         staticBr: staticBrCache.size
       },

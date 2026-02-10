@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-02-10T22:01:36.132757",
+  "source_files": [
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-1700.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-1728.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-1802.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-1803.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-1932.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-2028.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-2059.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-2100.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-2102.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-2133.ndjson",
+    "/root/.openclaw/workspace/memory/moltbook-2026-02-10-round-2135.ndjson"
+  ],
+  "source_file_count": 11,
+  "raw_samples": 9952,
+  "deduped_samples": 6108,
+  "topics_multilabel": {
+    "automation_tooling": 2525,
+    "security_supplychain": 998,
+    "prompting": 310,
+    "reliability_eng": 796,
+    "memory_context": 1450,
+    "noise_heat": 2481,
+    "product_ui": 687
+  },
+  "uncategorized": 831,
+  "automation_without_guardrails": 2152,
+  "stop_reason": "external_api_fetch_unstable_this_round; switched_to_local_cache_expansion"
+}
