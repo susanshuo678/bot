@@ -43,6 +43,8 @@ let bootstrapEtagCache = null;
 let bootstrapBodyCache = null;
 const BOOTSTRAP_CACHE_TTL_MS = 2000;
 const PUBLIC_API_CACHE_CONTROL = 'public, max-age=15, stale-while-revalidate=60, must-revalidate';
+let latestDataUpdatedAtCache = { ts: 0, value: null };
+const LATEST_DATA_UPDATED_AT_CACHE_TTL_MS = 2000;
 
 function getEnabledCards() {
   const ver = getFileVersionKey(FILES.cards);
@@ -248,6 +250,7 @@ function invalidateBootstrapCache() {
   bootstrapCache = null;
   bootstrapEtagCache = null;
   bootstrapBodyCache = null;
+  latestDataUpdatedAtCache = { ts: 0, value: null };
   sortedCollectionCache.clear();
   enabledCardsCache.ver = '';
   enabledCardsCache.data = null;
@@ -440,10 +443,14 @@ function writeJson(file, data) {
     rotateBackups(file);
     try { fs.copyFileSync(file, backup); } catch {}
   }
-  fs.writeFileSync(tmp, content, 'utf8');
-  fs.renameSync(tmp, file);
-  jsonReadCache.delete(file);
-  return true;
+  try {
+    fs.writeFileSync(tmp, content, 'utf8');
+    fs.renameSync(tmp, file);
+    jsonReadCache.delete(file);
+    return true;
+  } finally {
+    try { if (fs.existsSync(tmp)) fs.unlinkSync(tmp); } catch {}
+  }
 }
 function send(res, status, body, type = 'application/json; charset=utf-8', method = 'GET') {
   const payload = Buffer.isBuffer(body) ? body : Buffer.from(String(body || ''), 'utf8');
@@ -764,6 +771,8 @@ function getSortedCollection(fileKey) {
 }
 
 function getLatestDataUpdatedAt() {
+  const t = now();
+  if ((t - latestDataUpdatedAtCache.ts) < LATEST_DATA_UPDATED_AT_CACHE_TTL_MS) return latestDataUpdatedAtCache.value;
   const files = [FILES.ads, FILES.shortcuts, FILES.tabs, FILES.cards];
   let maxTs = 0;
   for (const f of files) {
@@ -772,8 +781,9 @@ function getLatestDataUpdatedAt() {
       if (ts > maxTs) maxTs = ts;
     } catch {}
   }
-  if (!maxTs) return null;
-  return new Date(maxTs).toISOString();
+  const value = maxTs ? new Date(maxTs).toISOString() : null;
+  latestDataUpdatedAtCache = { ts: t, value };
+  return value;
 }
 
 function searchCardsForAdmin(query = '', category = '', limit = 30) {
@@ -1315,6 +1325,47 @@ function getCardActionabilitySummary() {
   return data;
 }
 
+function getCardsQuickInsights() {
+  const cards = getSortedCollection('cards');
+  const enabledCards = cards.filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const dayStartMs = startOfDay.getTime();
+
+  let updated24h = 0;
+  let updatedToday = 0;
+  let claimable = 0;
+  let stale14d = 0;
+
+  for (const item of enabledCards) {
+    const ts = Date.parse(String(item.updatedAt || item.createdAt || ''));
+    if (Number.isFinite(ts)) {
+      if ((nowMs - ts) <= dayMs) updated24h++;
+      if (ts >= dayStartMs) updatedToday++;
+      if ((nowMs - ts) >= 14 * dayMs) stale14d++;
+    } else {
+      stale14d++;
+    }
+    const link = String(item.link || '').trim();
+    if (link && link !== '#') claimable++;
+  }
+
+  return {
+    generatedAt: new Date().toISOString(),
+    totals: {
+      cards: cards.length,
+      enabled: enabledCards.length,
+      updated24h,
+      updatedToday,
+      claimable,
+      stale14d,
+      claimableRate: enabledCards.length ? Math.round((claimable / enabledCards.length) * 100) : 0
+    }
+  };
+}
+
 function getCardsQualityOverview() {
   const ver = getFileVersionKey(FILES.cards);
   if (qualityOverviewCache.data && qualityOverviewCache.ver === ver) return qualityOverviewCache.data;
@@ -1362,6 +1413,40 @@ function getCardsQualityOverview() {
   qualityOverviewCache.ver = ver;
   qualityOverviewCache.data = data;
   return data;
+}
+
+
+function getPublishReadinessReport() {
+  const cards = getSortedCollection('cards').filter(x => x.enabled !== false);
+  const nowMs = Date.now();
+  const metrics = { total: cards.length, missingLink: 0, missingSummary: 0, missingButtonText: 0, stale14d: 0 };
+  const risks = [];
+
+  for (const card of cards) {
+    const reasons = [];
+    const link = String(card.link || '').trim();
+    const summary = String(card.summary || '').trim();
+    const buttonText = String(card.buttonText || '').trim();
+    const ts = Date.parse(String(card.updatedAt || card.createdAt || ''));
+    if (!link || link === '#') { metrics.missingLink++; reasons.push('缺少可领链接'); }
+    if (!summary) { metrics.missingSummary++; reasons.push('缺少摘要'); }
+    if (!buttonText) { metrics.missingButtonText++; reasons.push('缺少按钮文案'); }
+    if (!Number.isFinite(ts) || (nowMs - ts) > 14 * 24 * 60 * 60 * 1000) { metrics.stale14d++; reasons.push('超过14天未更新'); }
+    if (reasons.length) {
+      risks.push({ id: String(card.id || ''), title: String(card.title || ''), reasons });
+    }
+  }
+
+  const weightedRisk = metrics.missingLink * 3 + metrics.missingSummary * 2 + metrics.missingButtonText + metrics.stale14d;
+  const denominator = Math.max(1, cards.length * 7);
+  const score = Math.max(0, 100 - Math.round((weightedRisk / denominator) * 100));
+  return {
+    generatedAt: new Date().toISOString(),
+    ready: score >= 85,
+    score,
+    metrics,
+    topRisks: risks.slice(0, 8)
+  };
 }
 
 function autoDisableLowQualityCards() {
@@ -1890,9 +1975,19 @@ const backend = http.createServer((req, res) => {
     return sendJsonWithEtag(req, res, getCardActionabilitySummary(), 'private, max-age=3, stale-while-revalidate=20');
   }
 
+  if (u.pathname === '/api/admin/cards/quick-insights' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getCardsQuickInsights(), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
   if (u.pathname === '/api/admin/cards/quality-overview' && (req.method === 'GET' || req.method === 'HEAD')) {
     if (!auth(req,res)) return;
     return sendJsonWithEtag(req, res, getCardsQualityOverview(), 'private, max-age=2, stale-while-revalidate=10');
+  }
+
+  if (u.pathname === '/api/admin/cards/publish-readiness' && (req.method === 'GET' || req.method === 'HEAD')) {
+    if (!auth(req,res)) return;
+    return sendJsonWithEtag(req, res, getPublishReadinessReport(), 'private, max-age=2, stale-while-revalidate=10');
   }
 
   if (u.pathname === '/api/admin/cards/category-stats' && (req.method === 'GET' || req.method === 'HEAD')) {
