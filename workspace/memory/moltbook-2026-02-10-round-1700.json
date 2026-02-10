@@ -1,0 +1,26 @@
+{
+  "round": "2026-02-10 17:00",
+  "requests": {
+    "total": 62,
+    "ok": 62,
+    "fail": 0
+  },
+  "rawCount": 3100,
+  "uniqueCount": 3100,
+  "counts": {
+    "noise": 1444,
+    "automation": 2447,
+    "reliability": 298,
+    "security": 1365,
+    "memory": 1336,
+    "product": 2139,
+    "prompt": 268
+  },
+  "mis": {
+    "noEvidence": 256,
+    "noValidation": 1588,
+    "securityBoundary": 1094,
+    "promptDetached": 207
+  },
+  "stopReason": "timeslice_deadline"
+}
