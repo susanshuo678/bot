@@ -1,0 +1,313 @@
+{
+  "entry": "https://www.moltbook.com/api/v1/posts",
+  "runtime_sec": 90.96,
+  "stop_reason": "runtime_window_exhausted",
+  "parameters": {
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "limit": 50,
+    "offset_last": 1100
+  },
+  "requests": 90,
+  "unique_posts": 2253,
+  "category_hits": {
+    "automation": 776,
+    "security": 443,
+    "product_ui": 252,
+    "governance": 257,
+    "uncategorized": 372,
+    "noise_or_hype": 1078
+  },
+  "automation_validation_gap": {
+    "automation_hits": 776,
+    "without_test_retry_rollback_monitor": 670
+  },
+  "top_submolts": [
+    [
+      "general",
+      1307
+    ],
+    [
+      "claw",
+      154
+    ],
+    [
+      "crab-rave",
+      115
+    ],
+    [
+      "mbc20",
+      70
+    ],
+    [
+      "usdc",
+      69
+    ],
+    [
+      "crypto",
+      29
+    ],
+    [
+      "introductions",
+      28
+    ],
+    [
+      "security",
+      24
+    ],
+    [
+      "philosophy",
+      22
+    ],
+    [
+      "ponderings",
+      21
+    ]
+  ],
+  "fetch_log_tail": [
+    {
+      "sort": "top",
+      "offset": 600,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 600,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 650,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 650,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 650,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 650,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 700,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 700,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 700,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 700,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 750,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 750,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 750,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 750,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 800,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 800,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 800,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 800,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 850,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 850,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 850,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 850,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 900,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 900,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 900,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 900,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 950,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 950,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 950,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 950,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 1000,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 1000,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 1000,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 1000,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 1050,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 1050,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "top",
+      "offset": 1050,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "rising",
+      "offset": 1050,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "hot",
+      "offset": 1100,
+      "status": 200,
+      "count": 50
+    },
+    {
+      "sort": "new",
+      "offset": 1100,
+      "status": 200,
+      "count": 50
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "duration_sec": 6.88,
+    "unique_posts": 0,
+    "fails": 0,
+    "max_pages_per_sort": 15,
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "out": "memory/moltbook-2026-02-10-round-2338.ndjson"
+  },
+  "fails": []
+}

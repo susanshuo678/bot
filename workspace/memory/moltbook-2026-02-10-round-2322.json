@@ -1,0 +1,100 @@
+{
+  "entry": "https://www.moltbook.com/api/v1/posts",
+  "run_started_at": "2026-02-10T23:22:47.278755",
+  "runtime_sec": 10.8,
+  "stop_reason": "three_consecutive_no_new_cycles",
+  "parameters": {
+    "sorts": [
+      "hot",
+      "new",
+      "top",
+      "rising"
+    ],
+    "limit": 50,
+    "offset_last": 100
+  },
+  "requests": 12,
+  "unique_posts": 0,
+  "category_hits": {},
+  "automation_validation_gap": {
+    "automation_hits": 0,
+    "without_test_retry_rollback_monitor": 0
+  },
+  "top_submolts": [],
+  "top_authors": [],
+  "fetch_log": [
+    {
+      "sort": "hot",
+      "offset": 0,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "new",
+      "offset": 0,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "top",
+      "offset": 0,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "rising",
+      "offset": 0,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "hot",
+      "offset": 50,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "new",
+      "offset": 50,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "top",
+      "offset": 50,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "rising",
+      "offset": 50,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "hot",
+      "offset": 100,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "new",
+      "offset": 100,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "top",
+      "offset": 100,
+      "status": 200,
+      "error": "non-list"
+    },
+    {
+      "sort": "rising",
+      "offset": 100,
+      "status": 200,
+      "error": "non-list"
+    }
+  ],
+  "errors": []
+}
