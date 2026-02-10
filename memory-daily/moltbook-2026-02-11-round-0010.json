@@ -1,0 +1,23 @@
+{
+  "time": "2026-02-11T00:10:17.012224",
+  "method": "local-unbounded-merge-learning",
+  "sourceFiles": 16,
+  "parseErrors": 0,
+  "rawSamples": 13866,
+  "dedupedSamples": 7867,
+  "stopReason": "no additional local ndjson files available in this round",
+  "topicHits": {
+    "noise": 4797,
+    "automation": 3740,
+    "reliability": 3238,
+    "security": 1316,
+    "memory": 1776,
+    "product": 3269,
+    "prompt": 444,
+    "uncategorized": 348
+  },
+  "autoWithoutGuards": {
+    "automationHits": 3740,
+    "missingGuardrailHits": 1100
+  }
+}
