@@ -248,6 +248,272 @@
   - 生成批次对象页
   - 批次进入极简后台
   - 后续再长出比较 / 通知 / 回访
+
+## 2026-03-20 第五十五轮补充校正（把生产工程护栏正式纳入 MVP 构成）
+
+### 一个关键补充：首版不只要“能生成对象页”，还要“坏了能发现、能定位、能收敛”
+- 新判断：当前主线 A / B 过去已经把 **对象层 / 任务层 / trust layer** 压得比较清楚，但现在还需要把 **最小生产护栏层** 正式纳入 MVP 设计。
+- 原因很直接：
+  - 这些方向都不是纯静态网站，而是带抓取、生成、导入、异步处理的对象产品；
+  - 一旦真上线，最先遇到的问题大多不是“页面不好看”，而是超时、第三方抖动、抓取失败、坏批次、发布后异常、队列积压。
+- 所以现在更现实的 MVP 构成应变成五层：
+  1. **对象层**：report / batch schema
+  2. **任务层**：run / status / retry / replay
+  3. **可信层**：evidence / warning / version / review
+  4. **观测层**：uptime / issue / structured logs / trace-id
+  5. **护栏层**：timeout / retry budget / partial fallback / rerun / rollback
+
+### 对方向 A 的进一步工程化压缩
+- 方向 A 现在更适合被理解为：
+  - `repo / URL 输入`
+  - 触发一条分析任务
+  - 产出一个可信报告对象页
+  - 同时保证这条路径具备最小生产护栏
+- 这意味着方向 A 首版不只要有：
+  - `source`
+  - `summary`
+  - `evidence`
+  - `status`
+  - `next_actions`
+- 还应尽早补上：
+  - `request_id`
+  - `trace_id`
+  - `latest_run_status`
+  - `failure_reason`
+  - `duration_ms`
+  - `deploy_version`
+  - `rerun_count`
+  - `degraded_mode_used`
+- 更现实的关键路径监控顺序：
+  1. 首页可用
+  2. 输入提交成功率
+  3. 报告生成成功率 / 超时率
+  4. 分享页可访问性
+  5. 发布后错误波动
+
+### 对方向 B 的同步工程化压缩
+- 方向 B 现在更适合被理解为：
+  - `CSV / 文本导入`
+  - 触发批次处理任务
+  - 产出一个可处理批次对象页
+  - 同时把异常批次与低置信度结果显式对象化
+- 这意味着方向 B 首版不只要有：
+  - `top_themes`
+  - `quotes`
+  - `recommended_actions`
+  - `processing_progress`
+- 还应尽早补上：
+  - `failed_record_count`
+  - `low_confidence_count`
+  - `latest_run_status`
+  - `failure_reason`
+  - `duration_ms`
+  - `rerun_count`
+  - `partial_fallback_used`
+  - `input_size_limit_hit`
+- 更现实的关键路径监控顺序：
+  1. 上传成功率
+  2. 批次处理成功率 / 超时率
+  3. 部分失败率
+  4. 结果页可访问性
+  5. 发布后异常波动
+
+### 一个更适合网站 / SaaS MVP 的轻量生产工程顺序
+1. **先确认活着**：关键页面 / 核心 API uptime probe
+2. **再确认找得到问题**：issue 化错误入口 + 结构化日志 + request_id / trace_id
+3. **再确认不会雪崩**：timeout、有限重试、size limit、cache、degrade path、circuit breaker 思维
+4. **再确认能恢复**：任务状态机、失败原因、重跑入口、回滚、坏样本回收
+- 这比“先上大盘 / 先搭完整 observability stack”更适合小团队与个人 MVP。
+
+### 新增一个更实用的 MVP 判断维度
+在已有判断标准之外，再补一条：
+15. **坏了时能不能形成短闭环**：是否能在较短时间内发现、定位、重跑/回滚，而不是只知道“用户说坏了”。
+- 如果一个方向需要复杂异步/AI/第三方依赖，却没有短闭环设计，它的真实上线成本会明显高于表面开发成本。
+
+### 当前主线的更现实首版实现顺序（更新后）
+1. 选成熟 starter / 配件层
+2. 定义对象 schema
+3. 定义任务状态机
+4. 做单对象页 / recent 流
+5. 补 uptime、issue 入口、结构化日志
+6. 补关键路径 trace
+7. 补 timeout / retry / partial fallback / rerun / rollback
+8. 最后再考虑更大 dashboard、更多分析维度、更多工作台能力
+
+### 当前排序不变，但工程边界更扎实
+1. **方向 A：repo / URL → 可信报告对象页 → recent 流 → 最小观测层 → 最小护栏层**
+2. **方向 B：CSV / text → 可处理批次对象页 → recent 流 → 最小观测层 → 最小护栏层**
+3. **方向 C：单场景输入 → 强结果对象页 → 回访层 → 最小观测层**
+- A / B 继续领先，不只是因为对象页强，而是因为它们也更容易被收敛成“可上线、可排障、可恢复”的轻量工程形态。
+
+## 2026-03-20 第五十九轮补充校正（starter 已足够成熟，首版继续死守对象层 + 任务层 + 最小流控层）
+
+### 一个更现实的实现判断：starter 已经越来越像“通用 SaaS 配件全集”，首版别再把时间烧在那上面
+- 新判断：这轮重看 `nextjs/saas-starter`、`SaaS-Boilerplate`、`Better Auth`、`Payload`、`Trigger.dev`、`Inngest` 后，更清楚当前主线还能继续压缩。
+- 对 A / B 来说，更现实的首版结构现在可以更明确地写成：
+  1. **对象层**：对象 schema、对象页、recent 流、ownership / export / archive
+  2. **任务层**：状态、失败原因、run metadata、version、rerun
+  3. **最小流控层**：timeout、并发、限流、去抖、subset replay / retry budget
+  4. **配件层**：auth、billing、teams/basic RBAC、logging、testing、monitoring、deploy scaffolding
+- 也就是说，首版真正该自己做的，仍主要是 **对象层 + 任务层**；流控层是任务层真正能上线的必要补强。
+
+### 对方向 A 的新增强化
+- 方向 A 当前更完整地像：
+  - `repo / URL 输入`
+  - `报告对象 schema`
+  - `分析任务对象`
+  - `最小流控层（timeout / retry budget / concurrency）`
+  - `统一诊断/决策入口型强报告页`
+  - `recent 流`
+  - `ownership / export / archive`
+- 这意味着 A 的首版实现优先级更该继续压在：
+  1. report schema
+  2. run 状态与 failure reason
+  3. rerun / replay 入口
+  4. timeout / 并发 / 有限重试
+  5. 再用成熟 starter 接住 auth、billing、activity log、teams 等配件层
+
+### 对方向 B 的同步强化
+- 方向 B 当前更完整地像：
+  - `CSV / 文本导入`
+  - `批次对象 schema`
+  - `批次处理任务对象`
+  - `最小流控层（size limit / timeout / throttling / bad-row tolerance）`
+  - `统一处理入口型强批次页`
+  - `recent 流`
+  - `ownership / export / archive`
+- 这意味着 B 的首版实现优先级更该继续压在：
+  1. batch schema
+  2. run / step 状态与 failure reason
+  3. failed subset rerun / low-confidence subset rerun
+  4. size limit / timeout / throttling / 有限重试
+  5. 再把 auth、billing、monitoring、testing 等尽量站在成熟 starter 上
+
+### 新增一个更实用的判断维度
+43. **任务层是否已经连同最小流控层一起被设计进去**：如果一个方向不仅定义了状态，还清楚考虑了 timeout、并发、限流、重放/重跑、subset 补救，它会比只有“会跑任务”的方向更适合真实上线。
+
+### 当前更现实的首版实现顺序（再次压缩）
+1. 先选成熟 starter / 配件底座
+2. 再锁对象 schema
+3. 再锁任务状态机
+4. 再补最小流控层（timeout / retry budget / concurrency / size limits）
+5. 再做对象页 / recent 流
+6. 再补最小观测层与最小护栏层
+7. 最后才扩 teams、RBAC、复杂后台、enterprise feature
+
+### 当前排序不变，但“该自己做什么”更清楚
+1. **方向 A：repo / URL → 报告对象 + 分析任务 + 最小流控层 → 强报告页 → recent 流**
+2. **方向 B：CSV / text → 批次对象 + 批次任务 + 最小流控层 → 强批次页 → recent 流**
+3. **方向 C：单场景输入 → 强结果对象 + 刷新任务 + 最小流控层 → 回访层**
+- A / B 继续领先，一个更现实的原因是：它们都能自然长成“对象层 + 任务层 + 最小流控层 + 配件层复用”这条非常稳的轻量全栈骨架。
+
+## 2026-03-20 第五十二轮补充校正（聚焦报告对象页 / 批次对象页的数据模型与可信层）
+
+### 一个关键收缩：首版真正该先设计的，不是页面树，而是四层模型
+- 新判断：当前主线的 MVP 若想避免变成“好看但不可信的一次性 AI 页面”，最该先定义的是四层：
+  1. **对象层**：report / batch 本身是什么
+  2. **运行层**：run / step_run / retry / replay / version
+  3. **审计层**：audit_event / actor / action / before-after
+  4. **验证层**：schema validation / confidence / eval / review
+- 也就是说，首版对象页真正的差异化会更集中在：
+  - 字段是否清楚
+  - 状态是否可靠
+  - 结果能否解释
+  - 失败能否重跑
+
+### 对方向 A（报告对象页产品）的进一步压缩
+- 方向 A 现在更适合被理解为：
+  - 输入 `repo / URL / text`
+  - 触发一条 workflow/run
+  - 产出一个**验证过 schema 的报告对象**
+  - 在对象页里同时显示：内容 + 证据 + 状态 + warning + next actions + rerun
+- 这意味着首版应优先定义的 report 字段是：
+  - `source_type`
+  - `source_ref`
+  - `title`
+  - `summary`
+  - `status`
+  - `visibility`
+  - `confidence`
+  - `pipeline_version`
+  - `prompt_version`
+  - `latest_run_id`
+  - `positioning`
+  - `key_pages`
+  - `suspected_stack`
+  - `borrowable_ideas`
+  - `avoid_copying`
+  - `suggested_next_actions`
+  - `warning_flags`
+  - `evidence_count`
+- 首版页面优先级因此建议改成：
+  1. 输入页
+  2. 报告对象页（强可信层）
+  3. 最近报告列表
+  4. 分享页 / 公开页
+  5. 再考虑更复杂的推荐/比较
+
+### 对方向 B（批次对象页产品）的进一步压缩
+- 方向 B 现在更适合被理解为：
+  - 导入 `CSV / text / survey export`
+  - 触发 batch workflow
+  - 把中间步骤和失败状态正式对象化
+  - 在批次页里同时显示：洞察 + 处理进度 + 失败项 + 低置信度项 + replay 入口
+- 首版应优先定义的 batch 字段是：
+  - `input_type`
+  - `input_ref`
+  - `record_count`
+  - `status`
+  - `processing_progress`
+  - `latest_run_id`
+  - `pipeline_version`
+  - `top_themes`
+  - `representative_quotes`
+  - `recommended_actions`
+  - `failed_record_count`
+  - `low_confidence_count`
+  - `needs_review_count`
+  - `evaluation_status`
+  - `last_replay_at`
+- 这也说明方向 B 的首版重点不该只是“生成洞察”，而应是“生成一个可处理、可重跑、可比较的批次对象页”。
+
+### 新的 MVP build order（比之前更工程化）
+1. 先定义对象 schema
+2. 再定义状态机
+3. 再定义 run / replay / review 入口
+4. 再做对象页布局
+5. 最后再补列表页 / 分享页 / 周边配件
+- 这个顺序比“先做 landing 和页面”更稳，因为当前主线本质上已经是对象产品，而不是普通工具站。
+
+### 报告对象页的最小状态机建议
+- `draft → processing → ready → review_required → published`
+- 旁路状态：`failed`、`archived`
+- 对应按钮自然变成：
+  - rerun
+  - mark for review
+  - approve/publish
+  - archive
+
+### 批次对象页的最小状态机建议
+- `uploaded → queued → processing → ready`
+- 异常分支：`partially_failed`、`failed`
+- 后处理分支：`review_required → published / archived`
+- 对应按钮自然变成：
+  - rerun failed items
+  - rerun low-confidence items
+  - full rerun
+  - approve/publish
+
+### 新增一个更实用的首版判断维度
+在已有排序维度上，再补一条：
+7. **对象结果是否有正式 trust layer**：是否能回答“这是谁生成的、基于什么、什么时候、失败了没、能不能重跑、是否经过验证/审核”。
+- 如果没有这一层，AI 对象页很容易只剩“漂亮摘要”。
+
+### 当前主线的更清楚 MVP 定义
+1. **方向 A：repo / URL → 可信报告对象页 → recent stream → 轻分享层**
+2. **方向 B：CSV / text → 可处理批次对象页 → recent stream → replay / compare 层**
+3. **方向 C：单场景输入 → 强结果对象页 → 回访与提醒层**
+- A/B 之所以继续领先，是因为它们现在都已经不只是“结果页产品”，而是**对象 + run + trust layer** 产品。
 - 重点不是先把“分析能力”做满，而是把“批次对象是否可信、是否可回看、是否可处理”做扎实。
 
 ### 新增一个实际工程判断维度
@@ -1542,6 +1808,298 @@
 5. 单角色工作台型 niche SaaS
 
 
+## 2026-03-20 第五十七轮补充校正（替代型表达 / frontstage 对象页 / trust layer 再收敛）
+
+### 新增一条更现实的产品判断：首版不只要“对象页强”，还要让它像一个足够清楚的 frontstage 产品
+- 新判断：这一轮定向看 Cap、Documenso、Formbricks、Papermark 后，更清楚当前主线 A / B 若想更有转化，不该只是“有个强对象页”。
+- 更现实的首版还应同时满足：
+  1. **对外表达清楚替代哪条低效流程**；
+  2. **公开对象页就是 frontstage 主产品层，而不是附属输出页**；
+  3. **trust / ownership 信号直接前台化**，让用户敢把对象放进来。
+- 也就是说，当前更完整的首版结构已经更像：
+  - **替代型 landing → 强示例对象 / gallery → 低摩擦输入 → 强对象页（可公开）→ recent / library → ownership / trust layer → 对象驱动提醒 / 收费边界**。
+
+### 对方向 A 的新增强化：报告对象产品更应像“公开研究对象页产品”，而不是分析后台
+- 方向 A（GitHub / 网站产品拆解报告对象库）当前更完整的首版路径现在更像：
+  1. Landing：直接讲“替代手工研究笔记 / 手工产品拆解整理”；
+  2. 首屏放 2-4 个强示例报告 / gallery；
+  3. repo / URL 极短输入 / 导入；
+  4. 输入接入状态 → 报告对象 schema → 分析任务对象；
+  5. **公开强报告页**（摘要、关键判断、来源、evidence、warning、next actions、基础 metadata）；
+  6. 登录后进入 private object page / recent 报告流；
+  7. 再沉淀到 library / archive；
+  8. ownership / trust layer（导出、visibility、activity、archive、rerun、failure reason）。
+- 这意味着 A 的首页与产品描述应继续收紧：
+  - 卖点不是“AI 分析 GitHub”，而是“把手工研究流程压成一个可分享、可保存、可回看的研究对象”。
+
+### 对方向 B 的同步强化：批次对象产品也应更像“处理入口型前台对象页”
+- 方向 B（AI 反馈洞察批次库）当前更完整的首版路径现在更像：
+  1. Landing：直接讲“替代手工整理反馈 / 手工做洞察周报”；
+  2. 首屏放 2-3 个示例批次 / 示例洞察页；
+  3. CSV / 文本低摩擦导入；
+  4. 导入接入状态 → 批次对象 schema → 批次处理任务对象；
+  5. **公开/私有强批次页**（主题、引文、建议动作、状态、风险点、处理入口）；
+  6. 登录后进入 recent batch 流；
+  7. 再沉淀到 batch library / archive；
+  8. ownership / trust layer（导出、visibility、activity、rerun、failure reason）。
+- 也就是说，B 也不该对外讲成“AI feedback platform”，而应继续讲成“把一批原始反馈压成一个可处理对象”。
+
+### 新增一个更实用的 MVP 判断维度
+42. **产品是否已经具备“替代型表达 + frontstage 对象页 + trust layer”三件套**：如果一个方向不仅有强对象页，还能清楚讲替代什么流程、公开页如何传播、对象为什么值得信任和长期保存，它更适合真正上线验证。
+
+### 一个新的页面与层级优先级提醒
+当前更现实的首版顺序现在可以进一步压成：
+1. 替代型 landing（讲替代谁/什么低效流程）
+2. 强示例对象 / gallery
+3. 低摩擦输入 / 导入
+4. public frontstage object page
+5. private object page + recent stream
+6. ownership / trust layer
+7. library / archive
+8. notification / pricing / analytics 作为自然二阶段增强
+- 原因：
+  - Papermark 继续证明公开对象页就是产品主层；
+  - Documenso 继续证明 trust/ownership 应当前台化；
+  - Cap 继续证明 analytics 最适合作为分享对象后的自然增强；
+  - Formbricks 继续证明模板/示例对象是 adoption 正式层。
+
+### 对当前主线的再次强化
+- 方向 A 现在更完整地像：
+  - **替代型 landing → 强示例报告 / gallery → 低摩擦 repo / URL 输入 → public 报告对象页 → private object page / recent 流 → library / archive → ownership / trust layer → 轻 analytics / reminder / pricing**
+- 方向 B 现在更完整地像：
+  - **替代型 landing → 强示例批次 / gallery → 低摩擦 CSV / 文本导入 → public/private 批次对象页 → recent 流 → batch library / archive → ownership / trust layer → digest / reminder / pricing**
+- A / B 继续领先，又多了一个现实原因：
+  - 它们都能很自然地长成“强前台对象页产品”，而不是只能躲在后台里成立。
+
+## 2026-03-20 第六十一轮补充校正（对象页背后的运行层进一步压成 flow / task / artifact / trigger / replay）
+
+### 一个关键新增判断：A / B 的 MVP 已不该只设计对象 schema，还应正式补“artifact 层”与“trigger/replay 层”
+- 新判断：这轮补看 Prefect、Kestra、Windmill 后，更清楚当前主线的运行层还可以再收一层。
+- 对 A / B 来说，更现实的首版数据/运行骨架现在更像 5 件套：
+  1. **flow**：本次处理整体运行
+  2. **task / step**：流程里的明确阶段
+  3. **artifact**：阶段产物、导出件、证据件、日志摘要
+  4. **trigger**：由什么触发（手动、导入、定时、事件、审核通过）
+  5. **replay**：如何重跑（全量、单步、子集、历史回填）
+- 也就是说，首版如果只有对象字段与最终结果，还不够；还应至少预留：
+  - 阶段产物怎么挂到对象页；
+  - 是什么触发了这次 run；
+  - 重跑是 full / step / subset 哪一种。
+
+### 对方向 A 的新增强化
+- 方向 A 当前更完整地像：
+  - `repo / URL 输入`
+  - `输入接入状态`
+  - `报告对象 schema`
+  - `analysis flow / task / artifact 层`
+  - `统一诊断/决策入口型强报告页`
+  - `audit / review / rerun / backfill`
+  - `recent 流 → library / archive`
+- 这意味着 A 的首版现在更值得补的字段包括：
+  - `trigger_source`
+  - `latest_flow_id`
+  - `latest_task_stage`
+  - `artifact_count`
+  - `last_full_rerun_at`
+  - `last_step_rerun_at`
+  - `backfill_source`
+- 页面上也应更明确露出：
+  - 最近运行
+  - 关键 artifact（来源摘要、抓取片段、截图、结构化 evidence）
+  - 可执行动作卡（rerun / publish / archive / export）
+
+### 对方向 B 的同步强化
+- 方向 B 当前更完整地像：
+  - `CSV / 文本导入`
+  - `导入接入状态`
+  - `批次对象 schema`
+  - `batch flow / task / artifact 层`
+  - `统一处理入口型强批次页`
+  - `replay / review / comparison / backfill`
+  - `recent 流 → batch library / archive`
+- 这意味着 B 的首版现在更值得补的字段包括：
+  - `trigger_source`
+  - `latest_flow_id`
+  - `artifact_count`
+  - `failed_subset_count`
+  - `last_subset_rerun_at`
+  - `last_backfill_at`
+  - `processing_stage_summary`
+- 页面上也应更明确露出：
+  - 当前卡在哪一步
+  - 每一步产出了什么 artifact
+  - 失败子集 / 低置信度子集能否单独重跑
+
+### 新增一个更实用的 MVP 判断维度
+44. **对象页背后是否已经具备 flow / task / artifact / trigger / replay 五件套雏形**：如果一个方向不仅有对象 schema 和任务状态，还清楚定义了阶段产物、触发来源与重跑模式，它会比只会“生成一页结果”的方向更像真实产品。
+
+### 一个新的实现优先级提醒
+当前更现实的推进顺序可以进一步压成：
+1. 先选成熟 starter / 配件组合
+2. 再锁对象 schema
+3. 再锁任务状态机
+4. **再补 artifact / trigger / replay 设计**
+5. 再做对象页 / recent 流
+6. 再补 ownership / export / archive
+7. 再补最小 observability / 护栏层 / 对象驱动通知层
+8. 最后才扩复杂 workspace、team/RBAC、enterprise feature
+- 原因：
+  - 现在更容易把产品做成“会生成结果的页面”；
+  - 真正更难、也更值钱的，是把对象页背后的运行与补救层设计清楚。
+
+### 当前排序不变，但 A / B 的模型更完整
+1. **方向 A：repo / URL → 报告对象 + analysis flow/task/artifact 层 → 强报告页 → recent / library / archive**
+2. **方向 B：CSV / text → 批次对象 + batch flow/task/artifact 层 → 强批次页 → recent / batch library / archive**
+3. **方向 C：单场景输入 → 结果对象 + 刷新任务层 → 结果对象页 → recent / revisit**
+- A / B 继续领先，一个新的现实原因是：
+  - 它们现在都能自然长成“对象层 + 运行层 + artifact 层 + replay 层”的稳产品骨架，而不是一次性分析器。
+
+## 2026-03-20 第五十六轮补充校正（增长包装 / 激活路径 / 轻留存结构）
+
+### 新增一条更现实的 MVP 判断：首版不只要“对象页强”，还要把增长入口和留存入口一起设计清楚
+- 新判断：这一轮继续围绕 SaaS / 工具站增长与包装方式收敛后，更清楚当前主线 A / B / C 的首版不能只停在“能生成强对象页”。
+- 更现实的首版增长骨架应同时满足：
+  1. **landing page 先卖示例对象 / gallery + 明确替代流程**；
+  2. **公开对象页可直接承担分享传播与 SEO**；
+  3. **后台不是单一 history，而是 recent / library 双层**；
+  4. **定价直接映射对象/任务边界**；
+  5. **激活后很快给一次轻回访触发**（完成/失败/收藏/提醒/digest）。
+- 也就是说，当前主线的更现实首版结构，已经不仅是对象层/任务层/配件层，还应正式补上：
+  - **frontstage growth layer**
+  - **activation path layer**
+  - **light retention layer**
+
+### 对方向 A 的新增强化：报告对象产品的增长与包装骨架
+- 方向 A（GitHub / 网站产品拆解报告对象库）当前更完整的首版路径现在更像：
+  1. Landing：直接讲“替代手工研究笔记 / 产品拆解整理”；
+  2. 首屏给 2-4 个**强示例报告 / gallery**；
+  3. repo / URL 极短输入/导入；
+  4. 输入接入状态 → 报告对象 schema → 分析任务对象；
+  5. 统一诊断/决策入口型强报告页；
+  6. 支持公开/私有、唯一分享链接、基础 metadata；
+  7. 登录后优先看到 **recent 报告流**；
+  8. 再沉淀到 **library / archive**；
+  9. 用完成/失败/回看 digest 做轻留存触发；
+  10. 定价按报告数、私有对象、重跑、导出、archive、提醒来写。
+- 这意味着 A 的首页与定价页也应继续收紧：
+  - 首页重点展示结果对象长什么样，而不是强调抽象 AI；
+  - 定价重点展示对象/任务权益，而不是模糊 Pro feature list。
+
+### 对方向 B 的同步强化：批次对象产品的增长与包装骨架
+- 方向 B（AI 反馈洞察批次库）当前更完整的首版路径现在更像：
+  1. Landing：直接讲“替代手工整理反馈 / 手工做洞察周报”；
+  2. 首屏给 2-3 个**示例批次 / 示例洞察页**；
+  3. CSV / 文本低摩擦导入；
+  4. 导入接入状态 → 批次对象 schema → 批次处理任务对象；
+  5. 统一处理入口型强批次页；
+  6. 支持公开示例页、私有批次、唯一分享链接；
+  7. 登录后优先看到 **recent batch 流**；
+  8. 再沉淀到 **batch library / archive**；
+  9. 用导入完成 / 失败 / 周摘要 digest 做轻留存触发；
+  10. 定价按批次数、记录数、私有批次、重跑、导出、提醒来写。
+- 这意味着 B 的增长重点不该是“完整反馈平台”，而应是：
+  - 让用户很快看到一页高质量批次对象页；
+  - 再给他一个轻理由回来继续处理下一批或回看旧批次。
+
+### 对方向 C 的同步强化：单场景结果对象也应走同样骨架
+- 方向 C（垂直结果对象面板）若继续推进，更现实的首版也应沿同一结构理解：
+  1. 单场景替代性 landing；
+  2. 示例结果对象 / 示例公开页；
+  3. 低摩擦接入；
+  4. 强结果对象页；
+  5. recent / revisit；
+  6. 变化提醒 / digest；
+  7. 定价按对象、刷新次数、提醒、private/report/export 来写。
+- 也就是说，C 不该再被理解成“做个 dashboard”，而是“做个会传播、会回访、会收费的结果对象”。
+
+### 新增一个更实用的 MVP 判断维度
+41. **增长入口、激活路径、轻留存触发是否已经闭环**：如果一个方向已经清楚“用户先看什么示例对象、如何快速创建第一个对象、对象页如何传播、如何进入 recent、什么触发第二次回访”，它比只有强对象页的方向更适合真正上线验证。
+
+### 新增一个更适合当前主线的首版页面顺序
+1. Landing（替代流程 + 示例对象 / gallery）
+2. Input / Import（极短输入路径）
+3. Strong object page（公开分享能力）
+4. Recent stream
+5. Library / archive（后补但要预留）
+6. Pricing（按对象/任务边界）
+7. Reminder / digest / notification（轻留存触发）
+- 这比“先把后台做大”更符合当前对象型轻 SaaS 的真实增长路径。
+
+### 对当前主线的再次强化
+- 方向 A 现在更完整地像：
+  - **强示例报告 / gallery → 低摩擦 repo / URL 输入 → 报告对象 + 分析任务 → 公开强报告页 → recent 流 → library / archive → 对象驱动提醒 → 对象驱动定价**
+- 方向 B 现在更完整地像：
+  - **强示例批次 / gallery → 低摩擦 CSV / 文本导入 → 批次对象 + 处理任务 → 公开/私有强批次页 → recent 流 → batch library / archive → 批次提醒 → 对象驱动定价**
+- A / B 之所以继续领先，又多了一个现实原因：
+  - 它们都很适合走“示例对象解释价值 → 强对象页承担传播 → recent/library 承担留存 → 对象/任务额度承担收费”这条轻 SaaS 增长骨架。
+
+## 2026-03-20 第五十四轮补充校正（实时对象层 / schema-first 数据边界 / route-action 边界）
+
+### 新增一条更现实的实现判断：对象型 SaaS 首版除了“对象层 + 任务层 + 配件层”，还应开始显式补“数据边界层”和“路由动作边界层”
+- 新判断：这轮看 Convex、Drizzle、TanStack Start、Supabase 后，更清楚当前主线的实现骨架还能再压得更工程化一点。
+- 对 A / B 来说，更现实的首版分层现在可以写成 5 层：
+  1. **对象层**：report / batch / run 的 schema 与生命周期；
+  2. **任务层**：状态、失败原因、重跑、版本、flow control；
+  3. **数据边界层**：typed schema、relations、migration、query/update 约束；
+  4. **路由动作边界层**：route params、filters、public/private route、server actions / server functions；
+  5. **配件层**：auth、billing、storage、basic API、dashboard、email。
+- 这意味着首版不只要问“对象页长什么样”，还要问：
+  - 对象字段是否稳定；
+  - URL / filters / actions 是否长期可维护；
+  - 数据层和页面动作边界是否会很快失控。
+
+### 对方向 A 的新增强化
+- 方向 A（GitHub / 网站产品拆解报告对象库）当前更完整的首版骨架现在更像：
+  1. repo / URL 低摩擦输入 / 导入
+  2. 强示例报告 / 公开示例页
+  3. 输入接入状态
+  4. 报告对象 schema
+  5. 分析任务对象
+  6. **typed 数据边界层**（report / run / evidence / audit 的 schema、relations、migrations）
+  7. **typed 路由动作边界层**（report route、share route、recent filters、rerun / publish / archive actions）
+  8. 统一诊断/决策入口型强报告页
+  9. recent 流
+  10. ownership / 导出 / archive
+- 也就是说，A 的下一步实现重点不只是页面，而是把 report object 的 DB schema、route params、page actions 一起收紧。
+
+### 对方向 B 的同步强化
+- 方向 B（AI 反馈洞察批次库）当前更完整的首版骨架现在更像：
+  1. CSV / 文本低摩擦导入
+  2. 强示例批次 / 公开示例页
+  3. 导入接入状态
+  4. 批次对象 schema
+  5. 批次处理任务对象
+  6. **typed 数据边界层**（batch / run / item_error / evaluation / review 的 schema、relations、migrations）
+  7. **typed 路由动作边界层**（batch route、recent filters、review / rerun / publish actions）
+  8. 统一处理入口型强批次页
+  9. recent 流
+  10. ownership / 导出 / archive
+- 也就是说，B 的下一步实现重点也不只是批次页内容，而是让 schema、filters、actions 从一开始就更稳。
+
+### 新增一个更实用的 MVP 判断维度
+40. **数据边界层与路由动作边界层是否已经足够清楚**：如果一个方向已经能把对象字段、任务字段、URL/filter schema、页面动作边界一起定义清楚，它会比只有漂亮对象页的方向更容易长成长期产品。
+
+### 新增一个实现优先级提醒
+- 以后如果开始真做，更推荐的顺序现在可以进一步压成：
+  1. 先选成熟 starter / 配件底座（Supabase / starter / auth / storage 等）
+  2. 再锁对象 schema
+  3. 再锁任务状态机
+  4. 再锁数据边界层（relations / migrations / typed queries）
+  5. 再锁路由动作边界层（route params / filters / public-private / object actions）
+  6. 再做对象页 / recent 流
+  7. 再补最小 observability / 护栏层 / 对象驱动通知层
+- 原因：
+  - 配件层已经很成熟；
+  - 真正会长期拖累产品的，往往是 schema 漂、route/filter/action 漂，而不是 starter 不够全。
+
+### 对当前主线的再次强化
+- 方向 A 现在更完整地像：
+  - **低摩擦输入/导入 + 强示例报告 → 输入接入状态 → 报告 schema → 分析任务对象 → typed 数据边界层 → typed 路由动作边界层 → 强报告页 → recent 流 → ownership / 导出 / archive**
+- 方向 B 现在更完整地像：
+  - **低摩擦导入 + 强示例批次 → 导入接入状态 → 批次 schema → 批次处理任务对象 → typed 数据边界层 → typed 路由动作边界层 → 强批次页 → recent 流 → ownership / 导出 / archive**
+- 这两条主线之所以继续领先，又多了一个现实原因：
+  - 它们都能自然长成“对象层 + 任务层 + 数据边界层 + 路由动作边界层 + 配件层复用”这条非常稳的全栈产品骨架。
+
 ## 2026-03-20 第四十九轮补充校正（starter / schema / tasks / flow control 再收敛）
 
 ### 新增一条更现实的实现判断：成熟 starter 已经深到覆盖 teams / logging / testing / monitoring，首版更该死守“对象层 + 任务层”
@@ -2090,3 +2648,209 @@
 3. 垂直结果对象面板（低摩擦接入 + 示例结果对象 → 结果对象 schema → 刷新任务层 → 单场景结果对象 → recent / 回看层 → 最小观测/护栏层 → 变化/告警/摘要通知）
 4. 项目想法筛选器
 5. 单角色工作台型 niche SaaS
+
+## 2026-03-20 第六十三轮补充校正（全栈骨架继续收敛：starter 足够成熟，首版继续死守对象层 + 任务层 + 最小流控层）
+
+### 新增一条更现实的实现判断：成熟 starter 已经足够覆盖大部分通用 SaaS 配件层，首版别再把时间烧在那上面
+- 新判断：这轮重看 Next.js Postgres/Auth starter、Better Auth、Payload、Trigger.dev、Inngest、Open SaaS、Keystone 后，更清楚当前主线还能继续压缩。
+- 对 A / B 来说，更现实的首版结构现在可以更明确地写成：
+  1. **对象层**：对象 schema、对象页、recent 流、ownership / export / archive
+  2. **任务层**：状态、失败原因、run metadata、version、rerun
+  3. **最小流控层**：timeout、并发、限流、去抖、subset replay / retry budget
+  4. **配件层**：auth、billing、teams/basic RBAC、logging、testing、monitoring、deploy scaffolding
+- 也就是说，首版真正该自己做的，仍主要是 **对象层 + 任务层**；流控层是任务层真正能上线的必要补强。
+
+### 对方向 A 的新增强化
+- 方向 A 当前更完整地像：
+  - `repo / URL 输入`
+  - `报告对象 schema`
+  - `分析任务对象`
+  - `最小流控层（timeout / retry budget / concurrency）`
+  - `统一诊断/决策入口型强报告页`
+  - `recent 流`
+  - `ownership / export / archive`
+- 这意味着 A 的首版实现优先级更该继续压在：
+  1. report schema
+  2. run 状态与 failure reason
+  3. rerun / replay 入口
+  4. timeout / 并发 / 有限重试
+  5. 再用成熟 starter 接住 auth、billing、activity log、teams 等配件层
+
+### 对方向 B 的同步强化
+- 方向 B 当前更完整地像：
+  - `CSV / 文本导入`
+  - `批次对象 schema`
+  - `批次处理任务对象`
+  - `最小流控层（size limit / timeout / throttling / bad-row tolerance）`
+  - `统一处理入口型强批次页`
+  - `recent 流`
+  - `ownership / export / archive`
+- 这意味着 B 的首版实现优先级更该继续压在：
+  1. batch schema
+  2. run / step 状态与 failure reason
+  3. failed subset rerun / low-confidence subset rerun
+  4. size limit / timeout / throttling / 有限重试
+  5. 再把 auth、billing、monitoring、testing 等尽量站在成熟 starter 上
+
+### 新增一个更实用的判断维度
+45. **任务层是否已经连同最小流控层一起被设计进去**：如果一个方向不仅定义了状态，还清楚考虑了 timeout、并发、限流、重放/重跑、subset 补救，它会比只有“会跑任务”的方向更适合真实上线。
+
+### 当前更现实的首版实现顺序（再次压缩）
+1. 先选成熟 starter / 配件底座
+2. 再锁对象 schema
+3. 再锁任务状态机
+4. 再补最小流控层（timeout / retry budget / concurrency / size limits）
+5. 再做对象页 / recent 流
+6. 再补最小观测层与最小护栏层
+7. 最后才扩 teams、RBAC、复杂后台、enterprise feature
+
+### 当前排序不变，但“该自己做什么”更清楚
+1. **方向 A：repo / URL → 报告对象 + 分析任务 + 最小流控层 → 强报告页 → recent 流**
+2. **方向 B：CSV / text → 批次对象 + 批次任务 + 最小流控层 → 强批次页 → recent 流**
+3. **方向 C：单场景输入 → 强结果对象 + 刷新任务 + 最小流控层 → 回访层**
+- A / B 继续领先，一个更现实的原因是：它们都能自然长成“对象层 + 任务层 + 最小流控层 + 配件层复用”这条非常稳的轻量全栈骨架。
+
+
+## 2026-03-20 第六十四轮补充校正（生产环境工程 / 可观测性 / 稳定性骨架收敛：网站 / SaaS MVP 先做“最小线上可信层”）
+
+### 新增一个非常现实的判断：MVP 不是不上生产工程，而是只上最值钱的那一小层
+- 新判断：这轮集中看 OpenObserve、OpenTelemetry Collector、Prometheus、Alertmanager、Loki、Tempo、Sentry、Nightingale、Upptime 后，更清楚网站 / SaaS MVP 的生产工程首版不该理解成“以后再说”。
+- 但也不该一上来重建 Datadog / Grafana / ELK 全家桶。
+- 对当前主线，更现实的首版线上骨架应该是：
+  1. **应用可靠性层**：timeout、有限重试、并发限制、降级/回退、缓存、幂等、熔断边界
+  2. **最小观测层**：结构化日志、错误聚合、少量黄金指标、关键路径 trace
+  3. **最小告警层**：分组、静默、重复间隔、少量高价值告警
+  4. **外部可信层**：健康检查、状态页、事故记录
+- 也就是说，首版不是不上生产工程，而是只上 **最小线上可信层**。
+
+### 对方向 A 的新增强化
+- 方向 A 现在更完整地像：
+  - `repo / URL 输入`
+  - `报告对象 schema`
+  - `分析任务对象 + 最小流控层`
+  - `强报告页 / recent 流`
+  - `最小线上可信层（结构化日志 + error tracking + 核心指标 + 关键 trace + 外部健康检查）`
+- 这意味着 A 的首版工程优先级更应该是：
+  1. request_id / trace_id / report_id / run_id 统一关联
+  2. 外部 API 调用 timeout / retry budget / fallback
+  3. 关键任务耗时、失败率、第三方依赖错误率
+  4. 失败 run 可直接跳到对应日志 / trace / error
+  5. 再做更重 dashboard / 平台化告警
+
+### 对方向 B 的同步强化
+- 方向 B 现在更完整地像：
+  - `CSV / 文本导入`
+  - `批次对象 schema`
+  - `批次任务对象 + 最小流控层`
+  - `强批次页 / recent 流`
+  - `最小线上可信层（结构化日志 + error tracking + 批次指标 + step trace + 外部健康检查）`
+- 这意味着 B 的首版工程优先级更应该是：
+  1. batch_id / run_id / step_run_id / trace_id 统一关联
+  2. size limit / timeout / throttling / bad-row tolerance
+  3. 批次吞吐、失败率、低置信度比例、平均处理时长
+  4. failed subset rerun 能回看证据、日志与失败原因
+  5. 再做更重的多租户观测与复杂告警策略
+
+### 新增一个更实用的产品判断维度
+46. **这个方向是否能用“最小线上可信层”支撑真实上线**：如果一个方向天然能定义清楚关联键、关键指标、关键 trace、少量高价值告警、外部健康检查，它比只能做漂亮前台页的方向更适合真正上线。
+
+### 当前更现实的轻量工程化模式（适合网站 / SaaS MVP）
+1. **统一关联键先行**：request_id / trace_id / object_id / run_id
+2. **结构化日志先行**：别先堆日志平台，先把字段打对
+3. **错误追踪优先于大盘**：先把高频异常与慢事务抓出来
+4. **黄金指标少而硬**：错误率、延迟、任务耗时、队列深度、缓存命中率、外部依赖失败率
+5. **trace 只覆盖关键路径**：入口、外部 API、队列、任务 step
+6. **告警先做降噪**：分组、静默、重发间隔，高价值少量告警优先
+7. **状态页 / 事故记录尽早有**：它直接影响用户信任
+
+### 对“日志、监控、trace、告警、性能优化、缓存、超时、降级、熔断、灰度、线上排障、部署与可观测性”的压缩理解
+- **日志**：结构化 + 统一关联键 + 保留期控制
+- **监控**：少量黄金指标，不做大盘收藏
+- **trace**：关键链路串联，不求全量
+- **告警**：分组 / 静默 / 降噪优先于通知渠道数量
+- **性能优化**：先抓慢接口、慢查询、第三方瓶颈、缓存命中率
+- **缓存**：优先作为减压与降级手段，而不只是性能技巧
+- **超时**：所有外部依赖都要有明确 timeout，不能无限等
+- **降级 / 熔断**：第三方故障时要能返回较差但可用的结果
+- **灰度**：首版至少要能按 release/version 对比错误率与性能变化
+- **线上排障**：目标是 30 分钟内定位，不是把观测平台做漂亮
+- **部署**：优先低运维、可回滚、可看 release/version
+- **可观测性**：目标是“能串起来解释一次故障”，不是工具越多越好
+
+### 当前更现实的首版实现顺序（生产工程视角）
+1. 先把对象层 + 任务层做清楚
+2. 再补 timeout / retry budget / 并发限制 / 缓存 / 幂等等最小可靠性层
+3. 再补结构化日志 + 错误追踪
+4. 再补少量黄金指标
+5. 再补关键路径 trace
+6. 再补分组告警 + 外部健康检查 + 状态页
+7. 最后才扩更重的 observability 平台、复杂灰度体系、容量分析、全量日志管道
+
+### 当前排序不变，但“能否真实上线”判断更严格了
+1. **方向 A：repo / URL → 报告对象 + 分析任务 + 最小流控层 + 最小线上可信层 → 强报告页 → recent 流**
+2. **方向 B：CSV / text → 批次对象 + 批次任务 + 最小流控层 + 最小线上可信层 → 强批次页 → recent 流**
+3. **方向 C：单场景输入 → 强结果对象 + 刷新任务 + 最小线上可信层 → 回访层**
+- A / B 继续领先，而且现在领先得更现实：它们不只适合做前台对象页，也更容易定义真正能上线的“对象层 + 任务层 + 可靠性层 + 最小观测层”骨架。
+
+## 2026-03-20 第六十五轮补充校正（frontstage 对象页与替代型定位进一步被验证）
+
+### 一个新的压缩判断：首版更该卖“替代哪条手工流程”，而不是卖“我会分析”
+- 新判断：这轮定向补样 Documenso、Formbricks、Trigger.dev、Dub 后，更清楚了：当前主线首版如果想更像产品，landing / onboarding / 对外表达都更该直接讲 **替代哪条低效手工流程**。
+- 对方向 A：更适合讲“替代手工产品研究/拆解笔记”。
+- 对方向 B：更适合讲“替代手工读反馈、做周报、拉主题总结”。
+- 对方向 C：更适合讲“替代散落在多个地方的单场景结果判断”。
+- 这比抽象讲“AI 分析平台”更稳，也更容易让用户一眼懂。
+
+### 对方向 A 的新增强化
+- 方向 A 现在更完整地像：
+  - `替代手工研究笔记的 landing`
+  - `极短 repo / URL 输入`
+  - `报告对象 + 分析任务`
+  - `public / private 强报告对象页`
+  - `recent 流 / library / archive`
+- 这意味着 A 的首版更应该优先打磨：
+  1. 强示例报告页 / gallery
+  2. public object page 的可信度（source / status / generated_at / visibility / evidence）
+  3. 对象页上的窄动作卡（rerun / export / archive / compare-later）
+  4. recent 流里的状态可扫性
+- 相比之下，首页大而全功能说明、复杂后台、抽象“AI Copilot”叙事都应继续后置。
+
+### 对方向 B 的新增强化
+- 方向 B 现在更完整地像：
+  - `替代手工反馈汇总 / 洞察周报的 landing`
+  - `CSV / 文本导入`
+  - `批次对象 + 处理任务`
+  - `public/private 批次对象页`
+  - `recent 流 / batch library / archive`
+- 这意味着 B 的首版更应该优先打磨：
+  1. 导入后极快进入可读批次页
+  2. 批次页的 summary-first 结构
+  3. 主题 / 引用 / next actions 的前台组织
+  4. 失败批次 / 低置信度批次的状态显式化
+- 不该优先做的仍然是 survey infra、复杂采集渠道、重工作台。
+
+### 对方向 C 的同步修正
+- 方向 C 继续不该理解成“做一个 dashboard 产品”；更准确地说，应是：
+  - `替代某种单场景手工判断`
+  - `极短输入或自动接入`
+  - `强结果对象页`
+  - `recent / revisit / reminder`
+- 如果不能讲清“替代哪条判断流程”，方向 C 就很容易退化成泛 dashboard。
+
+### 新增一个更实用的前台产品判断维度
+47. **是否有足够强的替代型表述**：如果一个方向能自然表述为“替代某条低效手工流程 / 某个笨重产品的一层”，它更容易获得首批用户理解与转化。
+
+### 当前更现实的首版产品骨架（再压一层）
+1. **替代型 landing / strong example gallery**
+2. **极短输入 / 导入**
+3. **对象 + 任务**
+4. **public/private 强对象页**
+5. **recent 流 / library / archive**
+6. **最小可信层（status / evidence / run / export / visibility）**
+- 这比“首页 → 输入页 → 一个 AI 输出框 → 一个后台”更像真正能成立的轻 SaaS。
+
+### 当前排序不变，但首版包装方式更清楚了
+1. **方向 A：替代手工研究笔记的 repo / URL → 报告对象页产品**
+2. **方向 B：替代手工反馈汇总的 CSV / text → 批次对象页产品**
+3. **方向 C：替代单场景手工判断的结果对象页产品**
+- A / B 继续领先，而且现在更清楚它们为什么领先：不只是对象层稳，而是 **替代型定位 + 强对象页 + 任务可信层** 这三件事能同时成立。

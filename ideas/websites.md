@@ -1121,3 +1121,408 @@
 - 这进一步强化当前主线：
   - 方向 A：`repo / URL → workflow 化处理 → 强报告对象页 + trust layer → recent / library → replay / eval / reminder`
   - 方向 B：`CSV / 文本 → workflow 化处理 → 强批次对象页 + trust layer → recent / library → replay / eval / reminder`
+
+
+## 2026-03-20 第五十七轮补充研究：替代型 frontstage / 分享对象页 / trust layer 再收敛
+
+### 103. 替代低效手工研究流程的前台对象页产品
+- Problem：很多人不是没有研究结果，而是没有一个足够顺手、足够像产品的前台对象页来替代手工整理笔记、截图、链接收藏和口头总结。
+- Audience：独立开发者、产品学习者、研究型创作者、AI 工具站作者。
+- Why now：Cap / Documenso / Papermark 共同说明，强产品表达往往不是“我也能做分析”，而是“我替代哪条低效流程，并产出一个值得分享的对象”。
+- MVP：围绕单一对象（报告 / 批次 / 结果）直接输出强前台对象页：标题、关键判断、来源、证据、状态、下一步动作、分享链接。
+- Monetization：私有对象、公开分享页增强、导出、archive、提醒、访问分析。
+- Difficulty：中。
+- Notes：这不是新主线，更像当前 A / B / C 三条主线的共同表达方式升级。
+
+### 104. 公开对象页 + 私有对象后台的双层轻 SaaS
+- Problem：很多工具站只有一次性结果页，很多 SaaS 又一上来就过重后台，导致既不利于传播，也不利于留存。
+- Audience：独立开发者、小团队、研究型用户、分析型用户。
+- Why now：Papermark 再次说明，公开分享页和私有后台不是竞争关系，而是很强的双层结构：前者负责传播，后者负责沉淀与付费理由。
+- MVP：每个对象同时有两个投影：
+  1. public share page（摘要、关键卡片、基础 metadata）
+  2. private object page（状态、活动、重跑、标签、导出）
+- Monetization：私有对象额度、品牌化分享页、自定义域名、访问分析、团队空间。
+- Difficulty：中。
+- Notes：非常适合当前方向 A，也可自然迁移到方向 B/C。
+
+### 105. trust layer / ownership 强化型对象产品
+- Problem：很多 AI/分析类产品能生成结果，但用户不愿长期沉淀重要对象，因为不确定能否导出、归档、恢复、控制公开边界。
+- Audience：研究型用户、长期积累型用户、小团队、对资产归属敏感的人。
+- Why now：Documenso 与 Papermark 继续说明，用户买单的不只是功能本身，也包括“这个对象是不是归我、可不可以带走、以后能不能继续信任它”。
+- MVP：围绕单一对象补最小 trust layer：导出、archive、visibility、activity、created/updated、failure/retry、公开分享边界。
+- Monetization：私有对象、版本历史、archive、团队活动记录、ownership Pro。
+- Difficulty：低到中。
+- Notes：这不是脱离主线的新赛道，而是当前所有对象型方向都该继续上调的正式层。
+
+## 2026-03-20 第五十六轮补充研究：SaaS / 工具站增长与包装方式继续收敛
+
+### 98. 示例对象 / gallery 优先的对象型网站
+- Problem：很多对象型网站首页只给输入框，用户还没看到真实结果形态就得先投入自己的数据，转化会偏弱。
+- Audience：独立开发者、研究型用户、分析型用户、小团队。
+- Why now：这几轮持续收敛后更清楚，示例对象不是 demo 点缀，而是增长入口；很多 landing page 的真正转化按钮不只是一条输入框，而是“先看一个像样结果”。
+- MVP：首页首屏同时给 2-4 个高质量示例对象 / gallery，支持从示例对象直接进入 share page，再引导用户创建自己的对象。
+- Monetization：示例模板包、行业示例库、品牌化示例页、团队模板。
+- Difficulty：低到中。
+- Notes：这非常适合当前主线 A / B；比只讲功能更容易解释对象页质量与结果价值。
+
+### 99. 公开结果页驱动传播的对象产品
+- Problem：很多工具站有结果，但结果页只是终点，没有被当作传播入口设计。
+- Audience：独立开发者、内容创作者、研究型用户、小团队。
+- Why now：前面多轮已反复确认，公开结果页往往既是 SEO 资产，也是分享传播载体；真正强的增长不是“首页获客一次”，而是“对象页自己继续获客”。
+- MVP：每个对象页都支持公开/私有切换、唯一分享链接、基础 metadata、可复制摘要与轻 CTA；结果页本身可回流到产品创建页或示例库。
+- Monetization：私有对象、品牌化分享页、自定义域名、访问分析、团队空间。
+- Difficulty：中。
+- Notes：当前主线 A 最适合直接采用：报告页本身就是 frontstage 分发面。
+
+### 100. recent / library 双层留存的轻 SaaS
+- Problem：很多产品只有历史页，没有“最近流”和“库/归档”之间的节奏分层，用户既难快速回到刚生成的对象，也难把长期有价值对象沉淀下来。
+- Audience：研究型用户、分析型用户、长期积累型用户。
+- Why now：越来越清楚轻 SaaS 的后台不该只有一个列表；更自然的结构常是 recent 负责短周期回访，library/archive 负责长期沉淀。
+- MVP：后台只做两层：recent stream（最近生成/失败/重跑/待处理）+ library/archive（收藏/标签/状态/精选）。
+- Monetization：更长历史、收藏夹、archive、saved views、回看提醒。
+- Difficulty：低到中。
+- Notes：这比一上来做重工作台更现实，也更适合当前对象型主线。
+
+### 101. 对象驱动定价的轻 SaaS
+- Problem：很多工具站定价页只按模糊的 Pro/Team 分层，用户不清楚自己到底在为哪种价值付费。
+- Audience：独立开发者、微型 SaaS 作者、小团队。
+- Why now：这几轮持续收敛后更清楚，当前最适合的收费边界不是“页面数”或“会员身份”，而是对象数、任务次数、私有对象、重跑、导出、提醒、archive 这些对象/任务能力。
+- MVP：免费层只给少量公开对象与基础动作；付费层解锁私有对象、更多生成/重跑额度、导出、archive、回看提醒、团队协作。
+- Monetization：订阅制、额度包、对象/任务增强层。
+- Difficulty：低。
+- Notes：这不是新赛道，而是当前主线商业化表达的更清晰方式。
+
+### 102. 激活路径极短 + 轻留存触发的对象产品
+- Problem：很多网站能让用户完成第一次生成，但没有很快给出第二次回访理由，导致激活后马上流失。
+- Audience：独立开发者、研究型用户、分析型用户、小团队。
+- Why now：当前最清楚的增长结构已经不是“先做很多功能”，而是：极短创建路径 + 强对象页 + 一次轻提醒/回看触发。
+- MVP：把激活路径压成“输入/导入 → 强对象页 → 自动进入 recent → 可选收藏/订阅/回看提醒”；在对象完成或状态变化时给一次轻触发。
+- Monetization：更多提醒规则、digest、收藏/订阅、对象回看层。
+- Difficulty：低到中。
+- Notes：这很适合作为当前主线 A / B 的增长骨架，而不是额外功能包。
+
+## 第五十六轮后的强化判断
+- 又多确认了五件事：
+  1. **landing page 最该卖的不是功能清单，而是示例对象 / gallery + 明确替代流程**；
+  2. **公开结果页本身就是增长资产**，对象页应承担 SEO、分享与回流，而不是只是结果终点；
+  3. **后台留存更适合做 recent / library 双层结构**，recent 承接短周期动作，library/archive 承接长期资产；
+  4. **定价最该围绕对象与任务边界来写**，例如对象数、私有对象、重跑、导出、提醒、archive；
+  5. **最现实的激活与轻留存骨架** 已经更清楚：极短输入/导入 → 强对象页 → recent 流 → 轻提醒 / 收藏 / 回看。
+- 这进一步强化当前主线：
+  - 方向 A：`repo / URL → 强示例报告 / gallery → 公开报告对象页 → recent 流 → library / archive → 对象驱动提醒 / 对象驱动定价`
+  - 方向 B：`CSV / 文本 → 强示例批次 / gallery → 可处理批次对象页 → recent 流 → batch library / archive → 批次提醒 / 对象驱动定价`
+  - 方向 C：`单场景输入 → 强结果对象页 → recent / revisit → 变化提醒 / 对象驱动定价`
+
+## 2026-03-20 第五十八轮补充研究：AI 工程实现再收敛后，对网站点子的新增约束
+
+### 106. schema-first 动作卡优先的 AI 对象产品
+- Problem：很多 AI 网站一上来就做首页聊天框或万能 agent，结果边界不清、难验证、也不容易真正进入主流程。
+- Audience：独立开发者、研究型用户、小团队、需要把 AI 嵌进真实工作对象的人。
+- Why now：OpenAI Agents SDK、PydanticAI、Instructor、LangGraph 这轮一起把边界压得更清楚：**很多最值钱的 AI 功能，其实更适合做成对象页里的 schema-first 动作卡**。
+- MVP：围绕单一对象页（报告 / 批次 / 结果）只做 3-5 个明确动作：摘要、标签、风险点、建议、差异比较；每个动作都返回固定字段结构，并可重跑。
+- Monetization：高级动作包、批量动作、团队规则、自动化动作、更多对象额度。
+- Difficulty：中。
+- Notes：这不是偏离当前主线，而是把当前 A / B 的 AI 层进一步做实；比“做个万能聊天页”稳很多。
+
+### 107. 带 run / review / rerun 可信层的 AI 对象页产品
+- Problem：很多 AI 结果页只给最终输出，用户不知道卡在哪、为什么失败、能不能救、重跑后有没有改善。
+- Audience：研究型用户、分析型用户、小团队、需要反复依赖 AI 结果的人。
+- Why now：Trigger.dev、Inngest、Langfuse、OpenAI Agents SDK 都在强化同一点：**AI 结果一旦进入真实主流程，就必须有 run layer / review layer / rerun layer。**
+- MVP：对象页展示最小可信层：阶段状态、失败原因、最近 run、trace 摘要、review_required、重跑入口、输出版本。
+- Monetization：更多重跑额度、历史 run、团队 review、版本比较、异常提醒。
+- Difficulty：中。
+- Notes：这更像当前主线的核心卖点升级——不是“AI 会分析”，而是“AI 结果可追、可救、可比较”。
+
+### 108. 轻量代表样本 / 坏样本 / 回归验证层
+- Problem：很多 AI 网站每次改 prompt、模型或 workflow 后，只能靠体感判断有没有变好，旧坏例子很容易回归。
+- Audience：做 AI 功能的独立开发者、小团队、垂直工具作者。
+- Why now：Langfuse 与 PydanticAI 这轮再次说明，**eval / dataset / regression 已经不只是大平台配件，小产品也该有最小版本。**
+- MVP：保存 20-50 个代表对象/坏样本；支持新旧版本输出对比，并人工标记“更好/更差/失败”。
+- Monetization：更多样本数、自动回归批次、团队标注、版本历史、质量报告。
+- Difficulty：中。
+- Notes：既可作为主线 A / B 的增强，也可单独长成面向 AI 对象产品的配套工具层。
+
+## 第五十八轮后的强化判断
+- 又多确认了四件事：
+  1. 当前更值得做的 AI 网站，不是“更万能的聊天壳”，而是 **对象页里的明确动作集合**；
+  2. 对象页如果想更像产品，就该补 **run / review / rerun / trace / version** 这些可信层；
+  3. **代表样本 / 坏样本 / 版本对比** 已经值得进入二阶段高优先级，而不必等做成大平台；
+  4. 当前主线更应继续围绕：**强对象页 + schema-first 动作卡 + run 可信层 + 轻验证层**。
+
+## 2026-03-20 第六十轮补充研究：跨端 / 混合应用进一步压到“Web object center + iOS 受控入口层”
+
+### 109. Web 对象中心 + iOS companion 的对象型产品
+- Problem：很多对象型网站在 Web 上适合生成、管理、沉淀，但用户高频回访、提醒处理、分享导入、碎片时间清理对象的动作更适合发生在手机上。
+- Audience：研究型用户、独立开发者、小团队、信息密集型工作者。
+- Why now：Capacitor、WKWebView bridge、Swift Navigation、Telegram iOS 这一轮一起把边界压得更清楚了：**Web 继续做复杂对象中心，iOS 更适合做 inbox / reminder / quick-action companion**。
+- MVP：
+  - Web：对象详情页、recent / library、任务可信层、设置/帮助/后台；
+  - iOS：通知 inbox、recent objects、对象摘要卡、快捷收藏/归档/分享、从系统分享创建对象。
+- Monetization：高级提醒、离线缓存、移动端快捷处理、团队通知、Pro companion。
+- Difficulty：中。
+- Notes：重点不是重写全部页面，而是做“对象回访入口层”；非常贴当前方向 A / B 的中期形态。
+
+### 110. 摘要原生 + 详情 Web 的混合对象产品
+- Problem：很多跨端产品要么全原生导致详情页与后台迭代慢，要么全 WebView 导致高频体验发虚，最后两边都不够顺。
+- Audience：做工具产品、轻 SaaS、研究产品、分析产品的独立开发者和小团队。
+- Why now：react-native-webview、Capacitor、WKWebViewJavascriptBridge 这轮继续说明，更稳的切法通常是 **摘要原生、详情 Web**。
+- MVP：移动端只做对象摘要、状态、快捷动作；复杂详情、配置、帮助、rich object page 继续走 Web / WebView。
+- Monetization：更像产品实现骨架，但能显著降低多端成本、提高迭代速度。
+- Difficulty：中。
+- Notes：适合作为当前主线 A / B 的实现原则，而不一定单独卖成产品。
+
+### 111. bridge-first 的对象型产品架构
+- Problem：很多未来想长出 App 的网站，早期只想着页面怎么适配移动端，没有先定义对象协议、deep link、share-entry、bridge commands，后面产品会越来越碎。
+- Audience：准备做 Web + iOS companion 的独立开发者、小团队。
+- Why now：Capacitor / Cordova / WKWebView bridge 这轮对照后更清楚地说明，真正该先共享的不是 UI，而是 **对象协议、路由协议、bridge 协议、任务协议**。
+- MVP：围绕单一对象先固定：`object_id`、状态字段、deep link、share-entry、5-8 个稳定 bridge commands，再决定哪些页面原生、哪些页面 Web。
+- Monetization：更像方法论 / 内部架构原则，但会直接影响未来产品是否能顺滑长出移动端。
+- Difficulty：中。
+- Notes：很适合作为当前主线 A / B 的新增实现约束；尤其适合未来做 share-entry、push 回访、quick action。
+
+## 第六十轮后的强化判断
+- 又多确认了四件事：
+  1. 如果未来产品要长出 iOS 端，最现实的形态依旧不是“第二套完整前台”，而是 **对象 inbox / reminder / quick-action companion**；
+  2. 跨端真正该优先共享的，依旧是 **对象 schema、deep link、bridge command、任务状态**，而且现在更该带上版本、错误原因、trace_id 这类可信字段；
+  3. 更稳的混合边界继续收敛为 **摘要原生、详情 Web**；
+  4. 当前主线 A / B 的更现实推进顺序，是 **先做强 Web 对象中心，再补提醒/分享回流，再长出 iOS 高频入口层**。
+
+## 2026-03-20 第五十三轮补充研究：UI 系统 / 信息架构 / 结果页骨架继续收敛
+
+### 95. 强对象页优先的 UI 产品
+- Problem：很多网站首版一上来先做大 dashboard，结果真正最关键的单对象页反而不够强，用户难以形成明确心智。
+- Audience：独立开发者、分析型产品作者、研究型用户、小团队。
+- Why now：这几轮持续收敛后更清楚了，真正承载价值与留存的，常常不是首页，而是 report / batch / result 这类对象页。
+- MVP：先定义单对象页骨架：页头摘要、状态条、关键信号卡、evidence 区、动作卡、recent activity、相关对象。
+- Monetization：高级对象视图、比较、历史版本、分享页增强、团队批注。
+- Difficulty：中。
+- Notes：这不是新赛道，而是当前主线 A / B / C 的 UI 首要原则：**先强对象页，再谈更大工作台**。
+
+### 96. recent stream / 最近流驱动的轻后台
+- Problem：很多轻 SaaS 的后台首版做成空心 dashboard，看起来像后台，实际没有真正高频可看的内容。
+- Audience：对象型产品用户、研究型用户、独立开发者、小团队。
+- Why now：越来越清楚，早期后台更适合围绕“最近发生了什么”组织，而不是先堆总览图表。
+- MVP：围绕对象流与任务流做 recent stream：最近生成、最近失败、最近重跑、最近分享、最近需要处理。
+- Monetization：更长历史、筛选视图、订阅、digest、团队流。
+- Difficulty：低到中。
+- Notes：比泛 dashboard 更适合作为首版 backstage；也更贴近对象生命周期。
+
+### 97. 状态可见 + 动作可见的结果页产品
+- Problem：很多结果页只有结论，没有状态、来源、失败原因与下一步动作，用户看完就走，也不够信任。
+- Audience：研究型用户、分析型用户、依赖 AI / 异步任务的网站用户。
+- Why now：当前主线已经不只是“生成结果”，而是“让结果对象成为统一诊断/决策入口”。
+- MVP：对象页里显式放 4 层：状态流、关键结论、evidence / warnings、下一步动作卡。
+- Monetization：重跑、审核、版本比较、对象提醒、导出增强。
+- Difficulty：中。
+- Notes：这条更像当前所有对象型网站的 UI 筛选标准：**结果页必须既能看结论，也能看状态与动作**。
+
+## 第五十三轮后的强化判断
+- 又多确认了四件事：
+  1. 首版最该先做强的 UI，不是大 dashboard，而是 **强对象页**；
+  2. 早期后台更适合做成 **recent stream / 最近流 + 极简对象列表**，而不是空心总览；
+  3. 结果页若想更像产品，必须同时承载 **状态、证据、动作、分享** 四层；
+  4. 当前主线 A / B / C 在 UI 上其实越来越共用一套骨架：**dashboard 退后，对象页前置，recent 流承接回访**。
+- 这进一步强化当前主线：
+  - 方向 A：`repo / URL → 强报告对象页（状态条 / 关键卡片 / evidence / 动作卡 / 分享页）→ recent 流 → library / reminder`
+  - 方向 B：`CSV / 文本 → 强批次对象页（处理进度 / 主题卡 / quote / 动作卡 / 历史比较）→ recent 流 → batch library / reminder`
+  - 方向 C：`单场景输入 → 强结果对象页（状态变化 / 关键指标 / 最近流 / 分享页）→ revisit / subscription`
+
+## 2026-03-20 第六十一轮补充研究：UI 系统 / 信息架构 / 交互模式进一步压缩到可执行骨架
+
+### 112. dashboard 不是主舞台，而是对象导航与 attention queue
+- Problem：很多产品把 dashboard 做成第一主页面，结果信息很多但动作不聚焦，用户仍然要重新找对象、找状态、找下一步。
+- Audience：对象型轻 SaaS、分析型产品、研究产品、小团队工具。
+- Why now：前面多轮已确认留存来自对象页与 recent 流，这轮进一步确认 dashboard 更适合做“导航页 + 注意力队列”。
+- MVP：顶部只保留少量 summary cards，中间优先放 `needs attention / failed / review required / recently changed`，下方才是 recent stream。
+- Monetization：高级队列、saved views、团队 attention 规则、digest。
+- Difficulty：低。
+- Notes：**dashboard 首版只负责把人带到对象，不负责替代对象页本身。**
+
+### 113. 列表页更适合 scan-first，不适合首版做成 BI 工作台
+- Problem：很多列表页首版就堆很多列、图表、筛选器，扫描成本高，用户反而更难快速回到重要对象。
+- Audience：研究型用户、分析型用户、管理 recent/library 的对象型产品用户。
+- Why now：当前主线越来越依赖 recent / library / archive，列表页已经是正式层，但它的任务首先是“快速扫描与重开”。
+- MVP：默认卡片/行只放 title、source、status、updated_at、latest run、visibility、1 个主标签；筛选先围绕 lifecycle，而不是业务维度泛化。
+- Monetization：saved filters、bulk actions、团队视图、历史增强。
+- Difficulty：低。
+- Notes：**scanability > 配置性**；首版先做“看得快、点得准、能继续处理”。
+
+### 114. 对象详情页最好采用“summary-first, detail-on-demand”
+- Problem：很多详情页一上来就塞满长文本、日志、原始数据，首屏看起来很满，但决策效率低。
+- Audience：需要快速判断、复看、分享结果对象的用户。
+- Why now：对象页已被确认是产品主战场，这轮继续确认强对象页的首屏更应该服务决策，而不是服务完整展示。
+- MVP：首屏先给 summary、status、warnings、next actions；evidence、raw output、run detail、artifacts 放在次级 block / expand / tab 中。
+- Monetization：更深 detail views、compare views、audit/history、专家模式。
+- Difficulty：中。
+- Notes：**先回答“所以呢”，再展示“为什么”。**
+
+### 115. 状态流应该显式穿透到对象页、列表页、recent 流三处
+- Problem：很多产品只有详情页里有状态，列表页与 recent 流看不到阶段与风险，导致用户必须点进去才知道哪里出问题。
+- Audience：异步处理型 SaaS、AI 结果站、批处理产品、研究资产产品。
+- Why now：任务可信层已是当前主线核心，状态不应只存在后台或日志。
+- MVP：统一状态枚举与视觉 token，在 list / recent / object header 三处同时出现，并允许从失败态直接进入重跑/查看原因。
+- Monetization：高级状态规则、团队 triage、订阅提醒。
+- Difficulty：中。
+- Notes：**状态要可扫一眼，不要只可点进去看。**
+
+### 116. 操作卡片应优先做成对象上下文明确的“窄动作”
+- Problem：很多产品把操作埋进 dropdown、更多菜单或聊天框，导致对象工作流断裂。
+- Audience：需要在对象页上直接处理内容的用户。
+- Why now：多轮 AI/任务研究已经确认，最稳的增强方式仍然是对象页里的明确动作卡。
+- MVP：每个对象页只放 3-5 个高价值动作：rerun、publish、archive、export、generate summary/tag/risk card；每个动作有明确输入、状态、输出。
+- Monetization：批量动作、自动化动作、团队审批、动作历史。
+- Difficulty：中。
+- Notes：**动作卡不是按钮美化，而是对象工作流的前台投影。**
+
+### 117. 分享页应是对象页的 public projection，而不是重新设计一套落地页
+- Problem：很多产品把分享页做成“另一个页面体系”，结果 public/private 两边内容断裂，维护和认知成本都高。
+- Audience：需要公开传播、展示结果、承接 SEO/分享流量的对象型产品。
+- Why now：前面多轮已经确认 share page 是增长资产，这轮进一步确认最稳的做法是同一对象的双投影，而不是两套系统。
+- MVP：对象页核心结构保持一致，只裁掉私有 controls、内部活动流与敏感 metadata；保留 title、summary、status snapshot、key cards、evidence excerpt、CTA。
+- Monetization：branding、自定义域名、访问分析、public/private 边界增强。
+- Difficulty：中。
+- Notes：**public page 应该像对象页的 frontstage，而不是 marketing page 的变体。**
+
+## 第六十一轮后的强化判断
+- 又多确认了五件事：
+  1. **dashboard 首版更适合做对象导航 + attention queue**，不适合做主价值承载页；
+  2. **列表页的第一任务是 scanability**，不是配置感与大而全筛选；
+  3. **对象详情页应坚持 summary-first, detail-on-demand**，避免首屏信息过载；
+  4. **状态流必须同时出现在 object / list / recent 三处**，这样任务可信层才真的进入产品表层；
+  5. **操作卡与分享页都应围绕同一对象模型展开**：前者是 action projection，后者是 public projection。
+- 这进一步强化当前主线：
+  - 方向 A：`repo / URL → attention-oriented dashboard → scan-first recent/list → summary-first 报告对象页 → public share projection`
+  - 方向 B：`CSV / 文本 → attention-oriented dashboard → scan-first batch list → summary-first 批次对象页 → public/private 双投影`
+  - 方向 C：`单场景输入 → 强结果对象页 → recent / revisit / share → 变化提醒`
+
+## 2026-03-20 第六十五轮补充研究：替代型定位与 frontstage 对象页继续被验证
+
+### 122. 替代手工研究笔记的“拆解报告对象页”产品
+- Problem：很多开发者/产品新人会做 GitHub 或网站研究，但过程仍然是手工截图、记笔记、复制链接、整理结论，既慢又不统一。
+- Audience：独立开发者、产品新人、设计工程师、写作型开发者。
+- Why now：这轮 Documenso / Formbricks / Dub / Trigger.dev 再次说明，最容易成立的前台表达不是“我会分析”，而是“我替代某条低效手工流程”；同时 strong public object page 的价值还在继续上升。
+- MVP：输入 repo / URL → 生成 public/private 报告对象页，首屏包含 summary、status、evidence、borrowable ideas、next actions；同时进入 recent 流。
+- Monetization：私有对象数、导出、批量生成、archive、compare、团队空间。
+- Difficulty：中。
+- Notes：相比“GitHub 分析器”，这个说法更像一个真正替代手工研究流程的产品。
+
+### 123. 替代手工反馈周报的“批次洞察对象页”产品
+- Problem：团队收集到很多反馈、问卷、访谈文本后，常常还是靠手工读、手工摘录、手工写周报，效率低且难复盘。
+- Audience：独立开发者、小团队运营、PM、社区运营者。
+- Why now：Formbricks 再次说明收集层很重要，但洞察对象页和后续动作层才更像真正的价值主舞台。
+- MVP：导入 CSV / 文本 → 生成批次对象页，首屏给 themes、quotes、priority issues、next actions、status；批次进入 recent 流并支持回看。
+- Monetization：更多批次、导出周报、批次比较、团队 review、提醒。
+- Difficulty：中。
+- Notes：对外更适合卖“替代手工反馈整理/周报”，而不是泛泛卖“AI 洞察”。
+
+### 124. 替代手工结果判断的“单场景结果对象页”产品
+- Problem：很多运营/增长/内容工作并不缺数据，而是缺一个统一结果判断入口，导致大家还在多个工具和表格里手工拼判断。
+- Audience：内容运营、增长负责人、独立站作者、小团队。
+- Why now：Dub 再次证明，增长型产品真正能留住人的不是输入动作，而是可反复回访的结果页/分析页。
+- MVP：只选一个单场景（例如活动报名、链接表现、内容表现）→ 自动生成一个 summary-first 结果对象页，附状态、异常点、下一步动作、回看入口。
+- Monetization：历史对象、提醒、异常通知、导出、团队视图。
+- Difficulty：中。
+- Notes：如果不能清楚说出“替代哪条手工判断流程”，就不该继续做成方向 C。
+
+## 第六十五轮后的强化判断
+- 又多确认了四件事：
+  1. **替代型定位** 依旧是轻 SaaS / 工具站很强的前台包装方式；
+  2. 用户真正会分享、回看、复访的，往往是 **frontstage 主对象页**，不是输入页；
+  3. **任务可信层与对象可信层正在合流**，对象页上的 status / run / evidence / export / visibility 要一起设计；
+  4. 多输入入口更适合汇入 **同一对象模型**，而不是裂成一堆小工具页。
+- 这进一步强化当前主线：
+  - 方向 A：`替代手工研究笔记 → repo / URL → 报告对象页 → recent / library / archive`
+  - 方向 B：`替代手工反馈汇总 → CSV / 文本 → 批次对象页 → recent / batch library / archive`
+  - 方向 C：`替代单场景手工判断 → 强结果对象页 → revisit / reminder`
+
+## 2026-03-20 第六十六轮补充研究：跨端 / 混合应用方向继续压缩到“Web 对象中心 + iOS 入口层”
+
+### 125. Web object center + iOS summary shell 的对象型产品
+- Problem：很多对象型网站在 Web 上适合生成、管理、沉淀，但用户高频回访、提醒处理、快速查看对象状态的动作更适合发生在手机上。
+- Audience：研究型用户、独立开发者、小团队、信息密集型工作者。
+- Why now：Hotwire Native iOS、Turbo iOS、SwiftUI-WebView 这轮一起把边界压得更清楚了：**如果 Web 对象页已经足够强，iOS 首版更适合做导航壳、摘要层和 quick-action 入口，而不是重写第二套完整详情页。**
+- MVP：
+  - Web：对象详情页、recent / library、任务可信层、分享页；
+  - iOS：recent objects、通知入口、对象摘要卡、快捷标记/收藏/分享、受控 WebView 打开详情。
+- Monetization：高级提醒、移动端快捷处理、离线缓存、团队通知、Pro companion。
+- Difficulty：中。
+- Notes：这进一步强化当前主线 A / B 的中期形态：**强 Web 对象中心 + iOS 入口层**。
+
+### 126. 摘要原生 + 详情 Web 的混合对象产品
+- Problem：很多跨端产品要么全原生导致详情页与后台迭代慢，要么全 WebView 导致高频体验发虚。
+- Audience：做工具产品、研究产品、轻 SaaS 的独立开发者和小团队。
+- Why now：Hotwire/Turbo 的 shared/single WKWebView 路线，加上 SwiftUI-WebView 这种状态容器式集成，再次说明更稳的切法通常是 **摘要原生、详情 Web**。
+- MVP：移动端只做对象摘要、状态、快捷动作、导航容器；复杂详情、帮助、设置、rich object page 继续走 Web / WKWebView。
+- Monetization：更像产品实现骨架，但能显著降低多端成本、提高迭代速度。
+- Difficulty：中。
+- Notes：适合作为当前主线 A / B 的实现原则，而不一定单独卖成产品。
+
+### 127. bridge / plugin command 优先的对象型产品
+- Problem：很多未来想长出 App 的网站，早期只想着页面怎么适配移动端，没有先定义对象协议、deep link、share-entry、bridge commands，后面产品会越来越碎。
+- Audience：准备做 Web + iOS companion 的独立开发者、小团队。
+- Why now：Capacitor、WKWebViewJavascriptBridge、Hotwire Native 这轮放在一起后更清楚地说明，真正该先共享的不是 UI，而是 **对象协议、路由协议、bridge/plugin command、任务协议**。
+- MVP：围绕单一对象先固定：`object_id`、状态字段、deep link、share-entry、5-8 个稳定 commands（如 `openObject`、`shareObject`、`pickFile`、`registerPushToken`、`trackEvent`），再决定哪些页面原生、哪些页面 Web。
+- Monetization：更像方法论 / 内部架构原则，但会直接影响未来产品是否能顺滑长出移动端。
+- Difficulty：中。
+- Notes：很适合作为当前主线 A / B 的新增实现约束。
+
+## 第六十六轮后的强化判断
+- 又多确认了四件事：
+  1. 如果未来产品要长出 iOS 端，最现实的形态依旧不是“第二套完整前台”，而是 **对象 inbox / summary / quick-action companion**；
+  2. 跨端真正该优先共享的，依旧是 **对象 schema、deep link、bridge/plugin command、任务状态**；
+  3. 更稳的混合边界继续收敛为 **摘要原生、详情 Web**；
+  4. 当前主线 A / B 的更现实推进顺序，是 **先做强 Web 对象中心，再统一协议与命令层，最后再长出 iOS 入口层**。
+- 这进一步强化当前主线：
+  - 方向 A：`repo / URL → 强 Web 报告对象中心 → recent / library → 对象驱动提醒 → iOS summary / quick-action companion`
+  - 方向 B：`CSV / 文本 → 强 Web 批次对象中心 → recent / library → 对象驱动提醒 → iOS summary / quick-action companion`
+
+## 2026-03-20 第六十二轮补充研究：schema engineering / guardrails / eval-first / gateway 治理带来的新增约束
+
+### 118. schema-first / action-function 型 AI 对象产品
+- Problem：很多 AI 网站虽然说自己支持结构化输出，但实际只是吐 JSON，动作边界、字段边界、工具边界仍然很糊，难以长期维护。
+- Audience：做 AI SaaS、研究产品、分析产品、内部工具的独立开发者和小团队。
+- Why now：BAML 这轮非常明确地说明，更稳的方向不是继续磨 prompt 文案，而是把 AI 动作理解成 **typed function + schema engineering**。
+- MVP：围绕单一对象页（报告 / 批次 / 结果）把每个 AI 动作定义成函数式动作：固定输入、固定输出、固定字段写回、固定失败态。
+- Monetization：高级动作、批量动作、动作模板、团队规则、对象自动化。
+- Difficulty：中。
+- Notes：这不是新主线，而是当前 A / B 方向的新增实现约束：**先定义动作签名，再写 prompt。**
+
+### 119. 带 input/output/publish 三段质量闸门的 AI 网站
+- Problem：很多 AI 网站把“模型返回成功”误当成“结果可发布”，导致脏输入、脏输出、低质量结果都直接进入对象页或分享页。
+- Audience：研究型用户、分析型用户、小团队、对结果可信度敏感的对象型产品作者。
+- Why now：Guardrails 这轮再次说明，guardrails 不只是安全过滤，而应被理解成正式质量闸门。
+- MVP：围绕对象处理流程补三层 gate：
+  1. 输入检查；
+  2. 结构化输出验证；
+  3. 发布前质量/风险检查。
+- Monetization：高级 guard 模板、行业规则包、团队 review、发布审批、审计记录。
+- Difficulty：中。
+- Notes：这更像当前主线 A / B 的 trust layer 升级，而不是单独聊天产品。
+
+### 120. eval-first / regression-aware 的 AI 对象产品
+- Problem：很多 AI 网站每次改 prompt、模型、tool flow 后，只能靠体感判断有没有变好，坏例子会反复回归。
+- Audience：做 AI 功能的独立开发者、小团队、垂直工具作者。
+- Why now：Braintrust 这轮把“evaluate and ship AI products”讲得很清楚：eval 应比很多人以为的更早进入产品工程。
+- MVP：保存少量代表对象与坏样本；每次动作/模型/版本更新后跑轻量回归，并在对象页或后台显示版本对比与 scorer 结果。
+- Monetization：更多样本容量、自动回归批次、团队标注、质量报告、CI/工作流集成。
+- Difficulty：中。
+- Notes：这既可以是主线 A / B 的增强，也可以长成面向 AI 对象产品的窄工具层。
+
+### 121. gateway-governed 的 AI 对象产品
+- Problem：很多 AI 网站在早期把 provider、fallback、retry、tool access、guardrails 散在业务代码里，后面很难做成本控制、故障回退与权限治理。
+- Audience：做 AI 产品的独立开发者、小团队、垂直 SaaS 作者。
+- Why now：Portkey 这轮继续说明，gateway 的价值不只是模型聚合，而是 **fallback / retries / guardrails / observability / governance** 这整层。
+- MVP：即便不做完整 AI gateway，也先把主模型、备用模型、retry/fallback、trace metadata、少量 tool access policy 做成统一运行边界。
+- Monetization：更像内部骨架，但会显著提升产品稳定性；若单独产品化则可卖运行治理、成本控制、团队策略。
+- Difficulty：中到高。
+- Notes：对当前主线来说，更适合作为实现原则，而不是主打“模型聚合平台”。
+
+## 第六十二轮后的强化判断
+- 又多确认了四件事：
+  1. “结构化输出”如果想真正进入产品，应升级理解成 **schema engineering + typed actions**；
+  2. guardrails 更适合被理解成 **input/output/publish 三段质量闸门**，而不是安全附属件；
+  3. eval / regression 不该继续后置，哪怕轻 SaaS 也可以先从代表样本、坏样本、版本比较做最小闭环；
+  4. gateway 层真正值钱的是 **fallback / retries / guardrails / governance**，而不是 provider 数量本身。
+- 这进一步强化当前主线：
+  - 方向 A：`repo / URL → 报告对象 schema → typed action cards → run/fallback/trace layer → quality gates → eval/regression layer`
+  - 方向 B：`CSV / 文本 → 批次对象 schema → typed action cards → run/fallback/trace layer → quality gates → eval/regression layer`

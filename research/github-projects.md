@@ -248,7 +248,831 @@
 ### EF. schema-first 依旧是对象型轻 SaaS 最稳的起点
 - Payload、Keystone、Vendure 这轮再次一起说明：
   - schema 稳，API/admin/access/workflow/plugin 才容易稳；
+
+## 2026-03-20 第六十五轮有边界补充学习（frontstage 对象页 / 替代型定位 / 任务可信层再压缩）
+
+> 这轮继续避免无边界扩抓；Brave 搜索 key 仍缺失，所以不硬搜，只定向读取少量公开 GitHub README / 仓库元信息。
+> 样本只收 4 个：Documenso、Formbricks、Trigger.dev、Dub。
+> 目标不是找更多“新项目名”，而是继续验证当前主线里最值钱的那几层：**替代型定位、frontstage 对象页、任务可信层、以及结果页为什么比输入页更像产品主舞台。**
+
+### 194) Documenso：再次确认“替代型定位 + 强对象页 + trust 叙事”是很强的轻 SaaS 外壳
+- Repo：https://github.com/documenso/documenso
+- 可确认信号：README 直接写明 “The Open Source DocuSign Alternative.”，同时强调 trusted / self-host / roadmap / upcoming releases / open trust infrastructure。
+- 这轮最值得记住的点：
+  1. **替代型定位依旧非常强**：直接讲替代 DocuSign，比抽象讲“更智能的签署体验”更清楚。
+  2. **对象非常明确**：签署文档本身就是天然主对象；产品价值围绕这个对象的状态、参与方、可信度展开。
+  3. **trust 叙事不是配件**：self-host、可审查、roadmap、release、open trust infrastructure 这些信号会直接影响用户是否愿意把关键对象放进系统。
+  4. **前台对象页比后台更像产品主舞台**：真正被分享、被访问、被反复回看的，是文档签署对象，而不是抽象工作台。
+- 对当前主线的启发：
+  - A / B 都应继续按“强对象页先行”推进；
+  - public object page 的可信度（source、status、timestamp、visibility、review 痕迹）应继续上调；
+  - landing 更适合直接讲“替代哪条低效手工流程”。
+- 不值得直接照抄的点：
+  - 不要把合规、签名基础设施、复杂收件人流转当成个人首版模板；该借的是对象与 trust 外壳，不是重基础设施。
+
+### 195) Formbricks：再次确认“收集层只是入口，真正值钱的是洞察对象页与后续动作”
+- Repo：https://github.com/formbricks/formbricks
+- 可确认信号：README 直接写 open-source Qualtrics alternative、experience management、survey analysis、in-app / website / link / email surveys、prebuilt data analysis。
+- 这轮最值得记住的点：
+  1. **收集入口可以很多，但价值重心仍在分析/洞察层**。
+  2. **替代型定位对复杂 B2B 品类同样有效**：Qualtrics alternative 让用户立刻知道你站在哪个成熟品类上。
+  3. **Insight platform 的说法很重要**：说明结果页/洞察页不是附属报表，而是核心产品层。
+  4. **多入口统一到同一对象后台**：in-app、link、email 这些入口最终都要汇入统一的 survey / response / insight 对象模型。
+- 对当前主线的启发：
+  - 方向 B 继续该把“批次对象页”当核心，而不是把导入动作当核心；
+  - 方向 A 也可借这个思路：URL / repo 只是接入入口，强报告对象页才是主舞台；
+  - 多输入入口应服务同一对象模型，而不是让产品裂成很多工具页。
+- 不值得直接照抄的点：
+  - survey infra、触达渠道、埋点/SDK、复杂受众管理都太重，不适合作为轻对象产品首版模板。
+
+### 196) Trigger.dev：再次确认“任务层必须进入对象页表层，而不只是工程后台”
+- Repo：https://github.com/triggerdotdev/trigger.dev
+- 可确认信号：README 明确写 long-running tasks、retries、queues、observability、human-in-the-loop、realtime、run tracing and logs。
+- 这轮最值得记住的点：
+  1. **任务可信层必须可见**：run、trace、logs、alerts 这些不该只藏在工程后台里。
+  2. **realtime / subscribe to runs 很值得借**：对象页若能看到运行进展，会比“刷新等结果”更像真产品。
+  3. **human-in-the-loop 依然更适合关键节点能力**，不是把整个产品做成审批系统。
+  4. **长流程真正的产品感来自状态与恢复能力**，而不是“能跑很久”本身。
+- 对当前主线的启发：
+  - A / B 的对象页都应把 run status、最近一次运行、失败原因、trace link、rerun 入口做成 first-class block；
+  - recent 流也应带任务状态，而不是只有对象标题；
+  - “任务层 = 产品可信层”这件事继续被钉得更牢。
+- 不值得直接照抄的点：
+  - 不要为了像平台而提前做完整任务控制台；首版只借 run/status/retry/trace 的表层投影即可。
+
+### 197) Dub：再次确认“结果页/分析页才是增长型产品真正的回访器”
+- Repo：https://github.com/dubinc/dub
+- 可确认信号：README 直接写 short links、conversion tracking、affiliate programs、100M+ clicks、2M+ links monthly，并明确 tech stack 与 self-hosting。
+- 这轮最值得记住的点：
+  1. **增长型产品真正卖的不是输入动作，而是结果判断与归因页面。**
+  2. **结果对象一旦带有可回访属性，就天然会长出 dashboard / analytics / team / billing 层。**
+  3. **self-host / open-source / customer proof 这些 ownership/trust 信号，对长期沉淀类产品很重要。**
+  4. **成熟前台对象/结果页之后，后台扩展会更顺；反过来先做重后台，很容易空心。**
+- 对当前主线的启发：
+  - 方向 C 继续应理解为“单场景结果对象产品”，不是泛 dashboard；
+  - 方向 A / B 也都应继续把可回访结果对象页当成留存器；
+  - 结果页的传播、SEO、回访价值依旧比输入页更值得优先设计。
+- 不值得直接照抄的点：
+  - 真实 attribution / analytics infra 很重；首版借结果对象心智，不借重数据基础设施复杂度。
+
+## 新增横向结论（基于这轮 4 个样本）
+
+### GL. 替代型定位依旧是轻 SaaS 最稳的前台包装方式之一
+- Documenso（DocuSign alternative）、Formbricks（Qualtrics alternative）再次说明：
+  - 比起抽象讲 AI、自动化、平台能力，
+  - **直接讲“替代哪条低效流程 / 哪个笨重成熟产品”更容易成立。**
+- 对当前主线：
+  - A 更适合讲“替代手工产品研究/拆解笔记”；
+  - B 更适合讲“替代手工读反馈/人工汇总反馈”；
+  - C 更适合讲“替代散落在多个工具里的单场景结果判断”。
+
+### GM. frontstage 主对象页比输入页更像产品主舞台
+- 这轮 4 个样本再次一起强化：
+  - 用户真正回看、分享、判断、传播的，往往不是输入页；
+  - 而是 **签署对象页、洞察页、run 结果页、归因结果页**。
+- 对当前主线：
+  - 输入继续压到极短；
+  - 重点继续放在 public/private object projection、status、evidence、actions、revisit 机制上。
+
+### GN. 任务可信层与对象可信层正在合流
+- Trigger.dev 给的是 run/status/trace 视角，Documenso 给的是 trust/ownership 视角；
+- 这轮合起来看，更清楚一件事：
+  - **用户对对象是否可信，越来越同时取决于内容质量 + 运行过程可见性 + ownership 边界。**
+- 对当前主线：
+  - object page 上的可信层至少应包含：status、generated_at / updated_at、source、recent run、failure reason、visibility、export/archive。
+
+### GO. 多输入入口应该服务同一对象模型，而不是裂成很多工具页
+- Formbricks 再次说明：入口可以很多，但对象模型最好统一；
+- 对当前主线：
+  - A 可以后续支持 repo / URL / plain text intro，但都汇入同一 report 对象；
+  - B 可以支持 CSV / text / pasted responses，但都汇入同一 batch 对象。
+- 这样产品扩展会比“每个输入形式做一个独立小工具页”稳得多。
+
+## 2026-03-20 第五十九轮有边界补充学习（全栈 Web / SaaS 首版实现再校准：starter / auth / schema / durable tasks / flow control）
+
+> 这轮继续只定向看少量高价值公开 README 信号，不做无边界扩抓。
+> Brave 搜索 key 仍缺失，所以直接读取 6 个更贴近“全栈 Web / SaaS 首版到底该复用什么、自己该定义什么”的仓库：`nextjs/saas-starter`、`ixartz/SaaS-Boilerplate`、`Better Auth`、`Payload`、`Trigger.dev`、`Inngest`。
+> 目标不是找新方向，而是继续压缩：**成熟 starter 已经替我们覆盖到哪、auth 最合理的边界是什么、schema-first 为什么仍是对象产品起点、以及任务层为什么必须连同 flow control 一起被当成正式产品层。**
+
+### 188) Next.js `saas-starter`：再次确认 auth / billing / teams CRUD / activity log 已越来越像默认配件层
+- Repo：https://github.com/nextjs/saas-starter
+- 可确认信号：README 直接写出 landing page、pricing、Stripe Checkout、Customer Portal、dashboard、users/teams CRUD、basic RBAC、JWT cookie auth、middleware protection、activity logging。
+- 这轮最值得记住的点：
+  1. **官方 starter 已把很多“一个 SaaS 总得有”的层压进默认骨架**，首版没必要再把这些层当产品主战场。
+  2. **billing 真正值钱的仍是状态同步链**：Checkout、Portal、Webhook、subscription status，而不是支付按钮本身。
+  3. **activity logging 继续很值得借**：对象变化与用户动作可追溯，会直接增强对象页可信感。
+  4. teams/basic RBAC 已足够说明：**首版最危险的不是少，而是被 starter 自带能力带偏。**
+- 对当前主线的启发：
+  - A / B 继续应把 auth、billing、dashboard、activity log 视为成熟配件层；
+  - 真正该自研的仍是对象 schema、任务状态机、统一对象页、recent 流。
+- 不值得直接照抄的点：
+  - 不要因为 starter 自带 teams/RBAC，就把首版做成 team management 产品。
+
+### 189) `SaaS-Boilerplate`：再次确认成熟 starter 已覆盖 multi-tenancy / permissions / logging / monitoring / testing 的整套默认盘子
+- Repo：https://github.com/ixartz/SaaS-Boilerplate
+- 可确认信号：README 明确写出 Next.js、Shadcn、Clerk、multi-tenancy、role & permission、Drizzle、PostgreSQL/SQLite/MySQL、Sentry、Playwright、GitHub Actions、monitoring、user impersonation。
+- 这轮最值得记住的点：
+  1. **成熟 starter 已不只是 auth+billing demo，而是把 team/workspace、permissions、logging、error reporting、testing、CI/CD 都打包进来了。**
+  2. 这再次说明：**首版最不该自研的，往往正是最像“企业感”的那层通用复杂度。**
+  3. Sentry / monitoring / testing 被直接写进 starter，也提醒：可信基础层越来越像配件层，不是产品差异化来源。
+  4. impersonation、multi-tenancy 这类能力都是真需求，但更适合被理解为“成熟 starter 已经给的边界”，不是当前主线该主动做深的层。
+- 对当前主线的启发：
+  - A / B 首版更应继续把时间压在对象层、任务层、对象页、recent 流；
+  - teams / heavy admin / enterprise-feel features 继续后置。
+- 不值得直接照抄的点：
+  - 不要因为 starter 很全，就把首版拉向组织/权限/运维后台产品。
+
+### 190) Better Auth：再次确认 auth 的首版边界仍应是 identity / session / ownership，而不是复杂 authz story
+- Repo：https://github.com/better-auth/better-auth
+- 可确认信号：README 明确强调 framework-agnostic、plugin ecosystem、2FA、multi-tenant support、advanced authz、minimal code。
+- 这轮最值得记住的点：
+  1. **auth 最值得借的是 identity / session / ownership 这层，不是把复杂身份系统本身当产品主战场。**
+  2. plugin ecosystem 继续说明：2FA、多租户、复杂 authz 更适合作为按需接入层，而不是 MVP 默认负担。
+  3. framework-agnostic 也继续提醒：身份层最好别被某个 UI 结构绑死，未来 Web / API / App 更好共用。
+- 对当前主线的启发：
+  - A / B 首版继续只先锁：登录、session、ownership、public/private、基本 account boundary；
+  - org / SSO / advanced authz 继续后置。
+- 不值得直接照抄的点：
+  - 一上来就做完整 authz / enterprise identity story，会明显拖慢对象型产品首版。
+
+### 191) Payload：再次确认 schema-first + Next.js native + extensible admin 仍是对象型轻 SaaS 的稳起点
+- Repo：https://github.com/payloadcms/payload
+- 可确认信号：README 明确强调可直接装进 `/app`、前后端同层、automatic types、auth out of the box、versions/drafts、granular access control、hooks、extensible admin。
+- 这轮最值得记住的点：
+  1. **对象 schema 一旦稳，API、admin、access、versions、hooks 会自然稳很多。**
+  2. **Next.js native** 继续很重要：对象页、后台、公开页、API 可以留在同一套系统里，而不是拆成多块。
+  3. versions / drafts / access control 再次提醒：对象可信层不是附属功能，而是对象产品天然会长出来的一层。
+- 对当前主线的启发：
+  - A / B 继续该按“对象 schema → 对象页 → 极简后台 / recent 流”推进；
+  - 先锁字段、状态、可见性、版本/归档边界，比先加页面更重要。
+- 不值得直接照抄的点：
+  - 首版不必背重 CMS、复杂 block builder 或很深内容建模系统。
+
+### 192) Trigger.dev：再次确认任务层不只是后台执行层，而是 AI / 异步型 SaaS 的正式前台可信层
+- Repo：https://github.com/triggerdotdev/trigger.dev
+- 可确认信号：README 明确强调 long-running tasks、durability、retries、queues、observability、human-in-the-loop、structured inputs/outputs、run metadata、checkpointing、versioning、alerts。
+- 这轮最值得记住的点：
+  1. **任务层不该再被理解成“后台工程细节”；它本身就是产品可信层。**
+  2. run metadata / tags / realtime / alerts 很值得借：任务对象不只是完成与否，而应能被对象页直接消费和解释。
+  3. checkpointing / versioning / replay 再次强化：可恢复、可重跑、可比较，比一次成功更重要。
+  4. human-in-the-loop 仍应理解为关键节点能力，而不是整个产品都变审批系统。
+- 对当前主线的启发：
+  - A / B 的任务对象都应继续做成 first-class layer：状态、失败原因、trace-id、版本、重跑；
+  - 对象页最好直接显示任务状态，而不是把它藏到后台。
+- 不值得直接照抄的点：
+  - 不要为了“像平台”而提前做完整工作流控制台或超大运行时自由度。
+
+### 193) Inngest：再次确认任务层若没有 flow control，就还不算真正稳
+- Repo：https://github.com/inngest/inngest
+- 可确认信号：README 明确强调 durable functions、triggers、flow control、concurrency / throttling / debouncing / rate limiting / prioritization、steps、state store、history / replay、dashboard UI。
+- 这轮最值得记住的点：
+  1. **很多长流程不需要“万能 agent”，更需要 event trigger + explicit steps + flow control。**
+  2. concurrency、throttling、debouncing、rate limiting 被放到一等公民位置，说明很多线上问题本质上是流控问题，不是模型问题。
+  3. step output / state store 继续强化：中间产物更该被持久化，而不是持续把 prompt 拉长。
+  4. history / replay 也再次提醒：失败可回放与重跑，是产品可靠性的一部分。
+- 对当前主线的启发：
+  - A / B 的任务层不只要有状态，还应尽早预留 timeout、并发、限流、重放这些 flow control 能力；
+  - 批次对象尤其应尽早考虑 failed subset rerun / low-confidence subset rerun。
+- 不值得直接照抄的点：
+  - 不必一开始引入完整事件平台感；学它的 step/state/flow-control 思路就够了。
+
+## 新增横向结论（基于这轮补样）
+
+### EU. 现代全栈 SaaS 首版现在更清楚地像“三层主结构 + 一层流控补强”
+1. **对象层**：schema、对象页、recent 流、ownership / export / archive
+2. **任务层**：状态、失败原因、run metadata、version、rerun
+3. **配件层**：auth、billing、teams/basic RBAC、logging、testing、monitoring、deploy scaffolding
+4. **flow control 补强层**：timeout、并发、限流、去抖、rate limit、subset replay
+- 真正该自己做差异化的，仍主要是 **对象层 + 任务层**；flow control 是让任务层真正稳定的关键补强。
+
+### EV. starter 越成熟，越说明“别再把时间烧在通用 plumbing 上”
+- `nextjs/saas-starter` 与 `SaaS-Boilerplate` 一起再次说明：
+  - auth / billing / teams / permission / logging / testing / monitoring / CI/CD 都越来越像成熟底座；
+  - 首版真正该定义的，仍然是对象 schema、任务状态机、对象页结构、recent 流与 trust layer。
+
+### EW. auth 的更优首版理解仍然是 ownership / boundary，而不是 enterprise auth story
+- 对 A / B 来说，首版最重要的是：
+  - 谁创建对象；
+  - 谁能看；
+  - 是否公开；
+  - 是否私有；
+  - 是否能最小分享。
+- 复杂 org / SSO / advanced authz 继续主要属于二阶段复杂度。
+
+### EX. 任务层真正站稳，必须把 flow control 一起看进去
+- Trigger.dev 强调 durability / retries / metadata / versioning；
+- Inngest 强调 triggers / steps / concurrency / throttling / replay；
+- 两者一起说明：**AI / 异步型 SaaS 的稳定性，不只靠任务状态，还靠并发、节流、重放、阶段状态这些正式能力。**
+
+## 2026-03-20 第六十轮有边界补充学习（跨端 / 混合应用再校准：iOS companion 的正式职责、bridge 协议与 Web 对象中心）
+
+> 这轮继续避免无边界扩抓；Brave 搜索 key 仍缺失、`web_fetch` 对 GitHub 也受限，所以改为只定向读取少量高价值公开 README / 仓库入口信号。
+> 重点看了 7 个更贴近未来产品跨端实现边界的项目：`Capacitor`、`react-native-webview`、`WKWebViewJavascriptBridge`、`Swift Navigation`、`Sentry Cocoa`、`Telegram iOS`、`Cordova iOS`。
+> 目标不是再讨论“要不要做 App”，而是继续压缩：**iOS 端最值得承担什么职责、WebView/bridge 真正该如何被产品化、以及 Web SaaS 与 iOS companion 之间哪些协议应提前固定。**
+
+### 194) Capacitor：再次确认更现代的 hybrid 路线真正值钱的是“原生项目正式化 + 插件正式化”，不是 UI 全共享
+- Repo：https://github.com/ionic-team/capacitor
+- 可确认信号：README 明确强调 single codebase、cross-platform APIs、code execution layer、custom native plugins、PWA support；并特别写出 **treats native projects as source artifacts as opposed to build artifacts**。
+- 这轮最值得记住的点：
+  1. **原生项目是 source artifacts** 这个信号很关键：说明 iOS 层不是一次性打包壳，而是长期共演进的正式产品层。
+  2. 真正该共享的优先仍不是页面，而是调用原生能力的接口层：分享、相册/文件、push token、deep link、系统权限、后台触发。
+  3. custom native plugins 再次说明：原生能力更适合被压成少量正式插件/命令，而不是页面随手直调。
+  4. PWA + App Store 双分发也继续提醒：很多对象型产品完全可以先在 Web 上验证对象模型与任务层，再决定哪些入口值得原生化。
+- 对当前主线的启发：
+  - A / B 若未来长出 iOS companion，更适合采用：**Web 对象中心 + 原生插件层 + 少量原生 frontstage 入口**；
+  - 先把对象页、recent 流、任务可信层在 Web 端跑顺，再让移动端接住高频入口和系统能力。
+- 不值得直接照抄的点：
+  - 不要把 Capacitor 理解成“所有页面共用一套 Web UI 就结束了”；它真正值钱的是能力总线和原生层正式化。
+
+### 195) react-native-webview：再次确认 WebView 是混合边界设计工具，不是整个产品容器
+- Repo：https://github.com/react-native-webview/react-native-webview
+- 可确认信号：README 明确强调多平台兼容、Expo 支持，同时直接承认 WebView 维护复杂，覆盖登录流、PDF、渲染、嵌入页面等大量 use cases。
+- 这轮最值得记住的点：
+  1. **WebView 不是失败方案，而是边界设计工具。**
+  2. 更适合继续放在 Web / WebView 的，依旧是：rich detail、后台、设置、帮助、定价、说明页、频繁实验页、已有 Web 资产流程。
+  3. 更适合原生拿住的，依旧是：notification entry、recent/inbox、quick actions、share sheet、capture/upload、local draft、系统权限流。
+  4. 因此比“全原生 vs 全 WebView”更重要的问题，是：**摘要层和详情层怎么切，哪些对象场景值得原生化。**
+- 对当前主线的启发：
+  - A / B 如果长出 iOS 端，更稳的切法继续是：**摘要原生 + 详情 Web**；
+  - recent 流、通知 inbox、对象卡片、快捷标记更值得原生；复杂对象详情继续走 Web 更现实。
+- 不值得直接照抄的点：
+  - 不要把 WebView 当“整个产品容器”；真正值钱的是只把高变化和已有 Web 资产放进去。
+
+### 196) WKWebViewJavascriptBridge：再次确认桥接层真正该被视为“受控命令协议”，而不是技术胶水
+- Repo：https://github.com/Lision/WKWebViewJavascriptBridge
+- 可确认信号：README 明确展示 register/call handler 模式、仅支持 WKWebView、轻量、non-intrusive、强调性能与更清楚的默认安全边界。
+- 这轮最值得记住的点：
+  1. **bridge 的本质不是“让 JS 能调原生”，而是建立一套受控、可演进、可审计的命令协议。**
+  2. 很多未来会高频复用的能力都应尽早对象化成 command：
+     - `getSession`
+     - `refreshSession`
+     - `openObject`
+     - `shareObject`
+     - `pickFile`
+     - `registerPushToken`
+     - `trackEvent`
+     - `createObjectFromShare`
+  3. bridge 最怕野生扩张；更稳的做法始终是少量稳定命令、固定返回结构、失败码、版本字段。
+  4. WKWebView 默认更清楚的安全边界也再次说明：如果未来做 iOS hybrid，重点应放在 **WKWebView + protocol**，而不是临时脚手架拼接。
+- 对当前主线的启发：
+  - A / B 后续若走 hybrid，应优先共享：**对象 schema、deep link、bridge commands、task state 字段**；
+  - 先写协议，再写页面，会明显更稳。
+- 不值得直接照抄的点：
+  - 不要让 Web 页面随手加 handler；bridge 一旦失控，后面权限、安全和调试都会很痛苦。
+
+### 197) Swift Navigation：再次确认移动端复杂度更该被压在“状态与路由语义”上，而不是页面堆叠上
+- Repo：https://github.com/pointfreeco/swift-navigation
+- 可确认信号：README 明确强调由 enum/state 驱动导航、避免无效状态、把 destination 建模为显式状态。
+- 这轮最值得记住的点：
+  1. **对对象型产品来说，移动端最该先统一的不是页面组件，而是对象状态与 destination state。**
+  2. enum-driven navigation 很适合对象产品：报告详情、批次详情、提醒打开、分享回流、创建流、确认弹窗，都可以被定义成清楚状态。
+  3. 这再次强化了一个跨端判断：**真正该共享的是路由语义与对象生命周期，而不是 UI 细节。**
+  4. push / deep link / object route / task stage 如果不按状态机来想，companion 很快会变得很碎。
+- 对当前主线的启发：
+  - 若未来做 SwiftUI companion，更该先定义：**object route、destination enum、task stage、share-entry route**；
+  - 这会让通知打开、对象回看、任务回流都顺很多。
+- 不值得直接照抄的点：
+  - 不要把移动端复杂度理解成“页面多就完了”；真正难的是状态边界和无效状态控制。
+
+### 198) Sentry Cocoa：再次确认混合产品的可信度，取决于能否把原生事件、bridge、deep link 与对象/任务上下文串起来
+- Repo：https://github.com/getsentry/sentry-cocoa
+- 可确认信号：README 强调官方 Apple SDK、尽早初始化、SPM 推荐、稳定跨 Apple 平台支持。
+- 这轮最值得记住的点：
+  1. **混合应用最怕的问题不是 crash 本身，而是 crash / error 无法和对象、任务、deep link、bridge 命令关联。**
+  2. 更值得统一的移动端上下文字段继续变清楚：
+     - `object_id`
+     - `object_type`
+     - `task_id`
+     - `task_stage`
+     - `deep_link`
+     - `bridge_command`
+     - `request_id`
+     - `trace_id`
+     - `app_version`
+     - `web_build_version`
+  3. 移动端观测首版也不该只看 crash rate；更该能回答：用户从哪个提醒进来、打开了哪个对象、桥接调了什么、最终卡在 Web 还是 native。
+  4. 这再次说明：跨端产品的可信层不只是任务状态，也包括对象级埋点与错误上下文贯通。
+- 对当前主线的启发：
+  - A / B 若长出 companion，首版就应让 **移动端事件 ↔ 对象 ↔ 任务 ↔ Web 侧 trace** 可以关联；
+  - 否则一旦出线上问题，很难排查“到底碎在桥接、页面还是任务层”。
+- 不值得直接照抄的点：
+  - 不必一开始就上很重的移动端可观测平台感；更重要的是对象级上下文字段先统一。
+
+### 199) Telegram iOS：再次确认大型原生产品真正重的不是页面数量，而是原生工程面本身很重
+- Repo：https://github.com/TelegramMessenger/Telegram-iOS
+- 可确认信号：README 明确展示独立 `api_id`、Xcode、codesigning、配置文件、项目生成脚本、构建步骤。
+- 这轮最值得记住的点：
+  1. **对未来对象型产品来说，首版最不该低估的不是“写一个 iOS 页面”，而是整个原生工程面：签名、构建、依赖、配置、发布、版本治理。**
+  2. 这从反面再次说明：当前更现实的路线依旧不是先做重原生全量产品，而是先把 Web 对象中心做强，再让 iOS 只承接高频入口层。
+  3. 大型 iOS 应用的复杂度更多来自系统工程与长期维护，而不是单次 UI 实现；这进一步反对首版过早“双端重做”。
+  4. 对当前主线更重要的不是模仿 Telegram 的体量，而是记住：**移动 companion 必须值回这份工程复杂度，所以职责要非常克制。**
+- 对当前主线的启发：
+  - A / B 的 iOS 端更应收敛到 inbox / reminder / quick action / share-entry，而不是尝试完整复制 Web 对象中心；
+  - 先用 Web 承接 rich detail、设置、帮助、后台与高变化页，会更现实。
+- 不值得直接照抄的点：
+  - 不要把大型原生 App 的工程复杂度误当成当前首版该追求的方向；那会明显拖慢对象型产品起步。
+
+### 200) Cordova iOS：再次确认“能把 Web 技术打包进 App”不等于“边界已经设计好”
+- Repo：https://github.com/apache/cordova-ios
+- 可确认信号：README 明确强调 Cordova iOS 让 HTML/CSS/JS 应用跑在 iOS；要求 iOS 13+、Xcode、Node.js，并围绕平台添加、更新、Xcode 调试展开。
+- 这轮最值得记住的点：
+  1. 把 Web 应用装进 iOS 壳这条路本身并不过时，但旧一代混合路线更像“平台封装”，而不是“受控能力总线”。
+  2. 和 Capacitor 对照后更清楚：今天更值得借的不是“网页能跑在 App 里”这件事，而是 **原生项目是否被当正式源码层、插件层是否清楚、系统能力是否通过稳定协议暴露。**
+  3. Cordova 继续提醒：如果 hybrid 只是为了“少写一套 UI”，很容易得到一层能跑但产品边界含糊的壳；真正难的是长期的桥接治理与页面边界。
+  4. 这进一步强化前面的结论：**WebView/壳不是问题，问题是有没有先定义对象协议、路由协议和 bridge command。**
+- 对当前主线的启发：
+  - 若 A / B 未来走 hybrid，更应该站在 Capacitor / WKWebView bridge 这类“插件/协议优先”的思路上，而不是回到“先全部包进去再说”的旧壳思维。
+- 不值得直接照抄的点：
+  - 不要把“能打包上架”误解成“跨端产品边界已经设计好”。
+
+## 新增横向结论（基于这轮补样）
+
+### EY. 对当前主线来说，iOS companion 是否值得做，关键不在“能不能做”，而在“是否值得承担原生工程面”
+- Telegram iOS 这轮从反面把这件事钉得更牢：
+  - codesign、构建、配置、发布、依赖治理都是真成本；
+  - 所以移动端职责必须足够窄，最好只拿高频入口与系统能力。
+
+### EZ. 现代 hybrid 更值得借的不是“网页装进 App”，而是“原生层正式化 + 插件层正式化 + bridge 协议正式化”
+- Cordova 与 Capacitor 对照后更清楚：
+  - 旧路线更像平台封装；
+  - 更值得当前主线借的是 **source-artifact native layer + plugin API + clear bridge contracts**。
+
+### FA. 跨端真正该先写清楚的，依旧是 4 套协议，但现在更该补上“错误与版本结构”
+1. 对象协议
+2. 路由 / deep link 协议
+3. bridge command 协议
+4. 任务状态协议
+- 现在更进一步的补充是：这 4 套协议里都应尽早带上 **version、error reason、object_id、task_id、trace_id**。
+
+### FB. 当前主线更现实的移动端推进顺序可以继续压成三步
+1. **先把 Web 对象页 / recent 流 / 任务可信层做强**；
+2. **再补对象驱动提醒、状态变化、share-entry 与 deep link**；
+3. **最后再长出 iOS inbox / quick-action companion**。
+- 这比“一开始双端都重做”更稳，也更符合这轮新增信号。
+
+## 2026-03-20 第五十二轮有边界补充学习（数据建模 / 对象 schema / 状态机 / 批次处理 / 审计日志 / 重跑 / 验证层）
+
+> 这轮继续保持有边界，不扩抓很多项目；Brave 搜索 key 仍缺失，改为只定向读取少量高价值公开 README。
+> 重点看了 8 个项目/信号：`Temporal`、`Inngest`、`Trigger.dev`、`Langfuse`、`OpenAI Agents SDK`、`PydanticAI`、`NocoBase`、`Medusa`。
+> 目标不是找新方向，而是把当前主线真正需要的底层模型压实：报告对象页与批次对象页，到底该如何设计 schema、任务状态、审计、重跑、验证层。
+
+### 157) Temporal：再次确认“workflow history + durable execution + retry”不是附属实现，而是正式产品可信层
+- Repo：https://github.com/temporalio/temporal
+- 可确认信号：README 直接定义为 durable execution platform，强调 Workflows、resilient execution、automatic retries、CLI、workflow list、Web UI。
+- 这轮最值得记住的点：
+  1. **长流程最关键的不是一次跑通，而是每一步都能恢复、继续、列出、解释。**
+  2. Workflow list / Web UI 说明：运行历史本身就是产品对象，不该只藏在后台日志里。
+  3. retry 价值不只是稳定性，而是把失败从“黑盒报错”变成“可继续处理的状态”。
+  4. 对 AI/分析型产品来说，durable execution 很适合承接抓取、解析、生成、评分、人工修正这类长链路步骤。
+- 对当前主线的启发：
+  - 报告对象 / 批次对象后面都应挂一个 first-class run/workflow 对象；
+  - 对象页不只显示结果，也应显示最近一次运行状态、开始/结束时间、失败原因、可重跑入口。
+- 不值得直接照抄的点：
+  - 首版不必引入完整 Temporal 式基础设施；更该借它的状态/history/retry 观念。
+
+### 158) Inngest：再次确认“event + step + flow control + state store”是批次处理最稳的工程骨架
+- Repo：https://github.com/inngest/inngest
+- 可确认信号：README 明确强调 Triggers、Flow Control、Steps、batching、state store、history、replay、dashboard UI。
+- 这轮最值得记住的点：
+  1. **批次处理真正要建模的，不只是 batch 本身，还有 step outputs、step errors、resume/cancel、replay。**
+  2. concurrency、throttling、debouncing、rate limiting、prioritization 被摆到一等公民位置，说明线上很多问题首先是流控问题。
+  3. state store 明确提醒：中间产物要持久化，不要把全流程都塞进一次 prompt/一次任务里。
+  4. event history 与 replay 很适合转译成批次对象页里的“导入记录 / 重跑记录 / 版本比较”。
+- 对当前主线的启发：
+  - 批次对象页应按 step 组织：ingest → normalize → cluster/classify → summarize → review → publish；
+  - 报告对象若也有抓取/解析链路，同样适合 step 化。
+- 不值得直接照抄的点：
+  - 首版不必先做完整 event platform；学它的 step/state/flow 控制就够了。
+
+### 159) Trigger.dev：再次确认“run metadata / tags / bulk replay / structured IO”非常适合对象页产品
+- Repo：https://github.com/triggerdotdev/trigger.dev
+- 可确认信号：README 明确写出 retries、queues、idempotency、batchTrigger、structured inputs/outputs、run metadata、tags、bulk replay、checkpointing、versioning。
+- 这轮最值得记住的点：
+  1. **run metadata 很关键**：对象页不该只显示最后产物，还应消费运行元数据。
+  2. structured inputs/outputs 再次说明：验证层最好从任务边界就开始，而不是最后存库前才校验。
+  3. bulk replay 很适合批次对象：某一批失败项、低置信度项、特定标签项需要批量重跑。
+  4. versioning / checkpointing 说明：对象可信度很大一部分来自“当前结果属于哪一版流程/提示词/模型”。
+- 对当前主线的启发：
+  - 报告对象 / 批次对象都该挂 run_tags、run_metadata、pipeline_version、prompt_version、model_version；
+  - 批次页应预留“仅重跑失败项 / 仅重跑低置信度项 / 全量重跑”这三种入口。
+- 不值得直接照抄的点：
+  - 首版不必做很重的任务平台 UI，但对象页里应该露出 run 层，而不是完全隐藏。
+
+### 160) Langfuse：再次确认“trace / dataset / eval / prompt version”是 AI 对象产品的正式验证层
+- Repo：https://github.com/langfuse/langfuse
+- 可确认信号：README 明确强调 tracing、prompt management、evaluations、datasets、playground、API。
+- 这轮最值得记住的点：
+  1. **trace 不只是工程可观测性；它是解释对象结果来源的证据层。**
+  2. dataset / evaluation 说明：验证层不该只靠线上感觉，而要有可重复样本与回归。
+  3. prompt management / versioning 说明：对象结果应知道自己来自哪套指令与配置。
+  4. playground 信号也很有用：坏结果不只要能看到，还要能被快速修正并回归验证。
+- 对当前主线的启发：
+  - 报告对象页 / 批次对象页都该预留 trace_summary、evidence_count、evaluation_status、prompt_version 字段；
+  - 后续应有“小样本金标集 + 回归跑分”机制来约束改 prompt/改模型后的回退风险。
+- 不值得直接照抄的点：
+  - 首版不必做完整 LLMOps 平台；但 trace/eval 思维应提前内化到对象与任务模型里。
+
+### 161) OpenAI Agents SDK：再次确认“guardrails / sessions / human-in-the-loop / tracing”更像流程边界层，而不是聊天附加件
+- Repo：https://github.com/openai/openai-agents-python
+- 可确认信号：README 明确列出 guardrails、human in the loop、sessions、tracing、handoffs。
+- 这轮最值得记住的点：
+  1. **guardrails 的产品含义是输入/输出边界被正式建模。**
+  2. human-in-the-loop 说明：人工确认不只是审批按钮，而是状态机里的正式节点。
+  3. sessions/history 说明：上下文管理应被视作系统能力，而不是随手拼 prompt。
+  4. tracing 再次说明：多步骤 agent 流程若没有 trace，很难进入真实产品主流程。
+- 对当前主线的启发：
+  - 报告页与批次页都应预留 review_required、review_status、review_notes、approved_by 之类字段；
+  - 对高风险字段（标题、结论、动作建议）可采用“生成 → 待审 → 发布”而不是一步到位。
+- 不值得直接照抄的点：
+  - 不要因为 agents/handoffs 就把产品做成泛 agent 平台；当前重点仍是对象工作流。
+
+### 162) PydanticAI：再次确认“类型安全 + 结构化输出 + 失败重试 + graph”是对象 schema 的天然朋友
+- Repo：https://github.com/pydantic/pydantic-ai
+- 可确认信号：README 明确写出 type-safe、structured outputs、validation、evals、durable execution、graph support、human approval。
+- 这轮最值得记住的点：
+  1. **结构化输出真正重要的不是 JSON，而是失败后可校验、可重试、可局部修补。**
+  2. output validation 非常适合做对象写库前的正式闸门。
+  3. graph support 提醒：当流程从线性链路变复杂时，应该显式表达节点与边，而不是让控制流散落在代码里。
+  4. stream + immediate validation 也很适合需要逐步产出结构字段的页面。
+- 对当前主线的启发：
+  - 报告对象与批次对象都应有严格 schema；
+  - AI 生成字段最好分层：raw_output → normalized_fields → validated_object。
+- 不值得直接照抄的点：
+  - 首版不必引入复杂 graph 框架，但要保留 schema-first 与 validation-first 思维。
+
+### 163) NocoBase：再次确认“data model-driven, not form/table-driven”非常贴近当前对象页产品主线
+- Repo：https://github.com/nocobase/nocobase
+- 可确认信号：README 明确强调 data model-driven、UI/data decoupled、same table/record 可挂多 block/action、plugin architecture。
+- 这轮最值得记住的点：
+  1. **对象型产品最重要的不是表格页，而是先把 record/object 的数据模型定义清楚。**
+  2. UI 与 data decoupled 很关键：同一个报告对象/批次对象，未来可有公开页、后台页、embed 卡片、审核页。
+  3. 同一对象可以挂多种 block/action，这很适合对象页继续长出 evidence、history、audit、rerun、comments 等模块。
+  4. plugin 化再次说明：扩展性应建立在对象模型稳之后，而不是先铺页面。
+- 对当前主线的启发：
+  - 当前最该做的是把 report / batch / run / evidence / audit_event 这些对象关系定义清楚；
+  - 页面层可从这些对象自然派生，而不必先做很重的 dashboard 结构。
+- 不值得直接照抄的点：
+  - 首版不必做 no-code/插件平台；借它的 model-first 思维即可。
+
+### 164) Medusa：再次确认“building blocks / modules / workflow”提示我们应把可复用领域块拆清楚
+- Repo：https://github.com/medusajs/medusa
+- 可确认信号：README 明确强调 commerce modules、tools、customizable、foundational primitives、plugins。
+- 这轮最值得记住的点：
+  1. **能长大的系统，往往不是页面越做越多，而是基础领域模块越来越清楚。**
+  2. building blocks 思维很适合当前主线：对象、运行、证据、审计、提醒、导出，都可视为正式模块。
+  3. 可组合模块的前提仍然是核心对象 schema 稳定。
+- 对当前主线的启发：
+  - 报告对象页与批次对象页后续可以共用很多底层模块：run、audit、comment、tag、notification、export；
+  - 这也说明 A/B 两个方向很可能能共用一套对象/任务内核。
+- 不值得直接照抄的点：
+  - 首版不必过早追求 plugin ecosystem；先把共享模块边界想清楚就够了。
+
+## 新增横向结论（基于这轮补样）
+
+### EG. 报告对象页 / 批次对象页的真正底层，不只是 schema，而是“对象层 + 运行层 + 审计层 + 验证层”四层结构
+1. **对象层**：report / batch 本身的业务字段与生命周期
+2. **运行层**：run / workflow / step / retry / replay / queue / version
+3. **审计层**：audit_event / actor / action / before/after / reason / source
+4. **验证层**：schema validation / guardrails / eval / dataset / confidence / review
+- 这四层一旦分清，对象页就不会退化成一段自然语言结果。
+
+### EH. 适合当前主线的最小对象集合已经越来越清楚
+- `report`
+- `batch`
+- `run`
+- `step_run`
+- `evidence`
+- `audit_event`
+- `evaluation_result`
+- `comment/review`
+- `tag`
+- `notification/reminder`
+- 真正的页面只是这些对象的不同投影。
+
+### EI. 报告对象页的推荐 schema（首版可压缩）
+- 核心字段：
+  - `id`
+  - `source_type` (`repo` | `url` | `text`)
+  - `source_ref`
+  - `title`
+  - `summary`
+  - `status` (`draft` | `processing` | `ready` | `review_required` | `published` | `failed` | `archived`)
+  - `visibility` (`private` | `public` | `unlisted`)
+  - `confidence`
+  - `generated_at`
+  - `updated_at`
+  - `pipeline_version`
+  - `prompt_version`
+  - `latest_run_id`
+- 结构块：
+  - `positioning`
+  - `target_user`
+  - `key_pages`
+  - `suspected_stack`
+  - `notable_patterns`
+  - `borrowable_ideas`
+  - `avoid_copying`
+  - `suggested_next_actions`
+- 可信层：
+  - `evidence_count`
+  - `warning_flags`
+  - `review_status`
+  - `published_at`
+- 这会让报告页更像“可信研究对象”，而不是一次性 AI 输出。
+
+### EJ. 批次对象页的推荐 schema（更强调处理状态与重跑）
+- 核心字段：
+  - `id`
+  - `input_type` (`csv` | `text` | `survey_export` | `api_import`)
+  - `input_ref`
+  - `record_count`
+  - `status` (`uploaded` | `queued` | `processing` | `partially_failed` | `ready` | `review_required` | `published` | `failed` | `archived`)
+  - `processing_progress`
+  - `latest_run_id`
+  - `pipeline_version`
+  - `created_at`
+  - `updated_at`
+- 输出块：
+  - `top_themes`
+  - `clusters`
+  - `representative_quotes`
+  - `severity_summary`
+  - `recommended_actions`
+  - `change_vs_previous_batch`
+- 运行与质量块：
+  - `failed_record_count`
+  - `low_confidence_count`
+  - `needs_review_count`
+  - `last_replay_at`
+  - `evaluation_status`
+- 这会让批次页更像“可处理对象”，而不是一页静态分析摘要。
+
+### EK. 状态机应该先于页面设计
+- 报告对象建议先定：
+  - `draft → processing → ready → (review_required) → published / failed / archived`
+- 批次对象建议先定：
+  - `uploaded → queued → processing → ready / partially_failed / failed → review_required → published / archived`
+- 一旦状态机明确，页面上的按钮（重跑、发布、归档、审核通过、仅重跑失败项）就会自然长出来。
+
+### EL. 审计日志不该只是管理员功能，而是对象可信度的一部分
+- 建议记录：
+  - 谁创建/导入
+  - 谁改了标题/标签/状态/结论
+  - 哪次重跑更新了哪些字段
+  - 为什么发布/回滚/归档
+- 对当前主线来说，audit_event 很适合成为对象页右侧时间线模块。
+
+### EM. 重跑应被拆成至少三类，而不是一个模糊的“rerun”按钮
+1. **full rerun**：整条链路重跑
+2. **step rerun**：仅从某一步重新开始
+3. **subset rerun**：仅重跑失败项 / 低置信度项 / 选中记录
+- 这对批次对象尤其关键，也能显著提升报告对象的修正效率。
+
+### EN. 验证层建议分成三道闸门
+1. **输入验证**：source/input 是否完整、可抓取、格式合法
+2. **结构验证**：LLM 输出是否满足 schema / type / required fields
+3. **质量验证**：confidence、warning flags、eval score、人工审核是否通过
+- 这样对象页上的“ready”才真正有含义。
+
+### EO. 当前主线的更清楚工程压缩
+- 方向 A（报告对象页产品）现在更像：
+  - `source → report.run(workflow) → evidence + validated schema → report object page → audit/review/rerun layer`
+- 方向 B（批次对象页产品）现在更像：
+  - `import → batch.run(workflow) → step outputs + validation → batch object page → replay/review/comparison layer`
+- 这轮最重要的变化不是换方向，而是**把 trust layer 正式拆成可实现的数据模型与状态模型**。
+
   - schema 不稳，页面、后台、任务层都会漂。
+
+## 2026-03-20 第六十一轮有边界补充学习（workflow/data orchestration 再补样：state、asset、审批、回填、审计、重跑）
+
+> 这轮继续保持有边界；Brave 搜索 key 仍缺失，所以没有无边界扩抓，只定向读取少量高价值公开 README / 仓库入口信号。
+> 重点看了 4 个更贴近“对象页产品背后的 workflow / batch / state / replay / approval / audit”项目：`Prefect`、`Kestra`、`Windmill`，并补记 `Dagster` 的 README 入口信号受 raw 路径限制，只确认到其 README 指向 `python_modules/dagster/README.md` 的仓库结构信号，没有继续硬扩。
+> 目标不是找新方向，而是继续压缩：报告对象页与批次对象页背后的运行层，到底该如何进一步设计 state、step、artifact、approval、backfill/replay 与 UI 映射。
+
+### 201) Prefect：再次确认“flow / task / retry / cache / event-driven automation”非常适合轻量任务可信层
+- Repo：https://github.com/PrefectHQ/prefect
+- 可确认信号：README 明确强调 workflow orchestration、flows / tasks、resilient pipelines、scheduling、caching、retries、event-based automations、可用 self-hosted server / cloud dashboard 追踪运行活动。
+- 这轮最值得记住的点：
+  1. **对小团队和轻 SaaS 来说，任务层的最小闭环不一定要很重；flows + tasks + retries + caching + events 就已经很强。**
+  2. **运行活动被显式追踪** 这一点很重要：run history 不是后台噪音，而是对象可信层的一部分。
+  3. **cache / retry 应和 workflow 一起设计**，而不是事后补；很多对象页的“稳定感”来自不会每次都全量重算。
+  4. event-based automation 很适合转译成对象驱动触发：对象创建、失败、审核通过、发布后再跑后续动作。
+- 对当前主线的启发：
+  - A / B 的任务层可继续保持轻量，但应明确：`flow`、`task`、`retry_count`、`cached_result_used`、`trigger_source`；
+  - 对象页应显示最近 run、是否命中缓存、失败原因、可否重跑。
+- 不值得直接照抄的点：
+  - 首版不必上完整 orchestrator 平台感；借它的 flow/task/retry/cache 思路就够了。
+
+### 202) Kestra：再次确认“声明式 workflow + trigger + namespace + artifact + retry/timeout/backfill”很适合批次对象页
+- Repo：https://github.com/kestra-io/kestra
+- 可确认信号：README 明确强调 event-driven & scheduled workflows、YAML declarative interface、Git version control、inputs / outputs 生成 artifacts、retries、timeout、error handling、labels、subflows、backfills、dynamic tasks、sequential and parallel tasks。
+- 这轮最值得记住的点：
+  1. **批次对象真正要建模的，不只是 run 成功与否，还有 artifacts、labels、backfill、subflow、parallel/sequential stage。**
+  2. **artifact 是很强的中间层**：对象页不该只读最终结论，还应能挂阶段产物、导出件、日志摘要、失败片段。
+  3. **namespace / labels** 很适合转译成对象与任务的组织层：按 workspace、项目、来源类型、批次标签来切。
+  4. **backfill** 很有启发：很多“重跑”其实不是简单 rerun，而是对一段历史对象或一批历史记录的补算。
+- 对当前主线的启发：
+  - B 的批次页应继续强化 `artifact_count`、`stage_outputs`、`backfill_run_id`、`parallel_stage_status`；
+  - A 的报告页若有抓取/解析/摘要多步链路，也适合把关键 artifact（抓取摘要、截图、结构化 evidence）挂成正式块。
+- 不值得直接照抄的点：
+  - 首版不必引入完整 YAML/workflow authoring；更值得借的是 artifact/backfill/labels 这些正式对象观念。
+
+### 203) Windmill：再次确认“script → autogenerated UI → flow → app”说明很多内部动作最适合先做成明确操作卡
+- Repo：https://github.com/windmill-labs/windmill
+- 可确认信号：README 明确强调 scripts、background jobs、workflows、UIs、自动从脚本参数生成前端、flows、internal apps、自托管、Git 同步。
+- 这轮最值得记住的点：
+  1. **很多高频操作不需要先做成大后台，而适合先做成“参数明确的动作卡 / 操作面板”。**
+  2. script parameters → autogenerated UI 这个信号很适合当前主线：对象页上的很多动作天然就是参数化动作。
+  3. **workflow 与 UI 不该割裂**；用户需要在对象页上直接触发动作、看结果、再写回对象状态。
+  4. Git 同步也再次提醒：复杂工作流最终仍应能被版本化和审计，而不是全靠点点点。
+- 对当前主线的启发：
+  - A / B 的对象页动作区可继续收敛成少量参数化 action cards：`rerun failed subset`、`regenerate summary`、`publish`、`archive`、`export artifact`；
+  - 动作卡最好有固定输入、固定输出、固定 run 记录，而不是万能聊天框。
+- 不值得直接照抄的点：
+  - 首版不该滑向内部平台 / low-code builder；借它的“动作参数化 + UI 紧贴 workflow”就够了。
+
+### 204) Dagster（入口信号补记）：再次提醒“asset / check / lineage”值得作为下一轮重点补样
+- Repo：https://github.com/dagster-io/dagster
+- 可确认信号：仓库根 README raw 返回指向 `python_modules/dagster/README.md`，说明 monorepo 结构下文档入口分层明显；这本身也是一个信号：对象/资产层很可能被放在更明确模块里，而不是散在顶层 README。
+- 这轮最值得记住的点：
+  1. 即便这轮没继续扩抓，**Dagster 仍然值得在下一轮专门补“asset / asset checks / lineage / partition/backfill”视角**。
+  2. 从仓库结构信号看，它更像会继续强化“对象不是 run 的附属，而是 asset-first”的那一路。
+- 对当前主线的启发：
+  - 下一轮若继续补样，Dagster 很可能最适合作为“对象页 = asset page”的对照样本。
+
+## 新增横向结论（基于这轮补样）
+
+### FO. 运行层现在可以进一步拆成“flow / task / artifact / trigger / replay”五件套
+1. **flow**：本次对象处理的整体运行
+2. **task / step**：流程中的明确阶段
+3. **artifact**：阶段产物、导出件、证据件、日志摘要
+4. **trigger**：由什么触发（手动、导入、定时、事件、审核通过）
+5. **replay / backfill**：如何重跑（单对象、子步骤、历史范围、失败子集）
+- 这五件套一旦清楚，对象页就更容易从“结果展示”升级为“可处理对象”。
+
+### FP. 对象页上的“动作卡”应继续被理解成任务系统的前台投影
+- Windmill 再次说明：很多高频动作本质上是参数化脚本 / 参数化 run；
+- Prefect / Kestra 再次说明：这些动作背后应落到有状态、有重试、有 artifact 的 workflow；
+- 所以对象页动作卡最好具备：
+  - 明确输入参数
+  - 固定 run 记录
+  - 固定输出块 / artifact
+  - 固定失败态与重跑入口
+
+### FQ. artifact 层值得正式进入 A / B 主线的数据模型
+- 比起只存最终 summary，更适合显式建模：
+  - `artifact`（截图、抓取摘要、CSV 清洗结果、cluster 明细、导出文件、发布快照）
+  - `artifact_type`
+  - `artifact_status`
+  - `artifact_ref`
+  - `generated_by_run_id`
+- 这样对象页更容易长出 evidence/detail/export/debug blocks。
+
+### FR. replay 不应只理解成“再跑一次”，而应至少区分 4 类
+1. **full rerun**：整条流程重跑
+2. **step rerun**：从某一步继续
+3. **subset rerun**：只重跑失败项 / 低置信度项 / 选中记录
+4. **backfill replay**：对一段历史对象 / 历史批次补算
+- 这对批次对象尤其重要，对报告对象也会越来越重要。
+
+### FS. 对当前主线的进一步工程压缩
+- 方向 A 现在更完整地像：
+  - `repo / URL → input connection state → report schema → analysis flow/task/artifact layer → strong report object page → audit/review/rerun/backfill layer`
+- 方向 B 现在更完整地像：
+  - `CSV / text → import connection state → batch schema → batch flow/task/artifact layer → strong batch object page → replay/review/comparison/backfill layer`
+- 这轮最重要的新增不是换方向，而是：
+  - **对象页背后的运行层现在更清楚该长成 flow/task/artifact/trigger/replay 五件套。**
+
+## 2026-03-20 第五十八轮有边界补充学习（AI 应用工程实现再收敛：schema-first 动作 / guardrails / 状态化工作流 / tracing-eval 一体化）
+
+> 这轮继续避免无边界扩抓；Brave 搜索 key 仍缺失，所以不做泛搜索，只定向读取少量高价值公开 README / 仓库入口信号。
+> 重点看了 7 个更贴近“AI 怎么真正进入 SaaS 主流程”的项目/信号：`OpenAI Agents SDK (JS)`、`PydanticAI`、`LangGraph`、`Inngest`、`Trigger.dev`、`Langfuse`、`Instructor`（另顺手确认了 Vercel AI SDK 仓库入口信号）。
+> 目标不是找新产品方向，而是继续压缩：**结构化输出什么时候足够、什么时候该进入 workflow；tool / guardrail / tracing / eval 应如何变成对象页可信层；以及 AI 最适合嵌在真实 SaaS 主流程的哪一层。**
+
+### 181) OpenAI Agents SDK (JS)：再次确认 agent 真正可上线时，核心不是“会聊天”，而是 guardrails / sessions / tracing / HITL 一起进入运行边界
+- Repo：https://github.com/openai/openai-agents-js
+- 可确认信号：README 明确列出 agents、tools、guardrails、human-in-the-loop、sessions、tracing、handoffs。
+- 这轮最值得记住的点：
+  1. **guardrails 的工程含义很强**：输入边界、输出边界、风险动作边界，都不该只靠 prompt 口头约束。
+  2. **sessions 更适合被理解成对象级运行上下文**，不是泛聊天历史；同一个 report/batch 最好有自己的运行边界。
+  3. **tracing 不是调试附属品，而是 run-level 产品可信层**；没有 run trace，就很难把 agent 放进正式对象页。
+  4. **human-in-the-loop 应视为状态机正式节点**，而不是异常时临时拦截。
+- 对当前主线的启发：
+  - A / B 的对象页都应预留 `run_id`、`review_required`、`review_status`、`trace_summary` 这类字段；
+  - 高风险动作更适合“生成 → 待审 → 发布”，而不是一步直写对象。
+- 不值得直接照抄的点：
+  - 不要因为有 handoff / multi-agent 就把首版做成泛 agent 平台；当前更该借的是 guardrail + run 边界思路。
+
+### 182) PydanticAI：再次确认 schema-first + validation retry + durable execution 是 AI 对象产品最稳的默认起点
+- Repo：https://github.com/pydantic/pydantic-ai
+- 可确认信号：README 明确强调 structured outputs、validation、evals、durable execution、human approval、graph、streamed outputs。
+- 这轮最值得记住的点：
+  1. **结构化输出真正有价值时，不只是返回 JSON，而是失败可校验、可重试、可降级、可入库。**
+  2. **validation retry 很适合做对象写库前闸门**；很多脏输出应在 schema 层被挡住，而不是进入对象页后再人工补救。
+  3. **durable execution 再次说明：长流程 AI 的稳定性首先来自状态持久化，而不是模型变聪明。**
+  4. **streamed structured outputs** 很适合对象页边生成边显露已验证字段，而不是等整页完成。
+- 对当前主线的启发：
+  - 报告对象 / 批次对象可继续采用 `raw_output → normalized_fields → validated_object` 三层写入；
+  - 首版应优先把 schema、required fields、fallback path 设计清楚。
+- 不值得直接照抄的点：
+  - 首版不必为 graph 而 graph；关键是先把 schema-first 与 validation-first 做扎实。
+
+### 183) LangGraph：再次确认真正该产品化的不是“agent 图”，而是 stateful workflow + resume + memory layering
+- Repo：https://github.com/langchain-ai/langgraph
+- 可确认信号：README 明确强调 durable execution、human-in-the-loop、memory、debugging、stateful long-running workflows。
+- 这轮最值得记住的点：
+  1. **复杂 AI 流程最稳的实现仍是显式状态图，而不是长 prompt。**
+  2. **memory 应继续分层理解**：working memory、persistent memory、外部检索，不该混成一个超长上下文。
+  3. **resume / interrupt 非常适合对象页产品**：任务中断、待审、补资料、继续运行，都可以成为正式状态。
+  4. **debugging 的核心是看状态转移与节点产物，不只是看最终输出。**
+- 对当前主线的启发：
+  - A / B 的任务层应继续按 step/state 组织，并把关键 step 输出挂进对象页；
+  - 状态 UI 应回答“卡在哪一步、能否继续、需不需要人工介入”。
+- 不值得直接照抄的点：
+  - 不必一上来做图编辑器；首版固定 4-6 个步骤就够了。
+
+### 184) Inngest：再次确认 event → step.run → flow control → state store 是比“万能 agent”更稳的主流程骨架
+- Repo：https://github.com/inngest/inngest
+- 可确认信号：README 明确强调 triggers、steps、flow control、concurrency / throttling / rate limiting / prioritization、state store、history、replay。
+- 这轮最值得记住的点：
+  1. **很多 AI/SaaS 主流程本质上更像 durable function，而不是自由游走 agent。**
+  2. **flow control 是正式可信层**：并发、节流、去抖、限流、优先级这些不只是性能细节，而会直接影响对象是否可靠生成。
+  3. **state store 再次强化“中间产物要持久化”**；步骤输出比超长 prompt 更值得信任。
+  4. **history / replay 很适合转译成对象页上的 run history 与 rerun modes。**
+- 对当前主线的启发：
+  - A / B 的任务页应继续预留：full rerun / step rerun / subset rerun；
+  - 对批次对象尤其要尽早建 `failed_count`、`low_confidence_count`、`replayed_at` 这类字段。
+- 不值得直接照抄的点：
+  - 首版不必引入完整事件平台；学它的 step/state/flow control 即可。
+
+### 185) Trigger.dev：再次确认 run metadata / versioning / replay / alerts 很适合作为对象页可信层直接消费
+- Repo：https://github.com/triggerdotdev/trigger.dev
+- 可确认信号：README 明确强调 long-running tasks、retries、queues、structured IO、run metadata、checkpointing、versioning、bulk replay、alerts。
+- 这轮最值得记住的点：
+  1. **任务系统最值钱的不是“后台跑起来”，而是前台对象页能消费到 run metadata。**
+  2. **versioning 非常关键**：对象页应知道结果来自哪个 pipeline/model/prompt 版本。
+  3. **bulk replay / batchTrigger** 说明批次对象不该只有单次重跑，而应支持失败项/低置信度项重放。
+  4. **alerts 更适合作为对象驱动通知层的一部分**，而不是孤立 ops 告警。
+- 对当前主线的启发：
+  - A / B 都应继续挂 `pipeline_version`、`prompt_version`、`model_version`、`latest_run_id`；
+  - 对象页可继续强化 run timeline、failure reason、rerun CTA。
+- 不值得直接照抄的点：
+  - 不要为了“像平台”而一上来做完整运行控制台；对象页先把 run 露出来更重要。
+
+### 186) Langfuse：再次确认 tracing / datasets / evals / prompt version 应被理解成同一条产品改进闭环
+- Repo：https://github.com/langfuse/langfuse
+- 可确认信号：README 明确强调 tracing、prompt management、evaluations、datasets、playground、API。
+- 这轮最值得记住的点：
+  1. **trace 不只是工程排障层，也是对象结果来源的证据层。**
+  2. **dataset / eval 不该后置太久**；哪怕轻 SaaS，也可以先从代表样本 / 坏样本 / 版本对比做最小闭环。
+  3. **prompt/version 应是运行元数据，而不是散落在代码里的隐式状态。**
+  4. **playground 的真实价值是坏结果可快速回放、修正、再验证。**
+- 对当前主线的启发：
+  - 报告/批次对象都应预留 `evaluation_status`、`evidence_count`、`prompt_version`、`dataset_ref` 一类字段；
+  - 二阶段应优先做轻量坏样本库，而不是大而全 LLMOps 平台。
+- 不值得直接照抄的点：
+  - 首版不必自建完整 tracing/eval 平台；但对象与任务模型应提前为它留槽位。
+
+### 187) Instructor：再次确认很多最值钱的 AI 能力其实只是“窄动作 + 强 schema + 自动重试”，不必上 agent runtime
+- Repo：https://github.com/instructor-ai/instructor
+- 可确认信号：README 明确强调 response_model、validation、automatic retries、provider-agnostic，并直接写出“Use Instructor for fast extraction, reach for PydanticAI when you need agents.”
+- 这轮最值得记住的点：
+  1. **不是所有 AI 功能都值得 agent 化。** 标题、标签、摘要、字段抽取、风险卡、优先级卡，很适合 schema-first 小动作。
+  2. **automatic retries + validation** 对对象页动作卡尤其值钱，因为能显著降低脆弱度。
+  3. **provider abstraction 的主要价值之一仍是回退与替换，不只是支持更多模型。**
+- 对当前主线的启发：
+  - A / B 首版 AI 层继续应优先做“对象页内 3-5 个 schema-first 动作卡”；
+  - 只有跨抓取/解析/人工确认/重放时，再上更重的 workflow/runtime。
+- 不值得直接照抄的点：
+  - 别把所有动作都抽成一个万能 agent；很多地方小动作更稳、更便宜、更有产品感。
+
+## 新增横向结论（基于这轮补样）
+
+### EP. AI 应用真正可上线的骨架，现在更清楚地像“4 层正式系统”
+1. **schema-first action layer**：标题、标签、摘要、风险卡、建议卡、字段抽取
+2. **workflow / run layer**：显式步骤、状态持久化、resume、replay、flow control
+3. **trust / evidence layer**：trace、evidence、warnings、review、version、failure reason
+4. **eval / regression layer**：代表样本、坏样本、版本对比、dataset、evaluation status
+- 真正该自己做差异化的，仍主要是 **业务对象层 + action/workflow 层**。
+
+### EQ. 更适合当前主线的 AI 嵌入方式依旧不是首页聊天，而是“对象页动作卡 + 背后 run 层”
+- 对象页前台：动作明确、状态可见、结果可写回、失败可重试；
+- 后台 run 层：steps、versions、replay、trace、alerts。
+- 这会比“一个大 agent 接管全部流程”更稳。
+
+### ER. guardrails / validation / review 应被理解成同一条质量闸门，而不是三个零散配件
+1. **输入验证**：source / import 是否完整可处理
+2. **结构验证**：输出是否符合 schema / required fields
+3. **质量闸门**：confidence / warnings / eval / review 是否通过
+- 只有三层一起成立，对象页上的 `ready` / `published` 才真正可信。
+
+### ES. 当前主线的实现顺序可以再压清楚一点
+1. 先定对象 schema
+2. 再定对象页上的 schema-first 动作卡
+3. 再补 workflow / run 状态与 rerun modes
+4. 再补 trace / evidence / version / review 可信层
+5. 最后补坏样本库 / 轻回归验证层
+- 这比一开始追求“更万能 agent 平台”现实得多。
 
 ### EG. 任务层应继续被理解成前台可信层，而且要开始重视 flow control
 - Trigger.dev 强调 durability / retries / versioning / metadata；
@@ -1492,6 +2316,89 @@
 
 ### BS. 对 AI / 抓取 / 异步处理型 SaaS，任务系统能力和可观测性几乎是一回事
 - 一旦产品核心依赖抓取、解析、生成、批处理、第三方 API，真正 first-class 的工程能力就应该包括：超时、有限重试、状态流转、失败原因、重跑、样本回收、版本关联。
+
+## 2026-03-20 第六十一轮有边界补充学习（UI 系统 / 信息架构：attention queue、scan-first 列表、public projection）
+
+> 这轮不继续扩公开项目样本；Brave 搜索 key 仍缺失，因此不硬搜更多仓库，而是基于前面已经稳定的对象型 SaaS / 分享页 / recent 流 / 任务可信层信号，专门从 UI 系统与信息架构角度再压一层：dashboard 到底该做什么、列表页该怎么扫、详情页怎么避免信息过载、public/private 两层对象页如何共构。
+
+### 205) dashboard：再次确认它更适合做 object navigation + attention queue，而不是价值主舞台
+- 可确认信号：前几轮反复出现的高质量产品，无论是报告库、批次库、分享对象还是轻 SaaS，真正承载判断和动作的都是对象页；dashboard 更多承担 summary / queue / recent 的入口职责。
+- 这轮最值得记住的点：
+  1. **dashboard 首屏最该先回答的不是“全局有多少数据”，而是“现在哪些对象值得你立刻处理”。**
+  2. 更稳的 dashboard 结构通常是：少量 KPI summary → attention queue（failed / review required / recently changed）→ recent stream → quick create/import。
+  3. 对象型产品如果一开始就把 dashboard 做成图表大盘，很容易牺牲对象页清晰度，得到一个看起来完整但不够好用的后台。
+- 对当前主线的启发：
+  - A / B 首版首页都更适合像“对象导航页 + 注意力队列”；
+  - 报告对象 / 批次对象依旧才是产品真正的主舞台。
+
+### 206) list / library：再次确认首版应优先 scanability，而不是 BI 化
+- 可确认信号：前几轮关于 recent 流、library、极简后台的一致结论越来越明显：早期列表页的任务首先是“快速扫过、快速重开、快速定位失败/待处理对象”。
+- 这轮最值得记住的点：
+  1. **列表页首版更适合少字段、高信息密度、强扫描性，而不是很多列、很多图、很多组合筛选。**
+  2. 首版最值得稳定显示的字段，仍然是：title、source、status、updated_at、latest run、visibility、主标签/owner。
+  3. 筛选也应继续优先围绕 lifecycle：recent、failed、review_required、published、archived，而不是一开始就做复杂 BI 维度。
+- 对当前主线的启发：
+  - A / B 的列表页都应继续理解成“可操作对象索引”，不是分析控制台；
+  - scan-first 会比 configurability-first 更适合首版。
+
+### 207) detail page：再次确认 summary-first、detail-on-demand 是更稳的对象页层次
+- 可确认信号：前几轮关于强对象页、状态条、evidence、动作卡、可信层的结论越来越一致；对象页首屏若不先服务决策，而先服务完整展示，往往会又长又散。
+- 这轮最值得记住的点：
+  1. **对象页首屏应优先回答“这是什么、现在状态如何、哪里值得关注、下一步做什么”。**
+  2. 更适合放在首屏的是：summary、status、warnings、key cards、next actions；
+     更适合按需展开的是：raw output、logs、trace、长 evidence、artifacts、历史版本。
+  3. 这类结构对 report / batch / vertical result object 三条主线都共用。
+- 对当前主线的启发：
+  - A / B 的详情页更应坚持 summary-first, detail-on-demand；
+  - 不应把 evidence / logs / run detail 全塞进首屏主叙事。
+
+### 208) status system：再次确认状态流必须同时穿透 object / list / recent 三层 UI
+- 可确认信号：任务可信层已在前几轮成为当前主线的核心卖点，但如果状态只存在详情页或后台日志里，用户仍然会感觉产品不够可信。
+- 这轮最值得记住的点：
+  1. **状态不仅是对象页头部的一条 badge，而应成为 list / recent / object 三层都可扫到的正式语言。**
+  2. 统一状态枚举、统一视觉 token、统一失败入口，会显著降低对象产品的认知负担。
+  3. 对 report / batch 这类异步型对象，失败原因和重跑入口最好能从列表层就直达，而不是非得点进详情页后再找。
+- 对当前主线的启发：
+  - A / B 都应尽早把状态系统设计成跨页面共享层，而不是页面局部组件。
+
+### 209) action cards：再次确认它们应被理解成 workflow 的 frontstage projection
+- 可确认信号：多轮 AI / 任务 / Windmill / Trigger.dev / schema-first 动作研究已经非常一致：很多高价值动作天然就是参数化 run，而不是聊天输入。
+- 这轮最值得记住的点：
+  1. **action card 不只是按钮集合，而是对象工作流在前台的投影。**
+  2. 更适合首版保留的动作通常只有 3-5 个：rerun、publish、archive、export、generate summary/tag/risk card。
+  3. 每个动作都应尽量自带明确输入、状态、输出和失败反馈，而不是变成神秘的“AI 帮我做点什么”。
+- 对当前主线的启发：
+  - A / B 的对象页操作区继续应坚持窄动作、强上下文、结果可写回对象。
+
+### 210) share page：再次确认 public share page 最稳的做法是 object page 的 public projection
+- 可确认信号：前几轮关于 Papermark、Cap、Documenso 以及分享页/frontstage 的结论已经足够一致：public page 最强的时候，不是重做另一套页面，而是同一对象的公开投影。
+- 这轮最值得记住的点：
+  1. **分享页与私有对象页最好共享同一对象 identity、同一内容骨架、同一版本语义。**
+  2. public page 保留 summary、status snapshot、key cards、evidence excerpt、CTA；去掉私有 controls、内部活动流、敏感 metadata。
+  3. 这样 public page 才能同时承担传播、SEO、品牌、回流，而不会和私有对象页割裂。
+- 对当前主线的启发：
+  - A 最适合直接采用“private object page + public share projection”双层；
+  - B 也可以在示例批次 / 公开案例层采用类似结构。
+
+## 新增横向结论（基于这轮补样）
+
+### FU. 当前主线的 UI/IA 骨架现在可以进一步压成 5 个正式层
+1. **dashboard/home**：summary + attention queue + recent stream
+2. **list/library**：scan-first 对象索引 + 生命周期字段
+3. **object page**：summary-first、status rail、key cards、detail-on-demand、action cards
+4. **recent stream**：对象变化与任务变化的回访入口
+5. **public projection**：对象页的公开投影，而不是独立内容孤岛
+
+### FV. 当前对象型产品最值得统一设计的，不只是组件，而是 4 套 UI 语言
+1. **状态语言**：processing / failed / review_required / published / archived
+2. **动作语言**：rerun / publish / archive / export / compare / generate
+3. **证据语言**：source / quote / screenshot / artifact / warning / trace summary
+4. **回访语言**：recently changed / needs attention / shared / failed / awaiting review
+- 这 4 套语言统一后，产品的一致性与可信感会明显提升。
+
+### FW. 对当前主线来说，dashboard 的正确首版角色已进一步固定：导航页，不是价值主战场
+- 真正值钱的仍是强对象页；
+- dashboard 只负责把用户带到正确对象、正确状态与正确动作。
 - 这不是“后端细节”，而是产品可信度本身。
 
 
@@ -2552,3 +3459,867 @@
   2. **再锁任务/workflow 与失败态**
   3. **再做对象页上的可信显示**
   4. **最后再补更重的多 agent / 广义 AI 工作台**
+
+
+## 2026-03-20 第五十五轮有边界补充学习（生产环境工程能力补样：issue 入口 / uptime / logs / traces / fault tolerance）
+
+> 这轮继续保持有边界，不做无边界扩抓；Brave 搜索 key 仍缺失，所以改为定向读取少量高价值公开 README 信号。
+> 重点看了 6 个更贴近“网站 / SaaS MVP 真上线后怎么发现问题、缩短故障闭环、避免局部故障扩散”的项目：`Sentry`、`Upptime`、`Loki`、`OpenTelemetry Collector`、`Resilience4j`、`Jaeger`。
+> 目标不是搭一套完整 observability 平台，而是继续压缩：对轻量网站 / SaaS 首版来说，哪些工程护栏最值钱，哪些层该尽早做成正式约束。
+
+### 170) Sentry：再次确认错误问题必须先 issue 化，日志/trace/回放都应围绕“问题对象”组织
+- Repo：https://github.com/getsentry/sentry
+- 可确认信号：README 直接把 debugging platform、issues、traces、logs、insights、replays、uptime 放在同一叙事里。
+- 这轮最值得记住的点：
+  1. **错误监控真正值钱的时候，不是攒一堆 event，而是先把问题 issue 化。** 小团队最怕被噪音淹没；先看问题对象，再展开日志/trace，会比先看散乱事件稳很多。
+  2. **logs / traces / replay / uptime 被拉进同一产品叙事，本质上是在强调“上下文不散”。** 出问题时最好围绕一次错误、一次慢请求、一次发布后异常来查，而不是在不同工具页跳来跳去。
+  3. **对对象型 SaaS，错误对象天然可以挂 report_id / batch_id / task_id / deploy_version。** 这样对象页、任务页、错误页能串起来。
+  4. 对 MVP 来说，Sentry 给的最强提醒不是“上更多模块”，而是：**先保证有一个明确的错误入口页。**
+- 对当前主线的启发：
+  - A / B 的对象页与任务页，后续都应尽量能挂到具体 issue / error fingerprint / trace-id；
+  - 首版最值得先上的不是大 dashboard，而是能把未处理错误聚到一起的入口。
+- 不值得直接照抄的点：
+  - 不要一开始就追求 replay、profiling、全量 APM 全家桶；MVP 先抓 errors + release + trace 关联就够值钱。
+
+### 171) Upptime：再次确认 uptime probe + status page 是极轻量且高回报的第一层生产护栏
+- Repo：https://github.com/upptime/upptime
+- 可确认信号：README 明确强调 GitHub Actions + Issues + Pages、scheduled checks、response time、incident history、status page、git-native audit trail。
+- 这轮最值得记住的点：
+  1. **可用性探针依旧是最值得最先补的一层。** 站挂了、核心 API 死了、证书过期了，这些问题发现得越晚，后面所有日志/trace 都没有意义。
+  2. **issue 化 incident + status page + git audit trail** 这个组合很适合小团队：简单、便宜、可追溯，而且天然带外部沟通面。
+  3. **response time 也值得跟 uptime 一起看**，但依然应该围绕少量关键路径，不是把所有接口都当一级监控对象。
+  4. 它再次强化一个判断：**MVP 监控对象更该围绕用户成功路径，而不是服务模块名。**
+- 对当前主线的启发：
+  - A 更该先监控：首页、输入提交、报告生成入口、分享页打开；
+  - B 更该先监控：上传入口、批次处理入口、结果页打开；
+  - status page / incident 记录层很适合后续作为可信度加分项。
+- 不值得直接照抄的点：
+  - 不要把 status page 当成首版产品的一部分硬做出来；先把探针与报警跑起来更重要。
+
+### 172) Loki：再次确认结构化日志的关键不是“收集更多”，而是字段稳定、成本可控、便于按标签回查
+- Repo：https://github.com/grafana/loki
+- 可确认信号：README 明确强调 label-based log aggregation、成本低、好维护、与 Prometheus 标签体系衔接、不做全文索引。
+- 这轮最值得记住的点：
+  1. **日志系统首版最值钱的不是全文搜索很炫，而是字段统一、成本低、按标签能快速回查。**
+  2. Loki 的“只重点索引 metadata / labels”很值得借：对 MVP 来说，`request_id`、`trace_id`、`task_id`、`report_id`、`batch_id`、`deploy_version` 这些字段常常比全文检索能力更重要。
+  3. **日志与指标共用标签心智很强。** 一旦错误率、慢请求和日志能按同一组对象字段回查，排障效率会高很多。
+  4. 对小团队来说，“便宜、简单、够用”往往比“日志平台功能最全”更实际。
+- 对当前主线的启发：
+  - A / B 的日志字段应尽早固定：`request_id`、`trace_id`、`task_id`、`report_id`/`batch_id`、`status`、`duration_ms`、`deploy_version`、`upstream`、`error_type`；
+  - 结构化日志应围绕对象/任务打点，而不是只输出字符串错误。
+- 不值得直接照抄的点：
+  - 首版不必搭很重的自建日志平台；学它的字段与标签思路就够了。
+
+### 173) OpenTelemetry Collector：再次确认 telemetry 入口层的核心价值是统一接入与可替换，而不是一开始做复杂管道工程
+- Repo：https://github.com/open-telemetry/opentelemetry-collector
+- 可确认信号：README 明确强调 vendor-agnostic、receive/process/export、统一 traces/metrics/logs、single codebase、reasonable defaults、internal telemetry。
+- 这轮最值得记住的点：
+  1. **统一 telemetry 入口层的价值在于把 SDK / backend 解耦。** 这样以后换 Jaeger、Tempo、SigNoz、商业后端都不至于重埋点。
+  2. **traces / metrics / logs 用统一入口接入，是长期上限更高的做法；**但极小规模首版未必要先上很复杂的 collector pipeline。
+  3. internal telemetry 这个信号也很重要：**观测系统自己也要可观测。**
+  4. 它再次强化一个判断：**标准化接入比后端选型更值得早做。**
+- 对当前主线的启发：
+  - 如果 A / B 后续真做 tracing/metrics/logs，优先保证埋点字段和 trace context 统一，晚点再决定最终后端；
+  - request-id / trace-id 贯通，从第一天就比“先选哪家平台”更重要。
+- 不值得直接照抄的点：
+  - 首版不必为了“架构更标准”而上过重 collector 拓扑；极轻规模时直连一个后端也可以，只要埋点标准别乱。
+
+### 174) Resilience4j：再次确认 timeout / retry / circuit breaker / bulkhead 应被看作正式产品护栏，而不是底层小技巧
+- Repo：https://github.com/resilience4j/resilience4j
+- 可确认信号：README 明确把 Circuit Breaker、Retry、Bulkhead、TimeLimiter、fallback 作为可组合 decorators 暴露出来。
+- 这轮最值得记住的点：
+  1. **故障护栏应被理解成组合件，而不是全或无。** timeout、retry、circuit breaker、bulkhead、fallback 完全可以按关键路径分别启用。
+  2. **有限重试 + 明确 fallback** 比“无限等待 + 最终超时”强太多；尤其对第三方 API、模型调用、抓取服务。
+  3. **隔离（bulkhead）和限时（time limiter）非常适合异步型 SaaS。** 局部卡死不该拖垮整条任务队列。
+  4. 它再次提醒：**很多线上事故不是功能错了，而是局部故障被放大。**
+- 对当前主线的启发：
+  - A 的抓取、模型调用、网页解析、分享页依赖都应有 timeout / retry budget / fallback；
+  - B 的上传解析、批处理、模型聚类、导出生成也应有 size limit / timeout / partial fallback；
+  - 对象页上最好能区分 `failed`、`partial`、`degraded`，别全都塞进一个失败态。
+- 不值得直接照抄的点：
+  - 首版不必全量搬运复杂容错库；关键是先形成“有限等待、有限重试、可降级、可隔离”的工程习惯。
+
+### 175) Jaeger：再次确认 trace 的 MVP 价值是关键路径耗时拆解，而不是追求分布式追踪平台感
+- Repo：https://github.com/jaegertracing/jaeger
+- 可确认信号：README 明确强调 distributed tracing、collector/query/UI、OTLP 接入、all-in-one quick start。
+- 这轮最值得记住的点：
+  1. **trace 首版最值钱的地方，是把一次慢请求/慢任务拆成几个关键阶段。** 例如抓取慢、模型慢、DB 慢、第三方 API 慢，到底慢在哪。
+  2. collector → storage → query/UI 这条链提醒：**trace 是为“看关键路径”服务的，不是为“大盘完整”服务的。**
+  3. Jaeger 现已很好支持 OTLP，这也再次强化：**优先跟 OpenTelemetry 接轨，比早期押注某一款 UI 更重要。**
+  4. 对 AI / 异步任务型产品，trace 应优先打在用户会感知的长路径上，而不是每个函数都追。
+- 对当前主线的启发：
+  - A 更值得优先 trace：输入提交 → 抓取 → 解析 → 结构化生成 → 保存 → 页面可见；
+  - B 更值得优先 trace：上传 → 解析 → 分组/主题 → 建议生成 → 保存 → 页面可见；
+  - trace 应该能从任务页 / 错误页点进去，而不是单独躺在工程后台里。
+- 不值得直接照抄的点：
+  - 不要一开始为了“全链路 tracing”给所有操作打超细粒度 span；先抓 3-5 条关键路径就够。
+
+### 176) 这轮新增横向结论
+- **对网站 / SaaS MVP，生产工程首版最该追求的不是平台完整，而是短故障闭环：**
+  1. 先确认还活着：`uptime probe / status page / release watch`
+  2. 再确认找得到：`issue 化错误入口 / 结构化日志 / request-id / trace-id`
+  3. 再确认不会扩散：`timeout / retry budget / bulkhead / circuit breaker / fallback / cache policy`
+  4. 再确认能恢复：`任务状态机 / 失败原因 / 重跑入口 / 灰度 / 回滚 / 坏样本回收`
+- **日志、指标、trace 不该分散成三套独立心智，而应尽量围绕问题对象组织：** 错误 issue、慢请求、失败任务、发布后异常。
+- **对异步 / AI / 抓取型 SaaS，任务系统能力与生产工程能力几乎是一回事。** 没有状态流转、失败原因、timeout、重跑，观测层会很快失真。
+- **更适合 MVP 的告警不是“能报很多”，而是“报了之后真有人会处理”。** 首版通常只值得上：站点不可用、核心 API 错误率突增、任务失败率/超时率上升、队列积压、发布后异常波动。
+
+### 177) 这轮对当前主线的新增强化
+- **方向 A** 现在更完整地像：
+  `repo / URL → 输入接入状态 → 报告对象 schema → 分析任务对象 → 强报告页 → recent 流 → ownership / 导出 / archive → 最小观测层（issue/log/trace）→ 最小护栏层（timeout/retry/degrade/rerun/rollback）`
+- **方向 B** 现在更完整地像：
+  `CSV / 文本 → 导入接入状态 → 批次对象 schema → 批次处理任务对象 → 强批次页 → recent 流 → ownership / 导出 / archive → 最小观测层（issue/log/trace）→ 最小护栏层（timeout/size limit/partial fallback/rerun/rollback）`
+- 现在更现实的工程顺序是：
+  1. 选成熟 starter / 配件底座
+  2. 锁对象 schema 与任务状态机
+  3. 先补 uptime + issue 入口 + 结构化日志
+  4. 再补关键路径 trace
+  5. 再补 timeout / retry / degrade / rollback 等最小护栏
+  6. 最后再考虑更大的 observability/dashboard 叙事
+
+## 2026-03-20 第五十四轮有边界补充学习（全栈 Web / SaaS 实现骨架补样：实时对象层 / schema-first 数据层 / 类型安全路由 / Postgres 配件层）
+
+> 这轮继续保持有边界，不扩抓很多项目；Brave 搜索 key 仍缺失，所以只定向读取少量高价值公开 README 信号。
+> 重点看了 4 个更贴近“全栈 Web / SaaS 首版到底该如何搭对象层与数据/API 边界”的项目：`Convex`、`Drizzle ORM`、`TanStack Start`、`Supabase`。
+> 目标不是找新方向，而是继续压缩：对象与任务之外，实时数据层、schema-first DB 层、类型安全路由/全栈边界、Postgres 平台化配件层，哪些值得借，哪些不该抢走首版重心。
+
+### 166) Convex：再次确认“对象层 + 服务函数 + 实时更新”可以被压成统一开发面，但前提仍是对象模型清楚
+- Repo：https://github.com/get-convex/convex-backend
+- 可确认信号：README 直接强调 reactive database、strong consistency、pure TypeScript、database + server functions + client libraries，以及 live-updating apps。
+- 这轮最值得记住的点：
+  1. **实时更新真正值钱的时候，不是“页面会动”，而是对象状态、任务状态、recent 流天然保持同步。**
+  2. **database + server functions + client libraries 被压进同一套心智**，很适合对象型产品，因为对象页、recent 流、任务状态本来就需要强耦合。
+  3. strong consistency 这个信号很重要：对 report / batch / run 这类对象产品，状态流转若不稳，前台可信层会很快变假。
+  4. 但 Convex 也再次提醒：**实时层是加速器，不是对象模型替代品**；没有清楚 schema / state / ownership，实时只会更乱。
+- 对当前主线的启发：
+  - A / B 两条主线都很适合借“recent 流 + 对象状态实时更新”这类体验；
+  - 任务状态、失败原因、重跑后结果变化，若能实时反映，会明显增强对象页产品感。
+- 不值得直接照抄的点：
+  - 首版不必因为想要“更现代”就强上整套 reactive stack；更该先确保对象 schema 和任务状态机已经稳定。
+
+### 167) Drizzle ORM：再次确认 schema-first SQL 层非常适合对象型轻 SaaS，尤其适合把对象/任务字段压实
+- Repo：https://github.com/drizzle-team/drizzle-orm
+- 可确认信号：README 明确强调 lightweight、TypeScript-first、SQL schema declaration、serverless-ready、Drizzle Kit、Drizzle Studio、支持 PostgreSQL / MySQL / SQLite。
+- 这轮最值得记住的点：
+  1. **Drizzle 的价值不在“又一个 ORM”，而在它把 schema-first、typed SQL、migration、studio 压成一条非常适合小团队的路径。**
+  2. 对当前主线这类对象产品来说，report / batch / run / evidence / audit_event 这类表一旦定清楚，很多对象页与后台层会自然稳很多。
+  3. serverless-ready 继续很重要：说明对象层与 DB 层不必强依赖传统重后端结构，也能保持类型边界清楚。
+  4. 它再次强化一个判断：**真正该投入精力的是对象字段与状态字段本身，而不是 ORM 花样。**
+- 对当前主线的启发：
+  - A / B 若走传统 Postgres 路线，Drizzle 这类 schema-first 数据层非常贴当前主线；
+  - 特别适合先把 report / batch / run 的字段、关系、索引、状态机写扎实，再长对象页与 recent 流。
+- 不值得直接照抄的点：
+  - 首版不该为了“typed SQL 很爽”就过早做很深的数据抽象；学它的 schema-first 边界感就够了。
+
+### 168) TanStack Start：再次确认“类型安全路由 + server functions + full-stack 边界清楚”很适合强对象页产品
+- Repo：https://github.com/TanStack/router
+- 可确认信号：README 明确强调 TanStack Router 的 end-to-end type safety、schema-driven search params、loaders、caching/prefetching，以及 TanStack Start 的 SSR、streaming、server functions、full-stack features。
+- 这轮最值得记住的点：
+  1. **对象型产品很适合把 route、params、search、loader、server function 全部做成类型安全边界**，因为 report_id / batch_id / filters / tabs / actions 都很重。
+  2. schema-driven search params 这个信号很实用：recent 流、library、筛选/排序如果一开始就无约束，后面很容易烂。
+  3. server functions 再次强化：很多首版产品未必要先分成很重的 API 层和前端层，关键是对象层边界要清楚。
+  4. 它也提醒：**强对象页产品的前端工程重点，不只是 UI，而是 route/data/action 边界是否长期可维护。**
+- 对当前主线的启发：
+  - A / B 这类“强对象页 + recent/list + filters + actions”产品，非常适合借这种 route/data/action 一体化思路；
+  - 对象页动作、recent 流过滤条件、分享页/public-private route 边界，都应尽早类型化。
+- 不值得直接照抄的点：
+  - 首版不必因为想追类型安全就引入过多前端基础设施；重点仍是对象路由与动作边界清楚。
+
+### 169) Supabase：再次确认 Postgres 平台化配件层已经非常成熟，首版不该再把 auth/API/storage 当主战场
+- Repo：https://github.com/supabase/supabase
+- 可确认信号：README 明确强调 hosted Postgres、Auth、REST/GraphQL、Realtime、Functions、Storage、Dashboard、自托管与本地开发路径。
+- 这轮最值得记住的点：
+  1. **Supabase 再次把“Postgres + auth + API + realtime + storage + dashboard”钉成成熟配件层。**
+  2. 对当前主线来说，这意味着很多首版真正不该自研的层已经越来越清楚：身份、基础 API、文件存储、简单实时、基础 dashboard。
+  3. 它也再次提醒：**真正值钱的不是 Firebase-like 配件齐全，而是你有没有把 report / batch / run 这些核心对象定义好。**
+  4. Realtime 信号很有用，但更适合作为对象层稳定后的增强；不应喧宾夺主。
+- 对当前主线的启发：
+  - A / B 都完全可以站在 Supabase 这类 Postgres 平台化配件层上快速起步；
+  - 更该自己定义的仍是对象 schema、任务状态机、对象页结构、recent 流与 trust layer。
+- 不值得直接照抄的点：
+  - 不要因为 Supabase 什么都有，就让首版滑向“平台能力展览”；对象层才是产品。
+
+## 新增横向结论（基于这轮补样）
+
+### EQ. 现在更清楚的一条实现分层：对象层 / 任务层之外，还可以再拆出“数据边界层”和“路由动作边界层”
+1. **对象层**：report / batch / run 等 schema 与生命周期
+2. **任务层**：状态、失败原因、重跑、版本、flow control
+3. **数据边界层**：typed schema、migration、relations、query/update 约束
+4. **路由动作边界层**：route params、filters、server functions、public/private route、object actions
+- 这进一步说明：首版真正值钱的不是“选哪个全家桶”，而是这些边界是否清楚。
+
+### ER. Postgres 平台化配件层越来越成熟，首版更不该再把 auth / API / storage / dashboard 当主战场
+- Supabase 再次证明：
+  - auth、REST/GraphQL、storage、dashboard、realtime 都更像成熟底座；
+  - 真正该自研的仍然是对象 schema、任务层、对象页、recent 流、trust layer。
+
+### ES. 实时层最适合服务“对象状态”和“任务状态”，而不是先服务炫技 UI
+- Convex / Supabase 的共同信号都在说明：
+  - 更值得实时更新的是 recent 流、任务状态、失败转成功、审核/发布状态；
+  - 而不是一上来追求大而全 live app 感。
+
+### ET. schema-first 继续被强化，但现在更该把“数据库 schema”与“URL/route schema”一起看
+- Drizzle 强化了 DB schema；
+- TanStack Start 强化了 route/search/action schema；
+- 两者放一起，刚好说明对象型轻 SaaS 最稳的路径是：**对象字段、任务字段、URL 参数、页面动作全部尽量类型化。**
+
+## 2026-03-20 第五十七轮有边界补充学习（替代型 frontstage / 分享对象页 / trust + analytics 再验证）
+
+> 这轮继续保持有边界，不扩抓很多项目；Brave 搜索 key 仍缺失，因此没有无边界搜索，而是只定向读取少量公开 README。
+> 重点看了 4 个更贴近“前台对象页 / 分享页 / trust layer / 结果传播”的项目：`Cap`、`Documenso`、`Formbricks`、`Papermark`。
+> 目标不是找新大方向，而是继续验证：哪些产品表达最适合轻 SaaS 首版，哪些对象页结构、分享层、可信层、analytics 层最值得借。
+
+### 177) Cap：再次确认“替代型定位 + 分享对象 + 轻分析”是非常强的前台产品组合
+- Repo：https://github.com/CapSoftware/Cap
+- 可确认信号：README 直接写明 *The open source Loom alternative*；强调 record / edit / share videos in seconds，且 monorepo 里同时有 desktop + web，并明确接 Tinybird 做 viewer telemetry/dashboard。
+- 这轮最值得记住的点：
+  1. **替代型定位依旧极强**：直接说替代 Loom，比泛泛说“视频协作工具”更有穿透力。
+  2. **核心对象很清楚**：视频对象天然带分享、查看、后续分析、历史管理，而不是先靠大工作台成立。
+  3. **analytics 是分享对象后的自然增强层**：不是先做大而全分析平台，而是围绕单个分享对象补 viewer telemetry。
+  4. desktop + web 的结构也再次提醒：前台入口可以多样，但真正该沉淀的是共享对象层与分享结果层。
+- 对当前主线的启发：
+  - A / B 的对象页也应继续更像“可分享对象”，而不是后台结果页；
+  - analytics/访问数据若要做，优先围绕单个公开对象页，而不是先做大盘。
+- 不值得直接照抄的点：
+  - 桌面录制、跨端分发、媒体处理链路都太重；更值得借的是替代型表达 + 分享对象 + 轻分析这套骨架。
+
+### 178) Documenso：再次确认“信任基础设施”可以通过强对象页与 ownership/self-host 叙事前台化
+- Repo：https://github.com/documenso/documenso
+- 可确认信号：README 直接写 *The Open Source DocuSign Alternative*，强调 trust、self-host、review how it works under the hood；技术栈里也很明确地给出 React Router、Prisma、Tailwind、react-email、tRPC、Stripe。
+- 这轮最值得记住的点：
+  1. **trust 不只是安全/后台能力，而是首页主叙事**；用户买单的是“敢不敢把重要对象放进来”。
+  2. **对象之所以成立，是因为生命周期与法律/流程边界清楚**；这再次强化“强对象 + 生命周期”比“多功能”更重要。
+  3. self-host / openness / auditability 很适合转译成对象型轻 SaaS 的 ownership layer：导出、可恢复、公开/私有、活动记录。
+  4. DocuSign alternative 这种表达再次说明：**替代谁 + 为什么更可信/更可控** 是很强的外部心智。
+- 对当前主线的启发：
+  - A / B 应继续提高 ownership / export / archive / visibility / activity 的权重；
+  - 对外表达更适合讲“替代手工研究笔记/手工反馈整理”，少讲抽象 AI。
+- 不值得直接照抄的点：
+  - 签署流程、法律合规、复杂协作链路太重；首版只借 trust layer 的前台化表达。
+
+### 179) Formbricks：再次确认“采集平台很大，但真正更适合当前主线借的是模板 + 分析层 + 多入口对象化”
+- Repo：https://github.com/formbricks/formbricks
+- 可确认信号：README 直接写 *The Open Source Qualtrics Alternative*；强调 in-app / website / link / email surveys、templates、targeting、analysis capabilities、privacy-first。
+- 这轮最值得记住的点：
+  1. **模板层继续被验证是正式 adoption 层**；用户往往不是从空白创建开始。
+  2. **多入口采集最终应汇到同一对象/分析层**；真正有价值的是 survey/batch/insight 对象，而不是入口本身。
+  3. privacy-first / self-host 继续强化：对象长期价值和 trust layer 常常绑在一起。
+  4. 也再次说明当前主线 B 不该去重做完整采集平台，而应继续守住 insight layer / batch object page。
+- 对当前主线的启发：
+  - B 更应坚持“已有数据导入 + 模板/示例批次 + 批次对象页”；
+  - A 也可借“模板/示例对象优先”的 onboarding 思路。
+- 不值得直接照抄的点：
+  - survey builder、targeting、组织协作、全渠道采集都太容易把首版拖重。
+
+### 180) Papermark：再次确认“公开分享页本身就是产品 frontstage，analytics/branding/permission 是自然二阶段” 
+- Repo：https://github.com/mfts/papermark
+- 可确认信号：README 直接写 *The open-source DocSend alternative*；功能非常直白：shareable links、custom branding、analytics、custom domains、自托管。
+- 这轮最值得记住的点：
+  1. **分享页不是附属输出，而是 frontstage 主对象页。**
+  2. branding / analytics / custom domain / permission 这类增强，都建立在“分享对象页已经成立”这个前提上。
+  3. 对轻 SaaS 来说，公开对象页完全可以同时承担传播、转化、回访和后续收费边界。
+  4. Papermark 再次强化：对象页与分享页最好不要是两套割裂结构，而应是一份对象的 public projection。
+- 对当前主线的启发：
+  - A 最适合直接借这套骨架：私有报告对象页 + 公共报告投影页；
+  - B 也可借：公开示例批次 / 私有批次后台 的双层结构。
+- 不值得直接照抄的点：
+  - 不要一开始就把品牌化、域名、细权限、细粒度访问分析做太满；首版先把对象页与公开投影做强。
+
+## 新增横向结论（基于这轮补样）
+
+### EZ. 当前最强的外部表达，依旧是“替代谁 + 产出什么对象 + 为什么更可信/更顺手”
+- Cap：替代 Loom
+- Documenso：替代 DocuSign
+- Formbricks：替代 Qualtrics
+- Papermark：替代 DocSend
+- 这再次说明：A / B 的对外表达更该像“替代手工研究笔记 / 手工反馈整理”，而不是抽象 AI 平台。
+
+### FA. 分享页真正强的时候，不是输出页，而是对象页的 frontstage 投影
+- 它同时承担：传播、SEO、品牌、回流、轻分析；
+- 对当前主线来说，公开对象页应继续被视为正式产品层。
+
+### FB. trust layer 与 ownership layer 的权重应继续上调
+- self-host / export / visibility / activity / archive / recovery 反复被验证不是附属，而是对象型产品长期成立的重要原因。
+
+### FC. 更现实的二阶段增强顺序仍然是：先分享对象页，再轻 analytics / branding / notification，不要先做重工作台
+- 这轮 4 个项目共同说明：前台对象页做强后，轻分析、提醒、品牌化都能自然长出来；
+- 首版若太早做重 workspace，反而容易空心化。
+
+## 2026-03-20 第五十三轮有边界补充学习（UI 系统 / 信息架构 / 对象页骨架收敛）
+
+> 这轮不继续扩公开项目样本；Brave 搜索 key 仍缺失，因此不硬搜更多新仓库，而是基于前面已足够稳定的高质量产品信号，专门从 UI 系统 / 信息架构 / 结果页骨架角度做一次收敛。
+> 重点不是“哪个网站更好看”，而是把真正适合当前主线产品的界面模式压成可执行约束：dashboard、对象页、列表页、详情页、状态流、操作卡片、分享页、recent 流到底该怎么组织。
+
+### 165) 最值得先做强的不是 dashboard，而是 single object page
+- 这轮最值得记住的点：
+  1. **很多 SaaS 看起来靠 dashboard 留存，实际真正承载判断与动作的是对象页。**
+  2. 首版若对象页不强，dashboard 往往只会沦为空心总览；相反，只要对象页足够强，dashboard 完全可以后置或极简化。
+  3. 当前主线 A / B / C 更适合先把 report / batch / result 设计成 first-class object page，再让首页/列表页只是这些对象的入口。
+- 对当前主线的启发：
+  - 首页更该像入口与 recent feed；
+  - 真正该花 UI 精力的是对象页信息密度、状态表达、动作区与分享层。
+
+### 166) 对象页最稳的 IA 骨架：header summary → status rail → key cards → evidence / detail → actions → recent activity
+- 这轮最值得记住的点：
+  1. **对象页首屏应先回答 5 个问题**：这是什么对象、现在是什么状态、值不值得看、哪里有风险、下一步做什么。
+  2. 更稳的对象页层次通常是：
+     - `Header summary`：标题、来源、owner、updated_at、visibility；
+     - `Status rail`：pending/running/failed/review/published + progress + warnings；
+     - `Key cards`：核心结论/关键指标/主要主题；
+     - `Evidence / detail blocks`：来源摘要、引用、截图、结构字段；
+     - `Action cards`：重跑、发布、补标签、生成分享页、导出；
+     - `Recent activity`：最近运行、评论、状态变化、分享记录。
+  3. 这比把所有内容塞成长文或把一堆 tab 平铺出来更适合结果对象产品。
+- 对当前主线的启发：
+  - 报告页、批次页、结果页都应共享这一基本骨架；
+  - tab 可以有，但不该替代首屏的状态与动作可见性。
+
+### 167) 列表页 / library 首版更适合做“对象列表 + 少量状态字段”，不是重型工作台
+- 这轮最值得记住的点：
+  1. **早期列表页最重要的不是视图多，而是对象能被快速扫描、比较、再次打开。**
+  2. 首版列表页最值得稳定显示的字段通常只有：title、source、status、updated_at、owner/tag、latest_run_state、share_state。
+  3. filter/sort 也应围绕对象生命周期来做：recent、failed、review_required、published、archived，而不是先上复杂 BI 式分组。
+- 对当前主线的启发：
+  - recent list / library 首版应优先像“可操作对象索引”而不是“全能工作台”；
+  - 大量复杂视图可以后置。
+
+### 168) recent stream 比 dashboard 总览更适合对象型轻 SaaS 首版
+- 这轮最值得记住的点：
+  1. **很多早期产品最有价值的不是聚合 KPI，而是最近发生了什么：新对象、失败任务、待审核、最近分享、状态变化。**
+  2. recent stream 同时兼顾后台入口、回访理由和任务可信层，比空心 dashboard 更容易成立。
+  3. recent stream 还能天然长出 digest / notification / reminder，而不需要先搭大而全分析层。
+- 对当前主线的启发：
+  - A / B 的 backstage 首版应继续优先 recent stream；
+  - dashboard 只需少量 summary cards 即可，不必先做重图表总览。
+
+### 169) 状态流应成为正式 UI 层，而不是后台实现细节
+- 这轮最值得记住的点：
+  1. **对象页必须显式表达状态流转**：input received → processing → ready → review_required → published / failed / archived。
+  2. 用户真正需要的不是“系统正在忙”，而是：现在在哪一步、失败了吗、能不能救、下一步是什么。
+  3. 更稳的状态表达方式通常是：顶部状态条 + 最近 run 卡片 + 可点击的失败原因 / warning。
+- 对当前主线的启发：
+  - 状态 UI 不该藏在 admin 或 logs 里；
+  - report / batch 页都应把 run state 作为对象页正式部分。
+
+### 170) action cards 比全局聊天框更适合当前主线 AI / 操作增强
+- 这轮最值得记住的点：
+  1. **对象型产品里的 AI 或自动化动作，更适合做成上下文明确的 action cards**，而不是悬空聊天框。
+  2. 高价值动作通常很少：补摘要、建议标签、生成分享页、重跑失败项、导出、发布、比较版本。
+  3. action cards 的优势是：输入上下文天然明确、结果可写回对象、状态可见、失败可重试。
+- 对当前主线的启发：
+  - A / B 的 AI 层继续应围绕 action cards，而不是首页 chat；
+  - 动作区最好就在对象页主内容附近，而不是深埋在 dropdown 里。
+
+### 171) 分享页不是 marketing 附属页，而是对象页的 frontstage 投影
+- 这轮最值得记住的点：
+  1. **分享页最强的时候，不是从头另做一页，而是从对象页抽出最值得传播的那层：摘要、关键卡片、证据片段、品牌化 header。**
+  2. 分享页应与对象页共享对象 identity、版本、发布时间、公开/私有边界，而不是两套完全脱节的内容结构。
+  3. 公开分享页天然适合承担增长、SEO、外部回访入口；私有对象页则承接编辑、重跑、审核、活动流。
+- 对当前主线的启发：
+  - 报告页与批次页都应尽早按“私有对象页 + 公共分享投影”双层结构思考。
+
+### 172) dashboard 的更优首版角色：导航页 / summary page，而不是价值主战场
+- 这轮最值得记住的点：
+  1. **dashboard 首版更适合作为对象入口、状态汇总、最近流容器，而不是复杂分析大盘。**
+  2. 更稳的 dashboard 首版结构通常是：少量 KPI summary + recent activity + attention queue（failed / review / needs action）+ quick create。
+  3. 一旦 dashboard 承载太多图表和模块，首版很容易失去对象中心。
+- 对当前主线的启发：
+  - 首页 / dashboard 继续应弱化“展示感”，强化“导航与处理入口感”。
+
+## 新增横向结论（基于这轮收敛）
+
+### EP. 当前主线最值得固定的一套 UI/IA 骨架已经更清楚
+1. **Dashboard / home**：少量 summary + attention queue + recent stream
+2. **Object page**：header summary + status rail + key cards + evidence/detail + action cards + recent activity
+3. **List / library page**：对象索引 + 生命周期字段 + 少量筛选
+4. **Share page**：对象页的 frontstage 投影，而不是独立内容孤岛
+- 这套骨架适用于 report、batch、vertical result object 三条主线。
+
+### EQ. 对象型产品的 UI 信任感主要来自 4 层同时可见
+1. **状态可见**：当前状态、进度、失败原因、warning
+2. **证据可见**：来源、引用、截图、结构字段
+3. **动作可见**：重跑、发布、导出、比较、补全、提醒
+4. **活动可见**：最近运行、最近修改、最近分享、最近评论
+- 缺哪一层，结果页都会更像一次性输出，而不是产品对象。
+
+### ER. current MVP UI 顺序应继续收敛为“对象页优先，dashboard 退后，recent 流前置”
+- 更现实的做法不是先做漂亮首页与大总览，而是：
+  - 先做强对象页；
+  - 再做 recent stream / 极简列表；
+  - 最后才逐步长出更大的 dashboard、library 视图与 automation。
+
+## 2026-03-20 第六十二轮有边界补充学习（AI 应用工程实现再补样：schema engineering / IO guardrails / eval-first / gateway governance）
+
+> 这轮继续保持有边界，不无边界扩样本；Brave 搜索 key 仍缺失，因此改为定向读取少量 GitHub README / 仓库元信息。
+> 重点补了 4 个更贴近“AI 应用工程实现真正缺的那几层”的项目：`BoundaryML/BAML`、`guardrails-ai/guardrails`、`braintrustdata/braintrust-sdk`、`Portkey-AI/gateway`。
+> 目标不是找新方向，而是继续压缩：结构化输出之后，什么叫 schema engineering；guardrails 到底该放在哪；eval / tracing 为什么该尽早产品化；以及 gateway / fallback / governance 为什么更像正式运行层，而不是高级配件。
+
+### 206) BAML：再次确认 prompt engineering 更稳的升级方向是 schema engineering，而不是 prompt 越写越长
+- Repo：https://github.com/BoundaryML/baml
+- 可确认信号：README 明确写出 *BAML is a simple prompting language for building reliable AI workflows and agents*，并直接把核心原则定义成 **LLM Prompts are functions**；强调 *schema engineering*、typesafety、streaming、retries、wide model support、即使模型不原生支持 tool-calling 也可做可靠调用。
+- 这轮最值得记住的点：
+  1. **BAML 最强的提醒，不是又一门 DSL，而是“prompt 应该被看成 typed function”。** 这很适合对象型产品：动作输入、动作输出、工具结果、对象字段，都更像函数签名而不是自由文本。
+  2. **schema engineering 这个说法很对。** 真正提高稳定性的往往不是继续磨 prompt 文案，而是先把返回类型、字段边界、可空性、枚举和工具返回结构讲清楚。
+  3. **streaming + typed partials 很有产品感**：对象页里的 AI 动作完全可以边生成边验证边渲染，而不是等一段长文本全部吐完。
+  4. **即使没有原生 tool-calling API 也强调可靠调用**，这再次说明：工具调用的产品可靠性不该完全绑死在单一 provider 能力上。
+- 对当前主线的启发：
+  - A / B 的对象页动作卡可继续收敛为“typed function + typed return”的心智；
+  - 更该先写的是动作签名与对象字段映射，而不是继续堆长 prompt。
+- 不值得直接照抄的点：
+  - 首版不必引入新 DSL；真正值得借的是 **prompt → typed action** 这条工程思路。
+
+### 207) Guardrails：再次确认 input/output guards 应被视为正式质量闸门，而不是 prompt 附件
+- Repo：https://github.com/guardrails-ai/guardrails
+- 可确认信号：README 明确把产品能力压成两件事：
+  1. **Input/Output Guards**：检测、量化、缓解风险；
+  2. **Generate structured data from LLMs**。
+  还明确给出 Guardrails Hub / validators / benchmark index 等信号。
+- 这轮最值得记住的点：
+  1. **guardrails 不该只理解成“安全过滤器”**；它更像对象写库前、对象发布前、动作执行前的正式质量闸门。
+  2. **input guard 和 output guard 应分开建模。** 输入是否完整、是否越界、是否有风险，和输出是否合 schema、是否包含风险内容、是否达到发布标准，是两套边界。
+  3. **validators/hub 的心智很适合对象页产品**：与其做一个模糊“quality score”，不如把风险/规则拆成可组合的验证器。
+  4. **benchmarking  guardrails latency/perf** 也很有启发：质量闸门不只是“要不要加”，还要考虑成本、延迟与命中率。
+- 对当前主线的启发：
+  - A / B 的 trust layer 现在更适合明确成：`input validation → structured output validation → publish/review guardrails` 三段式；
+  - 对象页上的 `ready / published` 状态不该只由 LLM 成功返回决定。
+- 不值得直接照抄的点：
+  - 首版不必接很大 validator 市场；更值得先做 3-5 个真正影响发布质量的 guard。
+
+### 208) Braintrust：再次确认 eval-first / experiment-first 应更早进入 AI 产品工程，而不是最后才补
+- Repo：https://github.com/braintrustdata/braintrust-sdk
+- 可确认信号：README 直接把 Braintrust 定义成 *platform for evaluating and shipping AI products*；JS SDK 明确强调 `logging, tracing, evals`，quickstart 直接从 `Eval(...)` 和 scorer 开始；并给出 OpenAI Agents、LangChain、OTel、Temporal 等集成。
+- 这轮最值得记住的点：
+  1. **Braintrust 最强的信号是：eval 不是研究附属，而是交付 AI 产品的起点之一。** README 不是先讲聊天，不是先讲 agent，而是先讲 eval。
+  2. **scorer / expected / task** 这套结构很适合轻量回归验证：代表样本、坏样本、版本对比，都可以先从非常小的样本集起步。
+  3. **与 OpenAI Agents / Temporal / OTel 的集成** 很说明问题：eval、trace、workflow 不应是三套分离系统，而该围绕同一 run/object 闭环。
+  4. **shipping AI products** 这个表述也很准：能上线的不只是“能跑”，还要“能比较、能回退、能持续改进”。
+- 对当前主线的启发：
+  - A / B 的二阶段增强应继续优先：代表样本、坏样本、版本比较、动作级 scorer，而不是先做更万能 agent 平台；
+  - `object_id / run_id / prompt_version / scorer result` 更值得进入数据模型。
+- 不值得直接照抄的点：
+  - 首版不必上完整实验平台；值得先借的是 **eval-first 心智**。
+
+### 209) Portkey：再次确认 AI gateway 的真正价值是 fallback / retries / guardrails / governance，而不只是模型聚合
+- Repo：https://github.com/Portkey-AI/gateway
+- 可确认信号：README 明确写 *AI Gateway*、*Route to 250+ LLMs with 1 fast & friendly API*，仓库描述直接写 *integrated guardrails*；输出中也可确认 request flow 里直接强调 **retries and guardrails**，并延伸到 org management / governance / security / MCP Gateway。
+- 这轮最值得记住的点：
+  1. **gateway 真正值钱的时候，不是“支持很多模型”，而是把 fallback、retry、cache、guardrails、observability、org governance 压成统一运行层。**
+  2. **guardrails 与 gateway 放在一起很有启发**：风险控制、路由和回退，很多时候本来就该发生在调用边界层，而不是散在业务代码里。
+  3. **MCP Gateway** 的方向再次提醒：工具接入也越来越像“受控组织级资源”，不是 prompt 想调什么就调什么。
+  4. **governance/security/org management** 说明一旦 AI 进入正式业务流，模型接入层会迅速从“SDK 配置”升级为“治理层”。
+- 对当前主线的启发：
+  - A / B 若以后需要多模型 / 多工具 / 多环境，更适合尽早把 `provider / fallback / guardrails / retries / trace metadata` 视为统一 gateway 运行层；
+  - 业务对象层不该直接泄漏 provider 细节。
+- 不值得直接照抄的点：
+  - 首版不必先上企业级 gateway；更值得先固定的是 **主模型 + 备用模型 + 明确 fallback / retry / metadata**。
+
+## 新增横向结论（基于这轮补样）
+
+### FX. “结构化输出”这件事现在更准确地应升级理解为：schema engineering
+- BAML 这轮把这件事钉得更牢：
+  - 不是只要 JSON；
+  - 而是要把 prompt/action 写成 typed function，明确输入、输出、枚举、可选字段、工具返回值和对象字段映射。
+- 这比泛泛讲“structured output”更可执行。
+
+### FY. 质量闸门应继续正式拆成三层：input guards / output validation / publish guards
+1. **input guards**：输入是否完整、合法、低风险
+2. **output validation**：结构、字段、类型、required 是否通过
+3. **publish/review guards**：是否达到对象页 ready/published 的业务标准
+- Guardrails 这轮再次说明：这三层不该混在一起。
+
+### FZ. eval-first 应进入轻 SaaS / 工具站的正式工程心智
+- Braintrust 这轮再次强化：
+  - eval 不只是研究团队的事；
+  - 代表样本、坏样本、版本比较、scorer，完全可以先做极小版本。
+- 当前主线的 AI 层若没有最小评估闭环，后面很容易反复回归坏例子。
+
+### GA. gateway 层的更优理解是“运行治理层”，不是“模型聚合层”
+- Portkey 这轮再次说明 gateway 真正值钱的是：
+  - fallback
+  - retries
+  - guardrails
+  - observability
+  - governance / security
+  - MCP/tool control
+- 也就是说，模型接入层一旦进入真实业务，就更像 runtime governance layer。
+
+### GB. 当前主线更适合继续压成 5 层
+1. **对象层**：report / batch / result schema
+2. **动作层**：schema-first AI action cards
+3. **运行层**：run / retry / rerun / fallback / trace metadata
+4. **质量层**：input guards / output validation / publish guards
+5. **验证层**：代表样本 / 坏样本 / version compare / eval scorers
+- 这轮最重要的变化不是换方向，而是把“可信 AI 对象页”背后的质量与运行模型压得更清楚了。
+
+## 2026-03-20 第六十三轮有边界补充学习（全栈 Web / SaaS 首版实现骨架再校准：starter / auth / schema / durable tasks / flow control）
+
+> 这轮继续保持有边界；Brave 搜索 key 仍缺失，所以不做无边界搜索，改为定向读取少量高价值公开 README / 仓库入口信号。
+> 重点补了 7 个更贴近“全栈 Web / SaaS 首版到底该复用什么、自己该定义什么”的项目/信号：Next.js Postgres/Auth starter、Better Auth、Payload、Trigger.dev、Inngest、Open SaaS、Keystone。
+> 目标不是找新方向，而是继续压缩：starter 已经替我们覆盖到哪、auth 的更合理边界是什么、schema-first 为什么仍是对象产品起点、以及任务层为什么必须连同 flow control 一起被当成正式产品层。
+
+### 210) Next.js Postgres/Auth starter：再次确认基础 auth + db 起步层已经高度模板化，但这还只是配件底座
+- Repo：https://github.com/vercel/nextjs-postgres-auth-starter
+- 可确认信号：README 明确写出 Next.js、NextAuth.js、Drizzle、Neon Postgres、简单 email/password 登录、可一键部署到 Vercel。
+- 这轮最值得记住的点：
+  1. **auth + db 起步层已经非常模板化**，说明首版没必要自己手拧最基础的登录、session、ORM、数据库落地。
+  2. 但它也提醒：这类 starter 解决的是“能起步”，不是“产品已经成立”；真正的产品性依旧不在 auth starter 本身。
+  3. 对当前主线来说，它更像最薄的一层配件底座，适合极简启动，但不该分散对象层和任务层的注意力。
+- 对当前主线的启发：
+  - A / B 可以继续把最基础的 auth / db 起步层完全视为可复用底座；
+  - 真正该自己做的仍是对象 schema、任务状态、对象页、recent 流。
+- 不值得直接照抄的点：
+  - 不要把“已经有 starter”误当成“已经有 SaaS 产品骨架”；它更多只是最薄底盘。
+
+### 211) Better Auth：再次确认 auth 的首版边界仍应是 identity / session / ownership，而不是复杂 authz story
+- Repo：https://github.com/better-auth/better-auth
+- 可确认信号：README 明确强调 framework-agnostic、plugin ecosystem、2FA、multi-tenant support、advanced authorization、minimal code。
+- 这轮最值得记住的点：
+  1. **auth 最值得借的是 identity / session / ownership 这层，不是把复杂身份系统本身当主战场。**
+  2. plugin ecosystem 再次说明：2FA、多租户、复杂 authz 更适合作为按需接入层，而不是 MVP 默认负担。
+  3. framework-agnostic 继续很重要：身份层最好别被页面结构写死，未来 Web / API / App 才更好共用。
+- 对当前主线的启发：
+  - A / B 首版继续只先锁：登录、session、ownership、public/private、基本 account boundary；
+  - org / SSO / advanced authz 继续后置。
+- 不值得直接照抄的点：
+  - 一上来就做完整 enterprise 身份与授权故事，会明显拖慢对象型产品首版。
+
+### 212) Payload：再次确认 schema-first + Next.js native + extensible admin 仍是对象型轻 SaaS 的稳起点
+- Repo：https://github.com/payloadcms/payload
+- 可确认信号：README 明确强调可直接装进 `/app`、automatic types、auth out of the box、versions/drafts、granular access control、hooks、extensible admin、no vendor lock-in。
+- 这轮最值得记住的点：
+  1. **对象 schema 一旦稳，API、admin、access、versions、hooks 会自然稳很多。**
+  2. **Next.js native** 继续重要：对象页、后台、公开页、API 可以留在同一套系统里，而不是拆成多块。
+  3. versions / drafts / access control 再次提醒：对象可信层不是附属页，而是对象产品天然会长出来的一层。
+- 对当前主线的启发：
+  - A / B 继续应按“对象 schema → 对象页 → 极简后台 / recent 流”推进；
+  - 先锁字段、状态、可见性、版本/归档边界，比先加页面更重要。
+- 不值得直接照抄的点：
+  - 首版不必背重 CMS、复杂 block builder 或很深内容建模系统。
+
+### 213) Trigger.dev：再次确认任务层不只是后台执行层，而是 AI / 异步型 SaaS 的正式前台可信层
+- Repo：https://github.com/triggerdotdev/trigger.dev
+- 可确认信号：README 明确强调 long-running tasks、durability、retries、queues、observability、human-in-the-loop、structured inputs/outputs、run metadata、checkpointing、versioning、alerts。
+- 这轮最值得记住的点：
+  1. **任务层不该再被理解成“后台工程细节”；它本身就是产品可信层。**
+  2. run metadata / tags / realtime / alerts 很值得借：任务对象不只是完成与否，而应能被对象页直接消费和解释。
+  3. checkpointing / versioning / replay 继续强化：可恢复、可重跑、可比较，比一次成功更重要。
+- 对当前主线的启发：
+  - A / B 的任务对象都应继续做成 first-class layer：状态、失败原因、trace-id、版本、重跑；
+  - 对象页最好直接显示任务状态，而不是把它藏到后台。
+- 不值得直接照抄的点：
+  - 不要为了“像平台”而提前做完整工作流控制台或超大运行时自由度。
+
+### 214) Inngest：再次确认任务层若没有 flow control，就还不算真正稳
+- Repo：https://github.com/inngest/inngest
+- 可确认信号：README 明确强调 durable functions、triggers、flow control、concurrency / throttling / debouncing / rate limiting / prioritization、steps、state store、history / replay、dashboard UI。
+- 这轮最值得记住的点：
+  1. **很多长流程不需要“万能 agent”，更需要 event trigger + explicit steps + flow control。**
+  2. concurrency、throttling、debouncing、rate limiting 被放到一等公民位置，说明很多线上问题本质上是流控问题，不是模型问题。
+  3. step output / state store 继续强化：中间产物更该被持久化，而不是持续把 prompt 拉长。
+- 对当前主线的启发：
+  - A / B 的任务层不只要有状态，还应尽早预留 timeout、并发、限流、重放这些 flow control 能力；
+  - 批次对象尤其应尽早考虑 failed subset rerun / low-confidence subset rerun。
+- 不值得直接照抄的点：
+  - 不必一开始引入完整事件平台感；学它的 step/state/flow-control 思路就够了。
+
+### 215) Open SaaS：再次确认 starter 的最大价值是把 auth / billing / uploads / email / jobs / deploy 一次压平
+- Repo：https://github.com/wasp-lang/open-saas
+- 可确认信号：README 明确写出 Stripe/Lemon Squeezy、analytics、OpenAI function calling、S3 uploads、email、Playwright、jobs、one-command deploy、full-stack auth。
+- 这轮最值得记住的点：
+  1. **starter 真正值钱的是把通用 plumbing 一次压平**，而不是替你定义产品。 
+  2. jobs / cron / deploy path 这类共性复杂度很容易被低估，一旦现成，才更能把时间留给对象层。
+  3. AI-ready 的真正含义也不是“首页挂 AI”，而是让 AI 更快嵌进已有 SaaS 主流程。
+- 对当前主线的启发：
+  - A / B 首版应继续避免自己拧 auth、billing、uploads、email、jobs、deploy；
+  - 更该把精力放在对象 schema、任务层、对象页、recent 流、ownership 边界。
+- 不值得直接照抄的点：
+  - 不要因为模板配件很全，就把首版做成配件展览。
+
+### 216) Keystone：再次确认“描述 schema → 自动长出 GraphQL API 与管理 UI”这条路依旧很适合对象产品
+- Repo：https://github.com/keystonejs/keystone
+- 可确认信号：README 明确强调 describe your schema、GraphQL API、Management UI、no boilerplate or bootstrapping、ship the code that matters。
+- 这轮最值得记住的点：
+  1. **schema-first 的价值非常朴素：先把对象讲清楚，很多 API / admin / data tooling 就自然出现。**
+  2. “ship the code that matters” 这个判断很对：对象型 SaaS 首版最不该浪费时间在重复 bootstrapping 上。
+  3. 也再次说明：对象 schema 越清楚，管理界面越容易不是空壳。
+- 对当前主线的启发：
+  - A / B 当前继续最该优先锁定的仍是报告对象 / 批次对象 schema；
+  - GraphQL 或具体框架可以后选，但 schema-first 思维应继续保留。
+- 不值得直接照抄的点：
+  - 首版没必要因为有管理 UI 就把产品重心拉去 CMS / 数据后台。
+
+## 新增横向结论（基于这轮补样）
+
+### GC. 现代全栈 SaaS 首版现在更清楚地像“三层主结构 + 一层流控补强”
+1. **对象层**：schema、对象页、recent 流、ownership / export / archive
+2. **任务层**：状态、失败原因、run metadata、version、rerun
+3. **配件层**：auth、billing、teams/basic RBAC、logging、testing、monitoring、deploy scaffolding
+4. **flow control 补强层**：timeout、并发、限流、去抖、rate limit、subset replay
+- 真正该自己做差异化的，仍主要是 **对象层 + 任务层**；flow control 是让任务层真正稳定的关键补强。
+
+### GD. starter 越成熟，越说明“别再把时间烧在通用 plumbing 上”
+- Next.js starter、Open SaaS、Better Auth 一起再次说明：
+  - auth / billing / uploads / email / jobs / deploy / teams / monitoring 都越来越像成熟底座；
+  - 首版真正该定义的，仍然是对象 schema、任务状态机、对象页结构、recent 流与 trust layer。
+
+### GE. auth 的更优首版理解仍然是 ownership / boundary，而不是 enterprise auth story
+- 对 A / B 来说，首版最重要的是：
+  - 谁创建对象；
+  - 谁能看；
+  - 是否公开；
+  - 是否私有；
+  - 是否能最小分享。
+- 复杂 org / SSO / advanced authz 继续主要属于二阶段复杂度。
+
+### GF. 任务层真正站稳，必须把 flow control 一起看进去
+- Trigger.dev 强调 durability / retries / metadata / versioning；
+- Inngest 强调 triggers / steps / concurrency / throttling / replay；
+- 两者一起说明：**AI / 异步型 SaaS 的稳定性，不只靠任务状态，还靠并发、节流、重放、阶段状态这些正式能力。**
+
+
+## 217) OpenObserve：再次确认“日志 + 指标 + trace + RUM 一体化”对小团队很有吸引力，但 MVP 期最该学的是“少系统、统一入口、低运维负担”
+- Repo：https://github.com/openobserve/openobserve
+- 可确认信号：README 明确强调 logs / metrics / traces / RUM / alerts 一体化、OpenTelemetry native、single binary deployment、S3-native、SQL + PromQL、统一 observability 平台。
+- 这轮最值得记住的点：
+  1. **对小团队 / SaaS MVP 来说，少装几套系统本身就是工程收益。**
+  2. unified 不只是“界面放一起”，而是让排障入口统一：先看对象/请求，再顺着日志、trace、指标往下钻。
+  3. single binary / object storage / stateless 这类表达再次说明：轻量部署与低维护成本，本身就是产品竞争力。
+- 对当前主线的启发：
+  - A / B 若以后长出运行可信层，优先考虑“统一诊断入口”而不是拆很多后台；
+  - 对象页应能挂最近失败、最近耗时、最近 warning、最近 run，而不是把线上信息埋进多个子系统。
+- 不值得直接照抄的点：
+  - 首版不要追求“大一统观测平台”；学它的 **低运维、一入口、统一查询心智** 就够了。
+
+### 218) OpenTelemetry Collector：再次确认“采集层应 vendor-agnostic + 可路由 + 可处理”，别把埋点出口写死
+- Repo：https://github.com/open-telemetry/opentelemetry-collector
+- 可确认信号：README 明确强调 vendor-agnostic、receive/process/export telemetry data、single codebase、支持 traces/metrics/logs、agent 或 collector 双形态。
+- 这轮最值得记住的点：
+  1. **采集层最值钱的不是炫技，而是把埋点、处理、转发从业务代码里解耦出来。**
+  2. 统一 collector 的意义在于：未来换后端、加采样、加脱敏、加路由，不必回业务代码里大改。
+  3. “处理后再导出”这件事很关键：说明 observability 不是只收数据，还要在入口层做过滤、采样、变换、降噪。
+- 对当前主线的启发：
+  - 若做网站 / SaaS MVP，最小观测栈也应尽量站在开放标准上，别一开始把 trace/log 绑定死到某家私有 SDK 语义；
+  - 可以把“ingest → process → export”理解成运行可信层的基础管道心智。
+- 不值得直接照抄的点：
+  - 首版没必要上超复杂 collector pipeline；保留 **标准化出口 + 后续可迁移** 即可。
+
+### 219) Prometheus：再次确认 metrics 的首要价值不是“图多”，而是把 SLI / 阈值 / 容量趋势正式化
+- Repo：https://github.com/prometheus/prometheus
+- 可确认信号：项目定位仍是 monitoring system and time series database；与 alerting / exporters / query 生态紧耦合。
+- 这轮最值得记住的点：
+  1. **metrics 最有价值的时候，是把“感觉变慢/变差”变成正式时序信号。**
+  2. 对 MVP 来说，先盯少量核心指标比铺满大盘更有用：请求量、错误率、P95/P99 延迟、队列深度、任务耗时、缓存命中率。
+  3. 时序指标特别适合容量规划、回归比较、发布前后对照；它不是日志的替代，而是趋势/阈值层。
+- 对当前主线的启发：
+  - A / B 若进入真实运行，应优先定义“少量核心服务指标”而不是先做华丽 dashboard；
+  - 对象页消费 run 状态，系统页消费少量黄金指标，这个边界更健康。
+- 不值得直接照抄的点：
+  - 不要首版就陷入 exporter 大全和监控大盘收藏癖。
+
+### 220) Alertmanager：再次确认告警系统的核心不是“能发通知”，而是分组、抑制、路由、降噪
+- Repo：https://github.com/prometheus/alertmanager
+- 可确认信号：README/示例配置明确强调 route、group_by、group_wait、group_interval、repeat_interval、receiver、matchers。
+- 这轮最值得记住的点：
+  1. **告警噪音本质上是分组/路由/节流问题，不只是阈值问题。**
+  2. group_wait / group_interval / repeat_interval 这种设计非常值得借：很多提醒不该立刻、重复、逐条发。
+  3. 接收人和标签路由是一等公民，说明“谁该收到什么”本身就是系统设计的一部分。
+- 对当前主线的启发：
+  - 对象驱动通知层应从一开始就考虑 quiet period、合并、重发间隔，而不是任务一失败就狂发；
+  - 批次失败、接口异常、状态变化更适合做 **digest / grouped notifications**。
+- 不值得直接照抄的点：
+  - 首版不用上完整 on-call 体系；学它的 **降噪与分组** 就够值钱。
+
+### 221) Loki：再次确认日志系统首版最重要的是“低成本集中化 + label 边界清楚”，别先追全文索引大而全
+- Repo：https://github.com/grafana/loki
+- 可确认信号：项目长期定位围绕 logs aggregation、与 Prometheus / Grafana 类似标签心智、低成本集中日志。
+- 这轮最值得记住的点：
+  1. **日志首版最重要的收益是集中化与可关联，不是极致搜索语法。**
+  2. label / stream 心智很重要：环境、服务、任务类型、对象 id、trace id 这些维度一旦稳定，排障效率会高很多。
+  3. 日志成本很容易失控，因此从第一天就该控制字段、级别、保留期与高基数标签。
+- 对当前主线的启发：
+  - A / B 若做最小线上栈，应优先保证结构化日志 + request_id / trace_id / object_id 关联；
+  - 线上排障很多时候只需要能按对象/任务把相关日志拉出来，而不是先做超强全文检索平台。
+- 不值得直接照抄的点：
+  - 不要把所有业务字段都打成 labels，特别是高基数 user input。
+
+### 222) Tempo：再次确认 trace 的真正价值是“把一次请求/任务跨服务串起来”，非常适合异步工作流型产品
+- Repo：https://github.com/grafana/tempo
+- 可确认信号：项目定位围绕 distributed tracing，常与 OTel / Grafana 体系联动。
+- 这轮最值得记住的点：
+  1. **trace 最值钱的时候，不是看酷炫火焰图，而是定位一条失败/超时请求到底卡在哪一步。**
+  2. 对异步任务、批处理、AI workflow、回调链路来说，trace 比单点日志更能解释“为什么慢 / 为什么断”。
+  3. trace-id 一旦进入日志、错误、对象页，很多排障动作会明显收敛。
+- 对当前主线的启发：
+  - A / B 的 run / step_run 模型天然适合和 trace 心智对齐；
+  - 若只做最小 trace，也该确保关键入口、外部调用、队列任务能被串起来。
+- 不值得直接照抄的点：
+  - 首版别为全量 tracing 付太高成本；优先覆盖关键路径与失败路径。
+
+### 223) Sentry：再次确认“错误 + 性能 + trace + replay/上下文”统一到 issue 入口，非常适合应用层排障
+- Repo：https://github.com/getsentry/sentry
+- 可确认信号：README 明确强调 detect / trace / fix issues，展示 issue details、traces、logs、uptime、replays、insights。
+- 这轮最值得记住的点：
+  1. **应用层线上排障的最高频入口，往往不是大盘，而是 issue。**
+  2. error grouping、上下文、版本、release、trace 关联，能显著提升“从报警到定位”的速度。
+  3. 对网站 / SaaS MVP 来说，Sentry 这类入口很适合先解决 JS/后端异常与慢事务问题，投入回报比很高。
+- 对当前主线的启发：
+  - “最小观测层”里，应用错误追踪很可能比自建复杂 observability 更早值回票价；
+  - 对象页若能挂 latest error / latest regression / release version，会很有 trust layer 味道。
+- 不值得直接照抄的点：
+  - 不要一上来追求所有 replay / profiling / APM 全开；先抓最关键错误路径。
+
+### 224) Nightingale：再次确认“监控”和“告警编排/分发”可以拆开理解；很多团队痛点其实在告警侧
+- Repo：https://github.com/ccfos/nightingale
+- 可确认信号：README 明确强调 open-source alerting expert、连接现有数据源、alerting engine、mute/subscription/notification rules、event pipelines。
+- 这轮最值得记住的点：
+  1. **很多系统已经有数据，但仍然不好用，问题出在告警引擎、分发规则、静默、订阅、事件处理。**
+  2. 这说明 observability 不是“采完就完”，后面的规则、通知、噪音控制同样重要。
+  3. event pipeline 心智值得借：告警在发送前，常常需要补元数据、重写标签、重分类。
+- 对当前主线的启发：
+  - 对象驱动通知层不该只是简单 webhook；应预留规则处理、静默、订阅与再分发心智；
+  - “谁订阅什么状态变化”可以逐步成为产品层能力，而不是纯基础设施细节。
+- 不值得直接照抄的点：
+  - 首版不用做完整告警中心；学它的 **规则/静默/订阅** 三件套已很够用。
+
+### 225) Upptime：再次确认“外部探测 + 状态页 + Git/Issue 审计轨迹”是超轻量可落地模式
+- Repo：https://github.com/upptime/upptime
+- 可确认信号：README 明确强调 GitHub Actions、Issues、Pages 驱动的 uptime monitor and status page，支持历史响应时间、incident history、git-native audit trail。
+- 这轮最值得记住的点：
+  1. **状态页和 uptime 检测可以极轻量，不一定一开始就上重监控栈。**
+  2. incident history / response time history / 审计轨迹 这些“公开对象”很适合 MVP 阶段建立用户信任。
+  3. 外部探测和内部指标是两回事；前者更贴近用户真实感知。
+- 对当前主线的启发：
+  - 面向网站 / SaaS MVP，最小线上可信层完全可以先有：外部健康检查 + 公开/半公开状态页 + 事故记录；
+  - 很多时候这比内部花哨图表更直接提升信任。
+- 不值得直接照抄的点：
+  - 不要把 GitHub Actions 式实现当唯一正解；学它的 **轻量 status/incident 公开层** 即可。
+
+## 新增横向结论（基于这轮补样）
+
+### GG. 网站 / SaaS MVP 的最小生产工程栈，首版更适合拆成“5 件套”
+1. **结构化日志**：统一字段，至少带 timestamp、level、service、env、request_id、trace_id、object_id / run_id
+2. **少量黄金指标**：QPS、错误率、P95/P99、任务耗时、队列深度、缓存命中率、第三方 API 失败率
+3. **关键路径 trace**：入口请求、外部 API、异步任务、关键 step 串起来
+4. **降噪告警**：分组、静默、重复间隔、升级规则，而不是“出事就逐条狂发”
+5. **外部健康检查 + 状态页**：从用户视角看站点是否可用，顺带沉淀事故历史
+- 这五件套已经能覆盖大多数 MVP 期的线上稳定性问题；远比一开始堆大而全平台更现实。
+
+### GH. 轻量工程化的关键，不是“把 logs/metrics/traces 都买齐”，而是统一关联键
+- 真正让排障速度提升的，往往不是工具数量，而是：
+  - `request_id`
+  - `trace_id`
+  - `user_id`（谨慎）
+  - `object_id / batch_id / report_id`
+  - `run_id / step_run_id`
+- 一旦这些键稳定，日志、错误、trace、对象页、告警就能串成一条线。
+
+### GI. 首版 observability 的正确目标不是“大盘完美”，而是“30 分钟内能定位线上问题”
+- 对网站 / SaaS MVP，更现实的问题是：
+  - 某接口变慢了，能不能看出是 DB、第三方 API、缓存还是队列卡住；
+  - 某批次失败了，能不能拉出对应 run / step / logs / trace；
+  - 某次发布后报错升高了，能不能按 release/version 对照。
+- 也就是说，先服务排障，再谈全景经营驾驶舱。
+
+### GJ. 线上稳定性的很多问题，本质上是流控与退化策略问题
+- 仅靠监控看见问题不够；更关键的是在应用层预留：
+  - timeout
+  - retry budget
+  - circuit breaker / 熔断
+  - fallback / degrade
+  - concurrency limit
+  - cache / stale cache
+  - idempotency
+- 这说明 observability 与 reliability 不该分家：看到问题后，系统本身要能扛一扛。
+
+### GK. 对网站 / SaaS MVP 最现实的“轻量可观测性升级顺序”
+1. 先补结构化日志
+2. 再补错误追踪（如应用异常聚合）
+3. 再补少量黄金指标
+4. 再补关键路径 trace
+5. 再补外部探测 + 状态页
+6. 最后再扩更重的告警编排 / 长期容量分析 / 多租户观测平台
+- 原因：这是 **投入最低、上线收益最高、对小团队最友好** 的顺序。
+
+
+## 2026-03-20 第六十六轮有边界补充学习（跨端 / 混合应用再补样：Hotwire Native / Turbo iOS / SwiftUI-WKWebView）
+
+> 这轮继续避免无边界扩抓；Brave 搜索 key 仍缺失，因此直接定向读取少量公开 README / 仓库元信息。
+> 样本只收 5 个：`hotwired/hotwire-native-ios`、`hotwired/turbo-ios`、`kylehickinson/SwiftUI-WebView`，并与本轮顺手复核的 `Capacitor`、`WKWebViewJavascriptBridge` 对照。
+> 目标不是再讨论“要不要做 App”，而是继续压缩：**Web SaaS 与 iOS companion 之间，什么适合 Hotwire/单 WebView 导航心智，什么适合原生命令桥接，什么适合 SwiftUI 摘要层。**
+
+### 226) Hotwire Native iOS：再次确认“单 WebView + 原生导航壳”非常适合 Web object center 型产品
+- Repo：https://github.com/hotwired/hotwire-native-ios
+- 可确认信号：README 明确强调 **single WKWebView instance across multiple view controllers**、native navigation UI、wrapping an existing Hotwire web app、iOS shell。
+- 这轮最值得记住的点：
+  1. **单 WKWebView + 多原生控制器** 这个心智很适合对象型产品：复杂详情继续走 Web，但导航、返回、切换、容器感交给原生拿住。
+  2. 它再次说明：真正值钱的不是“把网页装进 App”，而是让 **同一个 Web 对象中心** 通过原生导航壳看起来更像 App。
+  3. 这条路线特别适合已经有较强 Web SaaS / 对象页 / recent 流的产品，而不适合 UI 还没稳定时过早双端重做。
+  4. 这和之前的结论高度一致：**复杂详情页与高变化流程继续留给 Web，iOS 壳负责导航感、进入感、系统感。**
+- 对当前主线的启发：
+  - A / B 若未来长出 iOS 端，完全可以先按 **Web object center + native shell** 理解，而不是重新发明第二套详情页；
+  - 如果 Web 端对象页已足够强，Hotwire Native 这类路线会比全原生重写现实很多。
+- 不值得直接照抄的点：
+  - 它更偏“已有 Hotwire Web app 的移动延伸”；若当前 Web 主栈并非这一体系，也应借心智而不是硬搬框架。
+
+### 227) Turbo iOS：再次确认 hybrid 真正强在“共享 Web 视图资产 + 按需升级原生视图”
+- Repo：https://github.com/hotwired/turbo-ios
+- 可确认信号：README 明确写出 **single shared web view**、reuse views across iOS/Android/mobile browsers、upgrade to native views as needed；同时明确提示 **新项目应转向 Hotwire Native iOS**。
+- 这轮最值得记住的点：
+  1. **先共享 Web 视图资产，再按需把少数页面升级原生**，依旧是非常现实的跨端迭代顺序。
+  2. README 里“large apps with small teams”这个点很关键：说明 hybrid 路线的真正收益之一就是 **小团队也能先把产品跑起来**。
+  3. 它也进一步证明：跨端共享优先共享的确实不是组件，而是 **已有 Web 页面资产与路由资产**。
+  4. 官方迁移到 Hotwire Native 的信号，本身也说明这条路线在继续朝“统一 Hotwire Native + 更正式能力层”收敛。
+- 对当前主线的启发：
+  - A / B 的中期路线可继续理解为：**先强 Web 对象页 / recent 流，再把极少数高频摘要或入口原生化**；
+  - “摘要原生 + 详情 Web” 这条边界被进一步验证。
+- 不值得直接照抄的点：
+  - Turbo iOS 已进入迁移阶段，更该借的是路线判断，而不是把它当长期新依赖首选。
+
+### 228) SwiftUI-WebView：再次确认 SwiftUI 层更适合承接“摘要容器 + WebView 状态投影”，而不是重造全部详情逻辑
+- Repo：https://github.com/kylehickinson/SwiftUI-WebView
+- 可确认信号：README 明确把 `WKWebView` 当作可持有状态的对象模型，提供 `WebViewStore` 暴露 `title`、`canGoBack`、`canGoForward` 等状态给 SwiftUI。
+- 这轮最值得记住的点：
+  1. **把 WKWebView 当成状态对象，而不是一次性视图组件**，这个心智很适合混合对象产品。
+  2. SwiftUI 层最自然的职责，不一定是重做复杂详情，而更像是：标题、返回、前进、状态、顶部动作、外层导航容器。
+  3. 这进一步强化：**原生摘要层 / 导航层 / quick-action 层 + Web 详情层** 是非常稳的混合切法。
+  4. 如果未来做 iOS companion，SwiftUI 很适合承接 recent list、对象摘要卡、通知入口、外层导航，再嵌一个受控 WebView 进入详情。
+- 对当前主线的启发：
+  - A / B 的 iOS 端不该优先重造复杂对象详情，而应优先做 **对象摘要、状态、快速动作、受控 WebView 容器**；
+  - 这也让“对象 inbox / reminder / quick-action app” 的中期形态更具体了。
+- 不值得直接照抄的点：
+  - 这类库解决的是 SwiftUI-WKWebView 集成边界，不会自动解决 bridge 协议、鉴权、deep link 与任务状态设计。
+
+### 229) 与 Capacitor / WKWebViewJavascriptBridge 对照后的新增压缩：混合产品真正该先定的是 3 套边界
+- 本轮对照信号：
+  - `Capacitor` 强在 **native projects as source artifacts + plugin layer**；
+  - `WKWebViewJavascriptBridge` 强在 **少量稳定 command 的消息桥接**；
+  - `Hotwire Native / Turbo iOS` 强在 **single/shared WKWebView + native navigation shell**；
+  - `SwiftUI-WebView` 强在 **用 SwiftUI 承接外层状态与容器感**。
+- 这轮最值得记住的点：
+  1. 混合产品更清楚的设计顺序是：**先定 Web object center，再定 native shell，再定 bridge/plugin commands**。
+  2. 很多产品不需要“React Native 全量重做”或“全量 Capacitor 包壳”这种二元选择；更现实的是混合多种边界：
+     - Web 负责对象详情与高变化页；
+     - SwiftUI 负责摘要与外层壳；
+     - Bridge/Plugin 负责系统能力与对象级命令。
+  3. 这也进一步强化：跨端共享真正值钱的是 **对象协议、路由/deep link、任务状态、bridge command**，而不是 UI 一致性本身。
+
+## 新增横向结论（基于这轮补样）
+
+### GL. 对当前主线来说，hybrid 路线现在更清楚地像“三层组合”，而不是单一路线选择
+1. **Web object center**：复杂对象详情、管理页、high-change flows
+2. **Native shell / summary layer**：navigation、recent list、对象摘要、quick actions
+3. **Bridge / plugin command layer**：share、pick file、push token、open object、track event、session refresh
+- 这比简单说“做个 App 壳”更可执行。
+
+### GM. Hotwire/Turbo 进一步验证：如果 Web 对象页已经足够强，移动端首版更该复用“对象页资产”而不是重造
+- 也就是说，当前主线的关键前提继续不是“先写更多 iOS 页面”，而是 **先把 Web 对象页 / recent 流 / 任务可信层做强**。
+
+### GN. SwiftUI 在当前主线中的更优角色，不是重做复杂对象页，而是承接摘要、导航、通知入口与 quick actions
+- 这让“对象 inbox / reminder / quick-action companion” 这个中期形态更具体了。
+
+### GO. 当前最现实的跨端推进顺序可再压成 4 步
+1. 先做强 Web 对象中心
+2. 再统一对象协议 / 路由 / 任务状态
+3. 再补 bridge/plugin commands
+4. 最后才长出 SwiftUI summary shell / iOS companion
+- 这轮最重要的新增不是换方向，而是把“Web 为主、iOS 为入口层”的技术边界压得更具体了。
